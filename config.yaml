@@ -1,0 +1,29 @@
+bobMinimumVersion: "0.25rc2"
+
+# Keep ssh-agent working.
+layersWhitelist: ["SSH_AGENT_PID", "SSH_AUTH_SOCK"]
+
+layers:
+  - name: basement
+    scm: git
+    url: https://github.com/BobBuildTool/basement.git
+    commit: 2192e9fce98f505ad634d3831a8fda481ea2b05d
+    branch: master
+
+  - name: basement-gnu-linux
+    scm: git
+    url: https://github.com/BobBuildTool/basement-gnu-linux.git
+    commit: db1f5fdb2ce187412b55d8e6dc4db68dfece329b
+    branch: master
+
+  - name: ada
+    scm: git
+    url: git@git.codelabs.ch:bob/ada.git
+    branch: main
+    commit: 2babf71bc332c66fa1f43083a80caf4faad8356b
+
+  - name: codelabs
+    scm: git
+    url: git@git.codelabs.ch:bob/codelabs.git
+    branch: main
+    commit: 9a5dcdc3f4e348432d6b86616b725962e6c07bfd

@@ -1,0 +1,52 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: git@git.codelabs.ch:muen/arm64/kernel.git
+  branch: e0b84541c054-bob
+  commit: 1e6326aa76032b8b592bb217c18694d93de8eb48
+
+depends:
+  - muen::common-muschedinfo
+  - muen::muenonarm-policy-files
+  - if: "$(eq,${MUEN_BUILD_MODE:-release},test)"
+    depends:
+      - adacore::aunit-dev
+      - muen::muenonarm-test
+
+buildTools: [mugenspec, mugendts]
+buildVars: [OBJCOPY, RTS, MUEN_BUILD_MODE, MUEN_GDB_SUPPORT]
+buildSetup: |
+  export GPR_RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts
+  export SKP_DIR=$(pwd)/skp
+  export DEBUG_LEVEL=Level_3
+  export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
+  export BUILD_MODE=${MUEN_BUILD_MODE:-release}
+
+buildScript: |
+  rm -rf skp && mkdir -p skp
+  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+
+  GPRBUILD_EXTRA_ARGS=()
+  if [[ ${MUEN_BUILD_MODE:-release} == test ]]; then
+    cp ${BOB_DEP_PATHS[muen::muenonarm-test]}/*.ads skp
+    cp ${BOB_DEP_PATHS[muen::muenonarm-test]}/rts/* skp
+
+    GPRBUILD_EXTRA_ARGS+=("--implicit-with=aunit")
+    GPRBUILD_EXTRA_ARGS+=("-XRTS_CONFIG=${BOB_DEP_PATHS[muen::arm64-rts-aunit]}/usr/include/rts/")
+  fi
+  muenBuild $1/kernel
+
+  pushd install/usr/bin
+  if [[ ${MUEN_BUILD_MODE:-release} == test ]]; then
+    mv kernel_test.elf kernel.elf
+  fi
+
+  ${OBJCOPY} -O binary \
+    --set-section-flags .bss=alloc,load,contents \
+    --set-section-flags .stack=alloc,load,contents \
+    kernel.elf kernel.bin
+  popd
+
+packageScript: |
+  cp $1/install/usr/bin/* .

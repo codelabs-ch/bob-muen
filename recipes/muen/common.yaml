@@ -1,0 +1,33 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/common.git
+  branch: devel-armv8a-8c50d03ff97e-bob
+  commit: bd47a596284f170be45ddb8522a25140c1fbc19e
+
+buildScript: |
+  rsync -a --delete $1/ .
+
+multiPackage:
+  musinfo:
+    buildScript: |
+      muenBuild $1/musinfo/musinfo
+    packageScript: |
+      gprInstallPackageDev
+
+  muschedinfo:
+    buildScript: |
+      muenBuild $1/muschedinfo/muschedinfo
+    packageScript: |
+      gprInstallPackageDev
+
+  libmusinfo:
+    depends:
+      - muen::common-musinfo
+      - muen::common-muschedinfo
+    buildScript: |
+      rm -rf install
+      muenBuild $1/libmusinfo/libmusinfo
+    packageScript: |
+      gprInstallPackageDev

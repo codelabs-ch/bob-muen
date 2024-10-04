@@ -1,0 +1,210 @@
+# Development source linux kernel. When built, this recipe packages the \
+# source of the preferred virtual/kernel provider and makes it available for full kernel \
+# development or external module builds"
+# shamelessly stolen from yocto's kernel-devsrc.bb
+
+packageVars: [ARCH]
+packageScript: |
+  __BUILD_DIR=$1
+  packageKernelDev () {
+     kerneldir=$(pwd)
+
+     # fixup ARCH path.
+     case "$ARCH" in
+        i386|x86_64)
+           ARCH="x86"
+            ;;
+     esac
+
+     # first copy everything
+     (
+        cd ${__BUILD_DIR}/source
+        cp --parents $(find -type f -name "Makefile*" -o -name "Kconfig*") $kerneldir
+        cp --parents $(find -type f -name "Build" -o -name "Build.include") $kerneldir
+     )
+
+     # then drop all but the needed Makefiles/Kconfig files
+     rm -rf $kerneldir/Documentation
+     rm -rf $kerneldir/scripts
+     rm -rf $kerneldir/include
+
+     # now copy in parts from the build that we'll need later
+     (
+        cd ${__BUILD_DIR}
+
+        cp Module.symvers $kerneldir
+        cp System.map* $kerneldir
+        if [ -s Module.markers ]; then
+        i  cp Module.markers $kerneldir
+        fi
+
+        cp .config $kerneldir
+
+        # FIXME: This scripts copy blow up QA, so for now, we require a more
+        # complex 'make scripts' to restore these, versus copying them
+        # here. Left as a reference to indicate that we know the scripts must
+        # be dealt with.
+        cp -a scripts $kerneldir
+
+        # although module.lds can be regenerated on target via 'make modules_prepare'
+        # there are several places where 'makes scripts prepare' is done, and that won't
+        # regenerate the file. So we copy it onto the target as a migration to using
+        # modules_prepare
+        cp -a --parents scripts/module.lds $kerneldir/ 2>/dev/null || :
+
+        if [ -d arch/${ARCH}/scripts ]; then
+           cp -a arch/${ARCH}/scripts $kerneldir/arch/${ARCH}
+        fi
+        if [ -f arch/${ARCH}/*lds ]; then
+           cp -a arch/${ARCH}/*lds $kerneldir/arch/${ARCH}
+        fi
+
+        rm -f $kerneldir/scripts/*.o
+        rm -f $kerneldir/scripts/*/*.o
+
+        if [ "${ARCH}" = "arm64" ]; then
+           if [ -e arch/${ARCH}/kernel/vdso/vdso.lds ]; then
+              cp -a --parents arch/${ARCH}/kernel/vdso/vdso.lds $kerneldir/
+           fi
+        fi
+
+        cp -a --parents arch/*/include/generated $kerneldir
+        cp -a include $kerneldir/include
+        # we don't usually copy generated files, since they can be rebuilt on the target,
+        # but without this file, we get a forced syncconfig run in v5.8+, which prompts and
+        # breaks workflows.
+        cp -a --parents include/generated/autoconf.h $kerneldir/ 2>/dev/null || :
+
+        cp -a tools/objtool/objtool $kerneldir/tools/objtool/  2>/dev/null || :
+     )
+
+     # now grab the chunks from the source tree that we need
+     (
+        cd ${__BUILD_DIR}/source
+
+        cp -a scripts $kerneldir
+
+        # for v6.1+ (otherwise we are missing multiple default targets)
+        cp -a --parents Kbuild $kerneldir/ 2>/dev/null ||:
+
+        # if our build dir had objtool, it will also be rebuilt on target, so
+        # we copy what is required for that build
+        if [ -f ${__BUILD_DIR}/tools/objtool/objtool ]; then
+            # these are a few files associated with objtool, since we'll need to
+            # rebuild it
+            cp -a --parents tools/build/Build.include $kerneldir/
+            cp -a --parents tools/build/Build $kerneldir/
+            cp -a --parents tools/build/fixdep.c $kerneldir/
+            cp -a --parents tools/scripts/utilities.mak $kerneldir/
+
+            # extra files, just in case
+            cp -a --parents tools/objtool/* $kerneldir/
+            cp -a --parents tools/lib/* $kerneldir/
+            cp -a --parents tools/lib/subcmd/* $kerneldir/
+
+            cp -a --parents tools/include/* $kerneldir/
+
+            cp -a --parents $(find tools/arch/${ARCH}/ -type f) $kerneldir
+        fi
+
+        if [ "${ARCH}" = "arm64" ]; then
+            # arch/arm64/include/asm/xen references arch/arm
+            cp -a --parents arch/arm/include/asm/xen $kerneldir/
+            # arch/arm64/include/asm/opcodes.h references arch/arm
+            cp -a --parents arch/arm/include/asm/opcodes.h $kerneldir/
+
+            # v6.1+
+            cp -a --parents arch/arm64/kernel/asm-offsets.c $kerneldir
+
+            cp -a --parents arch/arm64/kernel/vdso/*gettimeofday.* $kerneldir/
+            cp -a --parents arch/arm64/kernel/vdso/sigreturn.S $kerneldir/
+            cp -a --parents arch/arm64/kernel/vdso/note.S $kerneldir/
+            cp -a --parents arch/arm64/kernel/vdso/gen_vdso_offsets.sh $kerneldir/
+
+            cp -a --parents arch/arm64/kernel/module.lds $kerneldir/  2>/dev/null || :
+
+           # 5.13+ needs these tools
+           cp -a --parents arch/arm64/tools/gen-cpucaps.awk $kerneldir/ 2>/dev/null || :
+           cp -a --parents arch/arm64/tools/cpucaps $kerneldir/ 2>/dev/null || :
+
+           # 5.19+
+           cp -a --parents arch/arm64/tools/gen-sysreg.awk $kerneldir/   2>/dev/null || :
+           cp -a --parents arch/arm64/tools/sysreg $kerneldir/   2>/dev/null ||:
+
+           if [ -e $kerneldir/arch/arm64/tools/gen-cpucaps.awk ]; then
+              sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-cpucaps.awk
+           fi
+           if [ -e $kerneldir/arch/arm64/tools/gen-sysreg.awk ]; then
+                sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-sysreg.awk
+           fi
+        fi
+
+        if [ -d arch/${ARCH}/include ]; then
+           cp -a --parents arch/${ARCH}/include $kerneldir/
+        fi
+
+        cp -a include $kerneldir
+
+        cp -a --parents lib/vdso/* $kerneldir/ 2>/dev/null || :
+
+        cp -a --parents tools/include/tools/le_byteshift.h $kerneldir/
+        cp -a --parents tools/include/tools/be_byteshift.h $kerneldir/
+
+        # required for generate missing syscalls prepare phase
+        cp -a --parents $(find arch/x86 -type f -name "syscall_32.tbl") $kerneldir/
+        cp -a --parents $(find arch/arm -type f -name "*.tbl") $kerneldir/ 2>/dev/null || :
+
+        # moved from arch/mips to all arches for v6.1+
+        cp -a --parents kernel/time/timeconst.bc $kerneldir/ 2>/dev/null || :
+        cp -a --parents kernel/bounds.c $kerneldir/ 2>/dev/null || :
+
+        # required to build scripts/selinux/genheaders/genheaders
+        cp -a --parents security/selinux/include/* $kerneldir/
+
+        # copy any localversion files
+        cp -a localversion* $kerneldir/ 2>/dev/null || :
+     )
+
+     # Make sure the Makefile and version.h have a matching timestamp so that
+     # external modules can be built
+     touch -r $kerneldir/Makefile $kerneldir/include/generated/uapi/linux/version.h
+
+     # This fixes a warning that the compilers don't match when building a module
+     # Change: CONFIG_CC_VERSION_TEXT="x86_64-poky-linux-gcc (GCC) 12.2.0" to "gcc (GCC) 12.2.0"
+     #         #define CONFIG_CC_VERSION_TEXT "x86_64-poky-linux-gcc (GCC) 12.2.0" to "gcc (GCC) 12.2.0"
+     sed -i 's/CONFIG_CC_VERSION_TEXT=".*\(gcc.*\)"/CONFIG_CC_VERSION_TEXT="\1"/' "$kerneldir/.config"
+     sed -i 's/#define CONFIG_CC_VERSION_TEXT ".*\(gcc.*\)"/#define CONFIG_CC_VERSION_TEXT "\1"/' $kerneldir/include/generated/autoconf.h
+     sed -i 's/CONFIG_CC_VERSION_TEXT=".*\(gcc.*\)"/CONFIG_CC_VERSION_TEXT="\1"/' $kerneldir/include/config/auto.conf
+
+     # make sure these are at least as old as the .config, or rebuilds will trigger
+     touch -r $kerneldir/.config $kerneldir/include/generated/autoconf.h 2>/dev/null || :
+     touch -r $kerneldir/.config $kerneldir/include/config/auto.conf* 2>/dev/null || :
+
+     if [ -e "$kerneldir/include/config/auto.conf.cmd" ]; then
+         sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
+         sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/include/config/auto.conf.cmd"
+         sed -i 's/ifneq "$(AR)" ".*-linux-.*ar.*$/ifneq "$(AR)" "ar"/' "$kerneldir/include/config/auto.conf.cmd"
+         sed -i 's/ifneq "$(OBJCOPY)" ".*-linux-.*objcopy.*$/ifneq "$(OBJCOPY)" "objcopy"/' "$kerneldir/include/config/auto.conf.cmd"
+         if [ "${ARCH}" = "powerpc" ]; then
+             sed -i 's/ifneq "$(NM)" ".*-linux-.*nm.*$/ifneq "$(NM)" "nm --synthetic"/' "$kerneldir/include/config/auto.conf.cmd"
+         else
+             sed -i 's/ifneq "$(NM)" ".*-linux-.*nm.*$/ifneq "$(NM)" "nm"/' "$kerneldir/include/config/auto.conf.cmd"
+         fi
+         sed -i 's/ifneq "$(HOSTCXX)" ".*$/ifneq "$(HOSTCXX)" "g++"/' "$kerneldir/include/config/auto.conf.cmd"
+         sed -i 's/ifneq "$(HOSTCC)" ".*$/ifneq "$(HOSTCC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
+         sed -i 's/ifneq "$(CC_VERSION_TEXT)".*\(gcc.*\)"/ifneq "$(CC_VERSION_TEXT)" "\1"/' "$kerneldir/include/config/auto.conf.cmd"
+         sed -i 's/ifneq "$(srctree)" ".*"/ifneq "$(srctree)" "."/' "$kerneldir/include/config/auto.conf.cmd"
+         # we don't build against the defconfig, so make sure it isn't the trigger for syncconfig
+         sed -i 's/ifneq "$(KBUILD_DEFCONFIG)".*"\(.*\)"/ifneq "\1" "\1"/' "$kerneldir/include/config/auto.conf.cmd"
+     fi
+
+     # make the scripts python3 safe. We won't be running these, and if they are
+     # left as /usr/bin/python rootfs assembly will fail, since we only have python3
+     # in the RDEPENDS (and the python3 package does not include /usr/bin/python)
+     for ss in $(find $kerneldir/scripts -type f -name '*'); do
+        sed -i 's,/usr/bin/python2,/usr/bin/env python3,' "$ss"
+        sed -i 's,/usr/bin/env python2,/usr/bin/env python3,' "$ss"
+        sed -i 's,/usr/bin/python,/usr/bin/env python3,' "$ss"
+     done
+
+  }

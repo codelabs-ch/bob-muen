@@ -1,0 +1,30 @@
+inherit: [install]
+
+metaEnvironment:
+  PD: "Muen SK events file system Linux kernel module"
+  LICENSE: "GPL-2.0-only [secunet, codelabs]"
+  COPYRIGHT: |
+    Copyright (C) 2020  secunet Security Networks AG
+    Copyright (C) 2020  codelabs GmbH
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/linux/muenevents.git
+  commit: de7dbbecc22d82c69f55adb7f80aa7c660eb8c31
+  branch: master
+
+depends:
+  - name: muen::linux-modules_prepare
+    use: [result, environment]
+
+buildVars: [LINUX_VERSION, CC, AR, CROSS_COMPILE, ARCH]
+buildTools: [make, target-toolchain]
+buildScript: |
+  rsync -a --delete $1/ .
+  mkdir -p install
+  make KERNEL_SOURCE=${BOB_DEP_PATHS['muen::linux-modules_prepare']}
+  make DESTDIR=$(pwd)/install install
+
+packageScript: |
+  mkdir -p lib/modules/${LINUX_VERSION}/extra
+  cp $1/install/lib/modules/extra/* lib/modules/${LINUX_VERSION}/extra

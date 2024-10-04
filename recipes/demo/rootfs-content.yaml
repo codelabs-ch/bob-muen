@@ -1,0 +1,11 @@
+checkoutSCM:
+  scm: git
+  url: git@git.codelabs.ch:rootfs-content.git
+  branch: main
+  commit: 202b262861ef566ff7d116939360899c5ef121a7
+
+buildScript: |
+  rsync -a --delete $1/* .
+
+packageScript: |
+  rsync -a --delete $1/common/* $1/arm64/* .

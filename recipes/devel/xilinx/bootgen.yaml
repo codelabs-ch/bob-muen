@@ -1,0 +1,26 @@
+inherit: [cpackage, make]
+
+checkoutSCM:
+  scm: git
+  url: https://github.com/Xilinx/bootgen.git
+  branch: xlnx_rel_v2024.1
+
+depends:
+  - libs::openssl-dev
+  - libs::zlib-dev
+  - use: []
+    depends:
+      - libs::openssl-tgt
+      - libs::zlib-tgt
+
+buildVars: [CROSS_COMPILE]
+buildScript: |
+  rsync -a --delete $1/ .
+  sed -i "s/-lssl -lcrypto/-lssl -lcrypto -lz -ldl -lpthread/" Makefile
+  CXXFLAGS="${CPPFLAGS}" LIBS="-ldl" makeParallel
+
+packageScript: |
+  cp $1/bootgen .
+
+provideTools:
+  bootgen: "."

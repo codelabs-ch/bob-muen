@@ -1,0 +1,112 @@
+inherit: [make]
+
+metaEnvironment:
+  PKG_VERSION: "6.1.35"
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/linux.git
+  branch: linux-6.1.35-muen-arm
+  commit: 7b211f2c333cdf875c9a79c11e76a13b542f2d9a
+  shallow: 50
+
+depends:
+  - muen::muenonarm-linux-config
+
+buildTools: [bison, flex, host-toolchain]
+buildVars: [ARCH, LINUX_CONFIG, LINUX_CUSTOM_CONFIG]
+buildScript: |
+  # prevent timestamps in configuration
+  export KCONFIG_NOTIMESTAMP=1
+  export KBUILD_BUILD_TIMESTAMP='Mon Dec 28 22:49:40 CET 2015'
+
+  cp -u "${BOB_DEP_PATHS[muen::muenonarm-linux-config]}/kernel.config" .config
+  make -C "$1" O=$PWD olddefconfig
+
+multiPackage:
+  "":
+    inherit: [pkg-config]
+    depends:
+      - tools:
+          target-toolchain: host-compat-toolchain
+        depends:
+          - libs::elfutils-libelf-dev
+          - libs::openssl-dev
+          - name: kernel::kmod
+            use: [tools]
+
+    buildTools: [target-toolchain]
+    buildVars: [CROSS_COMPILE]
+    buildScript: |
+      makeParallel LOCALVERSION=
+
+    multiPackage:
+      image:
+        packageVars: [PKG_VERSION, BASEMENT_DEBUG]
+        packageScript: |
+          mkdir -p boot
+
+          cp "$1/$(make -s -C "$1" image_name)" "boot/vmlinux-$PKG_VERSION"
+          cp "$1/System.map" "boot/System.map-$PKG_VERSION"
+          cp "$1/.config" "boot/config-$PKG_VERSION"
+
+          if [[ -d "$1/arch/arm64/boot/dts" ]] ; then
+              make -C "$1" INSTALL_DTBS_PATH="$PWD/boot/dtbs/$PKG_VERSION" dtbs_install
+          fi
+
+          if [[ ${BASEMENT_DEBUG:-0} != "0" ]] ; then
+              mkdir -p boot/.debug
+              cp "$1/vmlinux" "boot/.debug/vmlinux-$PKG_VERSION"
+          fi
+
+          cp $1/arch/${ARCH}/boot/Image Image.bin
+
+      modules:
+        packageToolsWeak: [kmod]
+        packageVars: [PKG_VERSION, BASEMENT_DEBUG, OBJCOPY]
+        packageScript: |
+          make -C "$1" INSTALL_MOD_PATH="$PWD" modules_install
+          rm lib/modules/"${PKG_VERSION}"/{build,source}
+
+          # Strip all modules. Shamelessly ripped from builddeb...
+          for module in $(find lib/modules/ -name *.ko -printf '%P\n'); do
+              module=lib/modules/$module
+              mkdir -p $(dirname usr/lib/debug/$module)
+              # only keep debug symbols in the debug file
+              if [[ ${BASEMENT_DEBUG:-0} != "0" ]] ; then
+                  $OBJCOPY --only-keep-debug $module usr/lib/debug/$module
+              fi
+              # strip original module from debug symbols
+              $OBJCOPY --strip-debug $module
+              # then add a link to those
+              if [[ ${BASEMENT_DEBUG:-0} != "0" ]] ; then
+                  $OBJCOPY --add-gnu-debuglink=usr/lib/debug/$module $module
+              fi
+          done
+
+          depmod -b "$PWD" "$PKG_VERSION"
+
+      modules_prepare:
+        inherit: [kernel-dev]
+        packageVars: [LINUX_VERSION]
+        packageScript: |
+          packageKernelDev
+
+  # This package is only for other recipes that need special kernel headers
+  # that are not available in the generic toolchain. Depending on this
+  # package should only be needed if you have a custom kernel with
+  # added/modified driver headers. It will make your package dependent on
+  # this kernel and it's particular configuration!
+  headers:
+    buildScript: |
+      make headers_install
+    packageScript: |
+      cp -a $1/usr .
+  dt-bindings:
+    buildScript: |
+      rsync -a --delete $1/include/dt-bindings .
+    packageScript: |
+      rsync -a --delete $1/ .
+
+provideVars:
+  LINUX_VERSION: "$PKG_VERSION"

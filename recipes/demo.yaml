@@ -1,0 +1,150 @@
+inherit: [muen-root]
+
+environment:
+  MUENBLOCK_BRANCH: "arm64"
+  MUENBLOCK_COMMIT: "967d6b52f318bd9a8a397085b65047dfd6096660"
+
+depends:
+  - name: devel::dtc
+    use: [tools]
+    forward: True
+
+  - name: utils::mtools
+    use: [tools]
+    forward: True
+
+  - name: devel::xilinx::bootgen
+    use: [tools]
+
+  - name: libs::glib-tools
+    use: [tools]
+    forward: True
+
+  - name: utils::dosfstools
+    use: [tools]
+
+  - name: utils::cpio
+    use: [tools]
+    forward: True
+
+  - name: utils::uboot-tools
+    use: [tools]
+
+  # build an aarch64 linux gnu compiler with ada enabled
+  - name: devel::cross-toolchain-aarch64-linux-gnu-ada
+    use: [tools]
+    forward: True
+    tools:
+      target-toolchain: host-compat-gnat-toolchain
+      host-native-toolchain: host-compat-gnat-toolchain
+
+  # target toolchain is now aarch64-linux-gnu with ada.
+  - depends:
+      - muen::linux-image
+      - muen::muenonarm-devicetree
+
+      - demo::rootfs
+
+      - environment:
+          RTS: "muen::rts"
+        depends:
+          - muen::muenonarm-subjects-example
+          - muen::muenonarm-subjects-event_logger
+
+          - muen::arm64-kernel
+          - muen::muenonarm-policy-files
+
+          - muen::muenonarm-bootgen_files
+
+buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools]
+buildVars: [TARGET_CONFIG]
+buildScript: |
+  mucheckelf ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml \
+    ${BOB_DEP_PATHS[muen::arm64-kernel]}/kernel.elf
+
+  # TODO: mugends needs all our dep in the CWD. Maybe we can extend the tool
+  # to handle multiple search directories to avoid unnecessary copies...
+
+  if [[ ${TARGET_CONFIG} == minimal ]]; then
+    cp ${BOB_DEP_PATHS[muen::muenonarm-subjects-event_logger]}/event_logger.bin subject_one.bin
+  else
+    cp ${BOB_DEP_PATHS[muen::muenonarm-subjects-example]}/example.bin subject_one.bin
+  fi
+  cp ${BOB_DEP_PATHS[muen::muenonarm-devicetree]}/*.dtb .
+
+  if [[ ${TARGET_CONFIG} == "minimal" ]] ; then
+    cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin Image_linux.bin
+    cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_linux.cpio.gz
+  else
+    cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin Image_lnx1.bin
+    cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx1.cpio.gz
+
+    cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin Image_lnx2.bin
+    cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx2.cpio.gz
+  fi
+
+  cp ${BOB_DEP_PATHS[muen::arm64-kernel]}/kernel.bin .
+
+  cp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/bin/* .
+
+  mugends -o . ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+
+  cp ${BOB_DEP_PATHS[muen::muenonarm-bootgen_files]}/* .
+  sed -i -e "/__BIF_MAIN__/{r $(pwd)/bootgen.config" -e "d}" bootgen.bif
+
+  bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
+
+  dd if=/dev/zero of=sdcard.img bs=128M count=1
+  mkfs.vfat -F 32 sdcard.img
+  mcopy -i sdcard.img BOOT.bin ::/
+
+  mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript.cmd bootscript.scr
+
+packageScript: |
+  cp $1/debug_fsbl.elf .
+  cp $1/BOOT.bin .
+  cp $1/sdcard.img .
+
+  cp $1/bootscript.scr .
+  cp $1/*.bin .
+  cp $1/*.dtb .
+  cp $1/*.pad .
+  cp $1/*.part .
+  cp $1/*.pt .
+  cp $1/*.sinfo .
+
+  if [[ ${TARGET_CONFIG} == "minimal" ]] ; then
+    cp $1/rootfs_linux.cpio.gz .
+  else
+    cp $1/rootfs_lnx1.cpio.gz .
+    cp $1/rootfs_lnx2.cpio.gz .
+  fi
+
+multiPackage:
+  qemu:
+    multiPackage:
+      zcu102:
+        depends:
+          - tools:
+              target-toolchain: host-compat-toolchain
+            depends:
+              - name: devel::xilinx::qemu
+                use: [tools]
+              - devel::xilinx::qemu-devicetrees
+        environment:
+          TARGET_PLATFORM: "qemu_zcu102"
+        multiPackage: &target_config
+          minimal:
+            environment:
+              TARGET_CONFIG: "minimal"
+          multicore:
+            environment:
+              TARGET_CONFIG: "multicore"
+        packageToolsWeak: [qemu]
+
+  xilinx:
+    multiPackage:
+      zcu104:
+        environment:
+          TARGET_PLATFORM: "xilinx_zcu104"
+        multiPackage: *target_config

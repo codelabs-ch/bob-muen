@@ -1,0 +1,13 @@
+packageTools: [target-toolchain]
+packageScript: |
+  mkdir -p usr/lib
+  # add some necessary files from the gnat toolchain
+  find ${BOB_TOOL_PATHS['target-toolchain']}/../../ -name libgnarl*.so -exec cp {} usr/lib \;
+  find ${BOB_TOOL_PATHS['target-toolchain']}/../../ -name libgnat*.so -exec cp {} usr/lib \;
+  # now we have libgnat.so and libgnat-23.so which are the same files. Make libgnat.so
+  # a symlink to libgnat-23.so to avoid ldconfig warnings (and safe a few bytes)
+  pushd usr/lib
+  rm libgnat.so libgnarl.so
+  ln -snf libgnat-*.so libgnat.so
+  ln -snf libgnarl-*.so libgnarl.so
+  popd

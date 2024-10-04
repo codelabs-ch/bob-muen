@@ -1,0 +1,33 @@
+inherit: [install]
+
+metaEnvironment:
+  PD: |
+    Linux kernel module implements a block device driver which transports block
+    I/O requests (bio) via shared memory channels provided by the Muen
+    Separation Kernel.
+  LICENSE: "GPL-2.0-only [secunet, codelabs]"
+  COPYRIGHT: "Copyright (C) 2018, 2020 secunet Security Networks AG"
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/linux/muenblock.git
+  branch: "${MUENBLOCK_BRANCH:-master}"
+  commit: "${MUENBLOCK_COMMIT:-8b5f4ce85fe7723615de1b4195dafac6eb14212d}"
+
+depends:
+  - name: muen::linux-modules_prepare
+    use: [result, environment]
+
+buildVars: [LINUX_VERSION, CC, AR, CROSS_COMPILE, ARCH]
+buildTools: [make, target-toolchain]
+buildScript: |
+  rsync -a --delete $1/ .
+  mkdir -p install
+  make KERNEL_SOURCE=${BOB_DEP_PATHS['muen::linux-modules_prepare']}
+  make KERNEL_SOURCE=${BOB_DEP_PATHS['muen::linux-modules_prepare']} \
+      DESTDIR=$(pwd)/install install
+
+packageScript: |
+  installPackageTgt $1/install/ "!/lib"
+  mkdir -p lib/modules/${LINUX_VERSION}/extra
+  cp $1/install/lib/modules/extra/* lib/modules/${LINUX_VERSION}/extra

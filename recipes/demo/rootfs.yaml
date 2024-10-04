@@ -1,0 +1,67 @@
+#build a minimal rootfs for the linuxes.
+
+depends:
+  - codelabs::adhcp-client
+  - codelabs::adhcp-notifier-simple
+  - core::busybox
+  - demo::gnat-linux
+  - libs::libc-tgt
+  - net::ethtool
+  - net::iptables
+  - net::openssh
+  - utils::bash
+  - utils::e2fsprogs
+  - utils::screen
+
+  - name: muen::linux-modules
+    use: [environment, result]
+  - muen::muenblock
+  - muen::muennet
+  - muen::muenevents
+  - muen::muenfs
+
+  - demo::rootfs-content
+
+  - name: kernel::kmod
+    use: [tools]
+    tools:
+      target-toolchain: host-compat-toolchain
+
+buildTools: [kmod, target-toolchain]
+buildVars: [LINUX_VERSION]
+buildScript: |
+  rm -rf rootfs .debug
+  mkdir -p rootfs .debug
+
+  for dep in "${BOB_DEP_PATHS[@]}"; do
+     rsync -av --exclude ".debug" ${dep}/ rootfs/
+     rsync -a ${dep}/ .debug/
+  done
+
+  pushd rootfs
+
+  ln -sf bin/busybox init
+  ln -sf /usr/bin/bash bin/bash
+  ln -sf /usr/bin/bash bin/sh
+
+  mkdir -p dev/pts etc mnt proc sys tmp
+  mkdir -p var/log
+  mkdir -p etc/network/if-pre-up.d
+  mkdir -p etc/network/if-up.d
+  mkdir -p etc/network/if-down.d
+  mkdir -p etc/network/if-post-down.d
+
+  touch etc/fstab
+
+  if [[ -d "lib/modules/${LINUX_VERSION}" ]]; then
+      depmod -b "$PWD" "${LINUX_VERSION}"
+  fi
+  popd
+
+packageTools: [cpio]
+packageScript: |
+  mkdir -p boot
+  (
+      cd $1/rootfs
+      find . | sort | cpio --create --reproducible --format=newc --owner=root:root | gzip
+  ) > boot/initramfs.cpio.gz

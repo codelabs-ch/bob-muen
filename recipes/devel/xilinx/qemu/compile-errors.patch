@@ -1,0 +1,13 @@
+diff --git a/block/file-posix.c b/block/file-posix.c
+index b16e9c21..bf4410d9 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1409,7 +1409,7 @@ static void raw_refresh_zoned_limits(BlockDriverState *bs, struct stat *st,
+                                      Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+-    BlockZoneModel zoned;
++    BlockZoneModel zoned = BLK_Z_NONE;
+     int ret;
+
+     bs->bl.zoned = BLK_Z_NONE;

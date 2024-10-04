@@ -1,0 +1,53 @@
+inherit: [autotools, meson, patch]
+
+checkoutSCM:
+  scm: git
+  url: https://github.com/Xilinx/qemu.git
+  tag: xilinx_v2024.1
+  commit: 2319c870e754148ec3b9d40be0d3dbee959c3251
+  shallow: 1
+
+depends:
+  - name: libs::gcrypt-tool
+    use: [tools]
+
+  - devel::dtc-dev
+  - libs::gcrypt-dev
+  - libs::glib-dev
+  - libs::zlib-dev
+  - libs::pixman-dev
+  - use: []
+    depends:
+      - devel::dtc-tgt
+      - libs::pixman-tgt
+      - libs::gcrypt-tgt
+      - libs::glib-tgt
+      - libs::zlib-tgt
+
+environment:
+  AUTOTOOLS_AUTO_STATIC: "no"
+  BASEMENT_LIBS: "shared"
+
+checkoutDeterministic: True
+checkoutTools: [meson, python3]
+checkoutScript: |
+  patchApplySeries -p1 $<<qemu/*.patch>>
+  meson subprojects download
+
+buildTools: [gcrypt]
+buildScript: |
+  mkdir -p __src__
+  rsync -a --delete $1/ __src__/
+  autotoolsBuild $(pwd)/__src__/ \
+    --target-list="aarch64-softmmu,microblazeel-softmmu" \
+    --enable-fdt --enable-slirp --disable-kvm --disable-xen \
+    --enable-gcrypt \
+    --extra-cflags="${MESON_CFLAGS[*]} -Wno-error=maybe-uninitialized" \
+    --extra-cxxflags="${MESON_CXXFLAGS[*]} -Wno-error=maybe-uninitialized" \
+    --extra-ldflags="${MESON_LDFLAGS[*]}"
+
+packageScript: |
+  rsync -a --delete $1/install/ .
+
+provideTools:
+  qemu: "usr/bin"

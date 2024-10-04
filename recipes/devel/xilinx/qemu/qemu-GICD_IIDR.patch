@@ -1,0 +1,21 @@
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 4a7c9c2..627cce0 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -981,7 +981,15 @@ static uint8_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+         }
+         if (offset == 9) {
+             /* GICD_IIDR byte 1 */
+-            return 0x04; /* Arm JEP106 identity */
++            return 0x14; /* Arm JEP106 identity / Revision */
++        }
++        if (offset == 0x0a) {
++            /* GICD_IIDR byte 2 */
++            return 0x00; /* Arm Product identity */
++        }
++        if (offset == 0x0b) {
++            /* GICD_IIDR byte 3 */
++            return 0x02; /* Arm Product identity */
+         }
+         if (offset < 0x0c) {
+             /* All other bytes in this range are RAZ */

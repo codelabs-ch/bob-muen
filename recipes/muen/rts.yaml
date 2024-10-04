@@ -1,0 +1,35 @@
+inherit: [gpr]
+
+depends:
+  - muen::build-cfg-gpr
+
+checkoutSCM:
+  scm: git
+  url: git@git.codelabs.ch:muen/rts
+  branch: devel
+  commit: 885cb0cdac1a6ee1b829c4c91c338badf769ecd3
+
+buildTools: [target-toolchain, gprbuild]
+buildScript: |
+  mkdir -p obj/adainclude obj/adalib
+
+  cp $1/src/*.ad* obj/adainclude
+  cp $1/src/aarch64/* obj/adainclude
+
+  gprbuild -P $1/rts \
+    --target=aarch64-linux-gnu \
+    --RTS=$(pwd)/obj \
+    --relocate-build-tree=build \
+    -XTARGET_ARCH=aarch64 \
+    -XBUILD_CFG=${BOB_DEP_PATHS[muen::build-cfg-gpr]}
+
+  gprinstall -P$1/rts --relocate-build-tree=build \
+    --target=aarch64-linux-gnu \
+    --prefix=install/usr -p -f -m \
+    -XTARGET_ARCH=aarch64
+
+packageScript: |
+  mkdir -p usr/include/rts/adainclude
+  mkdir -p usr/include/rts/adalib
+  cp $1/install/usr/gnat/* usr/include/rts/adainclude
+  cp $1/install/usr/adalib/* usr/include/rts/adalib

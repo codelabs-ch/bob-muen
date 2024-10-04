@@ -1,0 +1,641 @@
+inherit: [muen_component]
+
+depends:
+  - muen::build-cfg-gpr
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/tools.git
+  branch: devel-armv8a-a2d4948f88d0-bob
+  commit: da17381e41476f98b5f91e3a89d84e4c63cbeaf2
+
+multiPackage:
+  liballoc:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      dev:
+        buildScript: |
+          muenBuild $1/liballoc/liballoc
+        provideDeps: ['*-dev']
+        packageScript: |
+          gprInstallPackageDev
+      test:
+        inherit: [muen_test]
+        depends:
+          - muen::tools-libtest-dev
+        buildScript: |
+          DATA_DIR=$1/liballoc/data \
+          TESTS_DIR=$1/liballoc/tests \
+          muenTest $1/liballoc/gnattest_liballoc
+        packageScript: |
+          muenPackageTest
+
+  libmucfgcheck:
+    depends:
+      - muen::tools-libmulog-dev
+      - muen::tools-libmuxml-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      dev:
+        buildScript: |
+          muenBuild $1/libmucfgcheck/libmucfgcheck
+        provideDeps: ['*-dev']
+        packageScript: |
+          gprInstallPackageDev
+      test: &simple_test
+        inherit: [muen_test]
+        privateEnvironment:
+          TEST_NAME: "libmucfgcheck"
+        buildVars: [TEST_NAME]
+        buildScript: |
+          DATA_DIR=$1/${TEST_NAME}/data \
+          TESTS_DIR=$1/${TEST_NAME}/tests \
+          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+        packageScript: |
+          muenPackageTest
+
+  libmucfgvcpu:
+    depends:
+      - muen::build-cfg-scripts
+      - muen::tools-libmuxml-dev
+    buildTools: [tidy]
+    buildSetup: |
+      export MUCFGVCPU_GENERATED=$(pwd)/generated
+    buildScript: |
+      rm -rf generated && mkdir generated
+      for F in $1/libmucfgvcpu/profiles/*.xml; do
+        echo $F
+        NAME=$(basename ${F})
+        NAME=${NAME%.xml}
+        ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada \
+          Mucfgvcpu.Profile_${NAME} $F generated/mucfgvcpu-profile_${NAME}.ads
+      done
+    multiPackage:
+      dev:
+        buildScript: |
+          muenBuild $1/libmucfgvcpu/libmucfgvcpu
+        provideDeps: ['*-dev']
+        packageScript: |
+          gprInstallPackageDev
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "libmucfgvcpu"
+
+  libmulog-dev:
+    depends:
+      - codelabs::libs::alog-dev
+    buildScript: |
+      muenBuild $1/libmulog/libmulog
+    provideDeps: ['*-dev']
+    packageScript: |
+      gprInstallPackageDev
+
+  libmutools:
+    depends:
+      - ada::ada-bfd-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmuxml-dev
+    multiPackage:
+      dev:
+        buildScript: |
+          muenBuild $1/libmutools/libmutools
+        provideDeps: ['*-dev']
+        packageScript: |
+          gprInstallPackageDev
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "libmutools"
+
+  libmuxml:
+    depends:
+      - codelabs::libs::xia-dev
+      - muen::build-cfg-scripts
+      - muen::tools-libtest-dev
+
+    buildTools: [libxslt-tools, tidy]
+    buildSetup: |
+      export LIBMUXML_GENERATED=$(pwd)/generated
+    buildScript: |
+      rm -rf generated && mkdir -p generated
+      SCHEMA_FILES=("system_a" "system_b" "system_src"
+                    "vcpu_profile" "system_config"
+                    "hardware_config" "component")
+
+      for S in ${SCHEMA_FILES[@]}; do
+        SCHEMA_FILE=$(echo ${S} | sed -e 's/_a//g;s/_b//g;s/_src//g').xsd
+        xsltproc --path $1/libmuxml/schema/${S} --stringparam format ${S} \
+          ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/resolve.xsl $1/libmuxml/schema/${SCHEMA_FILE}   > generated/${S}.xsd
+        ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_schema \
+          generated/${S}.xsd generated/muxml-${S}_schema.ads
+      done
+    multiPackage:
+      dev:
+        buildScript: muenBuild $1/libmuxml/libmuxml
+        provideDeps: ['*-dev']
+        packageScript: gprInstallPackageDev
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "libmuxml"
+
+  libpaging:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      dev:
+        buildScript: |
+          muenBuild $1/libpaging/libpaging
+        provideDeps: ['*-dev']
+        packageScript: |
+          gprInstallPackageDev
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "libpaging"
+
+  libtest-dev:
+    buildScript: |
+      muenBuild $1/libtest/libtest
+    packageScript: |
+      gprInstallPackageDev
+
+  mucbinsplit:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucbinsplit/mucbinsplit
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucbinsplit: "usr/bin"
+      test:
+        inherit: [muen_test]
+        privateEnvironment:
+          TEST_NAME: "mucbinsplit"
+        buildVars: [TEST_NAME, OBJCOPY]
+        buildScript: |
+          mkdir -p build/test/obj
+          SECTIONS=(data text rodata)
+          for S in ${SECTIONS[@]}; do
+            ${OBJCOPY} -Obinary --only-section=.${S} $1/mucbinsplit/data/test_binary build/test/obj/${S}.ref
+          done
+          DATA_DIR=$1/${TEST_NAME}/data \
+          TESTS_DIR=$1/${TEST_NAME}/tests \
+          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+        packageScript: |
+          muenPackageTest
+
+  mucfgalloc:
+    depends:
+      - muen::tools-liballoc-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgalloc/mucfgalloc
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgalloc: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgalloc"
+
+  mucfgcjoin:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgcjoin/mucfgcjoin
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgjoin: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgcjoin"
+
+  mucfgcvresalloc:
+    depends:
+      - muen::tools-libmucfgcheck-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgcjoin/mucfgcjoin
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgcvresalloc: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgcvresalloc"
+
+  mucfgexpand:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-liballoc-dev
+      - muen::tools-libpaging-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmuxml-dev
+      - muen::tools-libmutools-dev
+      - muen::tools-libmucfgvcpu-dev
+      - muen::tools-libmucfgcheck-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgexpand/mucfgexpand
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgexpand: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgexpand"
+
+  mucfgmemhashes:
+    depends:
+      - muen::tools-libmucfgcheck-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgmemhashes/mucfgmemhashes
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgmemhashes: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgmemhashes"
+
+  mucfgmerge:
+    depends:
+      - muen::tools-libmucfgcheck-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgmerge/mucfgmerge
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgmerge: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgmerge"
+
+  mucfgvalidate:
+    depends:
+      - muen::tools-libmucfgcheck-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmutools-dev
+      - muen::tools-libmuxml-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgvalidate/mucfgvalidate
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgvalidate: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgvalidate"
+
+  mucfgvresalloc:
+    depends:
+      - muen::tools-libmucfgcheck-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgvresalloc/mucfgvresalloc
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucfgvresalloc: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucfgvalidate"
+
+  mucgenspec:
+    depends:
+      - muen::tools-libmucfgcheck-dev
+      - muen::tools-libmutools-dev
+    buildSetup: |
+      export MUCGENSPEC_GENERATED=$(pwd)/generated
+    buildScript: |
+      muenStringTemplates $1/mucgenspec/templates \
+        generated/string_templates.ads
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucgenspec/mucgenspec \
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucgenspec: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucgenspec"
+
+  mucheckelf:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucheckelf/mucheckelf -XLINKING=static
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucheckelf: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mucheckelf"
+
+  mucheckstack:
+    depends:
+      - adacore::gnatcoll-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucheckstack/mucheckstack
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mucheckstack: "usr/bin"
+      test:
+        inherit: [muen_test]
+        privateEnvironment:
+          TEST_NAME: "mucheckstack"
+        buildVars: [TEST_NAME]
+        buildScript: |
+          gprbuild -q -p -P$1/${TEST_NAME}/data/testci --relocate-build-tree=$(pwd)/build/test/test_ci
+          gprbuild -q -p -P$1/${TEST_NAME}/data/testci_main --relocate-build-tree=$(pwd)/build/test/test_ci_main
+          DATA_DIR=$1/${TEST_NAME}/data \
+          TESTS_DIR=$1/${TEST_NAME}/tests \
+          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+        packageScript: |
+          muenPackageTest
+
+  mugenacpi:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libmutools-dev
+    buildSetup: |
+      export MUGENACPI_GENERATED=$(pwd)/generated
+    buildScript: |
+      muenStringTemplates $1/mugenacpi/templates \
+        generated/string_templates.ads
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugenacpi/mugenacpi
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mugenacpi: "usr/bin"
+      test:
+        <<: *simple_test
+        buildTools: [acpica]
+        privateEnvironment:
+          TEST_NAME: "mugenacpi"
+
+  mugends:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libmutools-dev
+    buildSetup: |
+      export MUGENDS_GENERATED=$(pwd)/generated
+    buildScript: |
+      muenStringTemplates $1/mugends/templates \
+        generated/string_templates.ads
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugends/mugends
+        packageScript: |
+          gprInstallPackageTgt $1/install/
+        provideTools:
+          mugends: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugends"
+
+  mugendts:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libmutools-dev
+    buildSetup: |
+      export MUGENDTS_GENERATED=$(pwd)/generated
+    buildScript: |
+      muenStringTemplates $1/mugendts/templates \
+        generated/string_templates.ads
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugendts/mugendts
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugendts: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugendts"
+
+  mugenmsrstore:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugenmsrstore/mugenmsrstore
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugenmsrstore: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugenmsrstore"
+
+  mugenpt:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libpaging-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugenpt/mugenpt
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugenpt: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugenpt"
+
+  mugensinfo:
+    depends:
+      - muen::common-musinfo
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugensinfo/mugensinfo
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugensinfo: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugensinfo"
+
+  mugensolo5:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugensolo5/mugensolo5
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugensolo5: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugensolo5"
+
+  mugenspec:
+    depends:
+      - muen::tools-libmutools-dev
+    buildSetup: |
+      export MUGENSPEC_GENERATED=$(pwd)/generated
+    buildScript: |
+      muenStringTemplates $1/mugenspec/templates \
+        generated/string_templates.ads
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugenspec/mugenspec
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugenspec: "usr/bin"
+      test:
+        inherit: [muen_test]
+        privateEnvironment:
+          TEST_NAME: "mugenspec"
+        buildVars: [TEST_NAME]
+        buildScript: |
+          mkdir -p build/test
+          rsync -a $1/${TEST_NAME}/templates build/test
+          DATA_DIR=$1/${TEST_NAME}/data \
+          TESTS_DIR=$1/${TEST_NAME}/tests \
+          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+        packageScript: |
+          muenPackageTest
+
+  mugentau0cmds:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libpaging-dev
+      - muen::tools-libmulog-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugentau0cmds/mugentau0cmds
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugentau0cmds: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugentau0cmds"
+
+  mugenzp:
+    depends:
+      - adacore::xmlada-dev
+      - codelabs::libs::xia-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mugenzp/mugenzp
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mugenzp: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mugenzp"
+
+  mupcspkrdbg:
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mupcspkrdbg/mupcspkrdbg
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mupcspkrdbg: "usr/bin"
+      test:
+        depends:
+          - muen::tools-libtest-dev
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "mupcspkrdbg"
+
+  muwalkpt:
+    depends:
+      - muen::tools-libpaging-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/muwalkpt/muwalkpt
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          muwalkpt: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "muwalkpt"

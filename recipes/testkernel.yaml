@@ -1,0 +1,95 @@
+inherit: [muen-root]
+
+depends:
+  - name: devel::dtc
+    use: [tools]
+    forward: True
+
+  - name: utils::mtools
+    use: [tools]
+    forward: True
+
+  - name: devel::xilinx::bootgen
+    use: [tools]
+
+  - name: libs::glib-tools
+    use: [tools]
+    forward: True
+
+  - name: utils::dosfstools
+    use: [tools]
+
+  - name: utils::cpio
+    use: [tools]
+    forward: True
+
+  - name: utils::uboot-tools
+    use: [tools]
+
+  # build an aarch64 linux gnu compiler with ada enabled
+  - name: devel::cross-toolchain-aarch64-linux-gnu-ada
+    use: [tools]
+    forward: True
+    tools:
+      target-toolchain: host-compat-gnat-toolchain
+      host-native-toolchain: host-compat-gnat-toolchain
+
+  # target toolchain is now aarch64-linux-gnu with ada.
+  - depends:
+      - environment:
+          RTS: "muen::arm64-rts-aunit"
+          MUEN_BUILD_MODE: "test"
+        depends:
+          - muen::arm64-kernel
+          - muen::muenonarm-bootgen_files
+
+buildTools: [mucheckelf, bootgen, mtools, dosfstools, uboot-tools]
+buildVars: [TARGET_CONFIG]
+buildScript: |
+  cp ${BOB_DEP_PATHS[muen::arm64-kernel]}/kernel.bin kernel_test.bin
+
+  printf "tftpboot 0x0 kernel_test.bin\ndcache flush\ngo 0x0" > bootscript.cmd
+  mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript.cmd bootscript.scr
+
+  cp ${BOB_DEP_PATHS[muen::muenonarm-bootgen_files]}/* .
+  sed -i -e "/__BIF_MAIN__/{r $(pwd)/bootgen_test.config" -e "d}" bootgen.bif
+
+  bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
+
+  dd if=/dev/zero of=sdcard.img bs=128M count=1
+  mkfs.vfat -F 32 sdcard.img
+  mcopy -i sdcard.img BOOT.bin ::/
+
+packageScript: |
+  cp $1/debug_fsbl.elf .
+  cp $1/BOOT.bin .
+  cp $1/sdcard.img .
+
+  cp $1/kernel_test.bin .
+  cp $1/bootscript.scr .
+
+multiPackage:
+  qemu:
+    multiPackage:
+      zcu102:
+        depends:
+          - tools:
+              target-toolchain: host-compat-toolchain
+            depends:
+              - name: devel::xilinx::qemu
+                use: [tools]
+              - devel::xilinx::qemu-devicetrees
+        environment:
+          TARGET_PLATFORM: "qemu_zcu102"
+        multiPackage: &target_config
+          minimal:
+            environment:
+              TARGET_CONFIG: "minimal"
+        packageToolsWeak: [qemu]
+
+  xilinx:
+    multiPackage:
+      zcu104:
+        environment:
+          TARGET_PLATFORM: "xilinx_zcu104"
+        multiPackage: *target_config

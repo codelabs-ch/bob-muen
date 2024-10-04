@@ -1,0 +1,48 @@
+inherit: [gpr]
+
+depends:
+  - if: $(ne,${RTS:-UNSET},UNSET)
+    name: ${RTS}
+
+buildVars: [RTS, CROSS_COMPILE]
+buildVarsWeak: [MAKE_JOBS]
+buildSetup: |
+  export GPR_TARGET="${CROSS_COMPILE%"-"}"
+buildScript: |
+  muenBuild() {
+    gprbuild -P $1 \
+      -j${MAKE_JOBS:-$(nproc)} \
+      --relocate-build-tree=build \
+      -gnatef -s -k \
+      --target=${GPR_TARGET} \
+      ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+      ${GPRBUILD_EXTRA_ARGS:-} \
+      -largs "${LARGS[@]}" \
+      -cargs "${CARGS[@]}"
+    rm -rf install
+    gprinstall -P $1 \
+      --relocate-build-tree=build \
+      --target=${GPR_TARGET} \
+      --prefix="${PREFIX:-install/usr}" \
+      -m \
+      -p \
+      -f \
+      ${@:2}
+  }
+
+  # $1 templates dir
+  # $2 output file path
+  muenStringTemplates () {
+    mkdir -p $(dirname $2)
+    echo "-- Auto-generated" > $2
+    echo "package String_Templates is" >> $2
+    echo "   pragma Style_Checks (Off);" >> $2
+    for tmpl in $1/*; do
+      echo "" >> $2
+      echo -n $(basename $tmpl) | sed 's/templates\///g;s/\(\-\|\.\)/\_/g;' >> $2
+      echo ' : constant String := ""' >> $2
+      sed -e 's/"/""/g;s/^\(.*\)$/\& "\1" \& ASCII.LF/g' $tmpl >> $2
+      echo '& "";' >> $2
+    done
+    echo 'end String_Templates;' >> $2
+  }

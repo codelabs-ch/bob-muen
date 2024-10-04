@@ -1,0 +1,9 @@
+.bob-*
+__pycache__/
+dev
+work
+*.swp
+serial*.log
+layers/
+projects/
+user.yaml

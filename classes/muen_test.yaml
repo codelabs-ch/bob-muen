@@ -1,0 +1,46 @@
+inherit: [gpr]
+
+depends:
+  - adacore::aunit-dev
+
+buildVarsWeak: [MAKE_JOBS]
+buildTools: [libadalang-tools]
+buildVars: [TOOLCHAIN_SYSROOT]
+buildScript: |
+  muenTest () {
+    mkdir -p tests
+    if [[ ${TESTS_DIR:-UNSET} != UNSET ]]; then
+      rsync -a --delete ${TESTS_DIR}/ tests
+    fi
+
+    export GCONV_PATH=${BOB_TOOL_PATHS['target-toolchain']}/${TOOLCHAIN_SYSROOT}/usr/lib/gconv
+    export OBJ_DIR=$(pwd)/obj
+    export TESTS_DIR=$(pwd)/tests
+    gnattest -q --test-duration --omit-sloc --no-subprojects \
+        -P$1 \
+        --harness-dir=$(pwd)/build/test \
+        --tests-dir=$(pwd)/tests \
+        --stubs-dir=$(pwd)/stubs
+
+    gprbuild -P $(pwd)/build/test/test_driver \
+      -j${MAKE_JOBS:-$(nproc)} \
+      -gnatef -s -k \
+      --target=${GPR_TARGET} \
+      -p \
+      ${@:2} \
+      -largs "${LARGS[@]}" -lgcov \
+      -cargs "${CARGS[@]}"
+
+    pushd build/test
+    if [[ ${DATA_DIR:-UNSET} != UNSET ]]; then
+      cp ${DATA_DIR} . -r
+    fi
+    mkdir -p obj
+    ./test_runner --exit-status=on --passed-tests=show
+    popd
+  }
+packageScript: |
+  __SRC_DIR=$1
+  muenPackageTest () {
+    cp $__SRC_DIR/build/test/gnattest.xml .
+  }

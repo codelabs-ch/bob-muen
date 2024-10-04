@@ -1,0 +1,30 @@
+inherit: [install]
+
+metaEnvironment:
+  PD: "Muen SK channel file system Linux kernel module"
+  LICENSE: "GPL-2.0-only [secunet, codelabs]"
+  COPYRIGHT: "Copyright (C) 2015  secunet Security Networks AG"
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/linux/muenfs.git
+  commit: 3e26e69ec721f54f43eb113cd5c43c2cbeb2bc69
+  branch: master
+
+depends:
+  - name: muen::linux-modules_prepare
+    use: [result, environment]
+
+buildVars: [LINUX_VERSION, CC, AR, CROSS_COMPILE, ARCH]
+buildTools: [make, target-toolchain]
+buildScript: |
+  rsync -a --delete $1/ .
+  mkdir -p install
+  make KERNEL_SOURCE=${BOB_DEP_PATHS['muen::linux-modules_prepare']}
+  make DESTDIR=$(pwd)/install install
+
+packageScript: |
+  installPackageTgt $1/install/ "!/lib"
+
+  mkdir -p lib/modules/${LINUX_VERSION}/extra
+  cp $1/install/lib/modules/extra/* lib/modules/${LINUX_VERSION}/extra

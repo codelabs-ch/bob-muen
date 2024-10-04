@@ -1,0 +1,42 @@
+inherit: [make, install, pkg-config]
+
+metaEnvironment:
+  PD: "Muen virtual network interface kernel module for Linux"
+  LICENCE: "GPL-2.0-only [secunet, codelabs]"
+  COPYRIGHT: "Copyright (C) 2015  secunet Security Networks AG"
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/linux/muennet.git
+  commit: ec239e14c219b273dd51982c2aaae90f344d369f
+  branch: "master"
+
+buildTools: [target-toolchain]
+
+depends:
+  - libs::libnl-dev
+  - name: muen::linux-modules_prepare
+    use: [result, environment]
+  - use: []
+    depends:
+      - libs::libnl-tgt
+
+buildVars: [LINUX_VERSION, CFLAGS, CC, AR, CROSS_COMPILE, ARCH]
+buildScript: |
+  # FIXME: build out of tree
+  mkdir -p install build
+  rsync -a --delete $1/ build
+
+  pushd build
+  makeParallel KERNEL_SOURCE=${BOB_DEP_PATHS['muen::linux-modules_prepare']} \
+     CFLAGS="${CFLAGS} -I${BOB_DEP_PATHS['libs::libnl-dev']}/usr/include/libnl3 \
+             -L${BOB_DEP_PATHS['libs::libnl-dev']}/usr/lib" \
+     DESTDIR=$(pwd)/../install install
+  popd
+
+provideDeps: ['*-tgt']
+packageScript: |
+  installPackageBin $1/install/ "!/lib"
+
+  mkdir -p lib/modules/${LINUX_VERSION}/extra
+  cp $1/install/lib/modules/extra/* lib/modules/${LINUX_VERSION}/extra

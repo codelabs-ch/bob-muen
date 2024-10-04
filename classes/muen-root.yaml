@@ -1,0 +1,122 @@
+# this class collects tools needed to build muen based systems
+
+inherit: ['basement::rootrecipe']
+
+depends:
+
+  - name: libs::libxml2-bin
+    use: [tools]
+    forward: True
+
+  - name: libs::libxslt-bin
+    use: [tools]
+    forward: True
+
+  - name: utils::tidy
+    use: [tools]
+    forward: True
+
+  - name: utils::acpica
+    use: [tools]
+    forward: True
+
+  - name: adacore::ada-language-server
+    use: [tools]
+    forward: True
+
+  # with basement::rootrecipe we have a common set of tools and a host-
+  # toolchain which is also set as target toolchain.
+  # for muen we need a gnat toolchain first. Use alr to get one.
+  - name: adacore::alr
+    use: [tools]
+    forward: True
+
+  - name: adacore::gnat-x86_64-pc-linux-gnu
+    use: [tools]
+    forward: True
+  # target-toolchain is still host-compat toolchain.
+
+  - tools:
+      target-toolchain: host-compat-gnat-toolchain
+    depends:
+
+      - name: adacore::gprbuild-bootstrap
+        use: [tools]
+        forward: True
+
+      - name: adacore::gprbuild-tool
+        use: [tools]
+        forward: True
+
+      - name: muen::tools-mucbinsplit
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgalloc
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgcjoin
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgcvresalloc
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgexpand
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgmemhashes
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgmerge
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgvalidate
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgvresalloc
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucgenspec
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucheckelf
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucheckstack
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugenacpi
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugends
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugendts
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugenmsrstore
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugenpt
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugensinfo
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugensolo5
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugenspec
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugentau0cmds
+        use: [tools]
+        forward: True
+      - name: muen::tools-mugenzp
+        use: [tools]
+        forward: True
+      - name: muen::tools-mupcspkrdbg
+        use: [tools]
+        forward: True
+      - name: muen::tools-muwalkpt
+        use: [tools]
+        forward: True

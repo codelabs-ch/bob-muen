@@ -101,11 +101,22 @@ buildScript: |
   mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript.cmd bootscript.scr
 
 packageScript: |
-  cp $1/debug_fsbl.elf .
+  # SDCARD
   cp $1/BOOT.bin .
   cp $1/sdcard.img .
 
+  # TFTP
   cp $1/bootscript.scr .
+
+  # XSCT
+  cp $1/xsct.tcl .
+  cp $1/default_system.bit .
+  cp $1/default_system.hdf .
+  cp $1/debug_pmufw.elf .
+  cp $1/*.fill .
+
+  # Common files
+  cp $1/debug_fsbl.elf .
   cp $1/*.bin .
   cp $1/*.dtb .
   cp $1/*.pad .

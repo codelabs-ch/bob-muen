@@ -46,6 +46,7 @@ depends:
 buildTools: [mucheckelf, bootgen, mtools, dosfstools, uboot-tools]
 buildVars: [TARGET_CONFIG]
 buildScript: |
+  cp $<<testkernel/xsct.tcl>> xsct.tcl
   cp ${BOB_DEP_PATHS[muen::arm64-kernel]}/kernel.bin kernel_test.bin
 
   printf "tftpboot 0x0 kernel_test.bin\ndcache flush\ngo 0x0" > bootscript.cmd
@@ -61,12 +62,22 @@ buildScript: |
   mcopy -i sdcard.img BOOT.bin ::/
 
 packageScript: |
-  cp $1/debug_fsbl.elf .
+  # SDCARD
   cp $1/BOOT.bin .
   cp $1/sdcard.img .
 
-  cp $1/kernel_test.bin .
+  # TFTP
   cp $1/bootscript.scr .
+
+  # XSCT
+  cp $1/xsct.tcl .
+  cp $1/default_system.bit .
+  cp $1/default_system.hdf .
+  cp $1/debug_pmufw.elf .
+
+  # Common files
+  cp $1/debug_fsbl.elf .
+  cp $1/kernel_test.bin .
 
 multiPackage:
   qemu:

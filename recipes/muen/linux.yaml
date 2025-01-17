@@ -12,6 +12,10 @@ checkoutSCM:
 
 depends:
   - ${LINUX_CUSTOM_CONFIG}
+  - tools:
+      target-toolchain: host-compat-toolchain
+    depends:
+      - libs::ncurses-dev
 
 buildTools: [bison, flex, m4, host-toolchain, target-toolchain]
 buildVars: [ARCH, LINUX_CONFIG, LINUX_CUSTOM_CONFIG]
@@ -19,6 +23,10 @@ buildScript: |
   # prevent timestamps in configuration
   export KCONFIG_NOTIMESTAMP=1
   export KBUILD_BUILD_TIMESTAMP='Mon Dec 28 22:49:40 CET 2015'
+
+  # support 'make menuconfig'
+  export HOSTCFLAGS="-I${BOB_DEP_PATHS['libs::ncurses-dev']}/usr/include"
+  export HOSTLDFLAGS="-L${BOB_DEP_PATHS['libs::ncurses-dev']}/usr/lib"
 
   cp -u "${BOB_DEP_PATHS[${LINUX_CUSTOM_CONFIG}]}/${LINUX_CONFIG:-kernel.config}" .config
   make -C "$1" O=$PWD olddefconfig

@@ -51,7 +51,7 @@ depends:
           - muen::muenonarm-subjects-example
           - muen::muenonarm-subjects-event_logger
 
-          - muen::arm64-kernel
+          - muen::arm64-kernel-release
           - muen::muenonarm-policy-files
 
           - muen::muenonarm-bootgen_files
@@ -60,7 +60,7 @@ buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools]
 buildVars: [TARGET_CONFIG]
 buildScript: |
   mucheckelf ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml \
-    ${BOB_DEP_PATHS[muen::arm64-kernel]}/kernel.elf
+    ${BOB_DEP_PATHS[muen::arm64-kernel-release]}/kernel.elf
 
   # TODO: mugends needs all our dep in the CWD. Maybe we can extend the tool
   # to handle multiple search directories to avoid unnecessary copies...
@@ -83,7 +83,7 @@ buildScript: |
     cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx2.cpio.gz
   fi
 
-  cp ${BOB_DEP_PATHS[muen::arm64-kernel]}/kernel.bin .
+  cp ${BOB_DEP_PATHS[muen::arm64-kernel-release]}/kernel.bin .
 
   cp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/bin/* .
 

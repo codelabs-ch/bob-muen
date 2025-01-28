@@ -112,10 +112,11 @@ multiPackage:
   test:
     buildVars: [TARGET_CONFIG, TARGET_PLATFORM, MUEN_BUILD_MODE]
     buildScript: |
-      cp $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/kernel/${MUEN_BUILD_MODE}/reset_values.ads .
-      cp $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/kernel/rts . -r
+      mkdir -p rts-config
+      cp $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/kernel/${MUEN_BUILD_MODE}/reset_values.ads ./rts-config
+      cp $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/kernel/rts/* ./rts-config
     packageScript: |
-      rsync -a --delete $1/ .
+      cp -r $1/* .
 
   policy-files:
     buildTools: [mucfgjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]

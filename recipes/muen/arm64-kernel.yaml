@@ -1,25 +1,30 @@
+inherit: [muen_component]
+
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muen/arm64/kernel.git
   branch: e0b84541c054-bob
   commit: 1e6326aa76032b8b592bb217c18694d93de8eb48
 
+depends:
+  - muen::common-muschedinfo
+  - muen::muenonarm-policy-files
+
+buildTools: [mugenspec]
+buildSetup: |
+  export GPR_RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts
+  export SKP_DIR=$(pwd)/skp
+buildScript: |
+  rm -rf skp && mkdir -p skp
+  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+
 multiPackage:
   release:
-    inherit: [muen_component]
-    depends:
-      - muen::common-muschedinfo
-      - muen::muenonarm-policy-files
-    buildTools: [mugenspec]
-    buildVars: [OBJCOPY, MUEN_GDB_SUPPORT]
+    buildVars: [OBJCOPY, RTS, MUEN_GDB_SUPPORT]
     buildSetup: |
-      export GPR_RTS=${BOB_DEP_PATHS[muen::rts]}/usr/include/rts
-      export SKP_DIR=$(pwd)/skp
       export BUILD_MODE=release
       export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
     buildScript: |
-      rm -rf skp && mkdir -p skp
-      mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
       muenBuild $1/kernel
       pushd install/usr/bin
       ${OBJCOPY} -O binary \
@@ -30,21 +35,12 @@ multiPackage:
     packageScript: |
       cp $1/install/usr/bin/* .
   debug:
-    inherit: [muen_component]
-    depends:
-      - muen::common-muschedinfo
-      - muen::muenonarm-policy-files
-    buildTools: [mugenspec]
-    buildVars: [OBJCOPY, MUEN_GDB_SUPPORT]
+    buildVars: [OBJCOPY, RTS, MUEN_GDB_SUPPORT]
     buildSetup: |
-      export GPR_RTS=${BOB_DEP_PATHS[muen::rts]}/usr/include/rts
-      export SKP_DIR=$(pwd)/skp
       export BUILD_MODE=debug
       export DEBUG_LEVEL=Level_5
       export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
     buildScript: |
-      rm -rf skp && mkdir -p skp
-      mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
       muenBuild $1/kernel
       pushd install/usr/bin
       ${OBJCOPY} -O binary \
@@ -55,25 +51,16 @@ multiPackage:
     packageScript: |
       cp $1/install/usr/bin/* .
   test:
-    inherit: [muen_component]
     depends:
-      - muen::common-muschedinfo
-      - muen::muenonarm-policy-files
       - adacore::aunit-dev
       - muen::muenonarm-test
-    buildTools: [mugenspec]
-    buildVars: [OBJCOPY, MUEN_GDB_SUPPORT]
+    buildVars: [OBJCOPY, RTS, MUEN_GDB_SUPPORT]
     buildSetup: |
-      export GPR_RTS=${BOB_DEP_PATHS[muen::arm64-rts-aunit]}/usr/include/rts/
       export RTS_CONFIG=${BOB_DEP_PATHS[muen::muenonarm-test]}/rts-config
-      export SKP_DIR=$(pwd)/skp
       export BUILD_MODE=test
       export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
     buildScript: |
-      rm -rf skp && mkdir -p skp
-      mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
-      GPRBUILD_EXTRA_ARGS=()
-      GPRBUILD_EXTRA_ARGS+=("--implicit-with=aunit")
+      GPRBUILD_EXTRA_ARGS=("--implicit-with=aunit")
       muenBuild $1/kernel
       pushd install/usr/bin
       mv kernel_test.elf kernel.elf
@@ -85,21 +72,11 @@ multiPackage:
     packageScript: |
       cp $1/install/usr/bin/* .
   prove:
-    inherit: [muen_component]
-    depends:
-      - muen::common-muschedinfo
-      - muen::muenonarm-policy-files
-    buildTools: [mugenspec]
+    buildVars: [RTS]
     buildSetup: |
-      export GPR_RTS=${BOB_DEP_PATHS[muen::rts]}/usr/include/rts
-      export SKP_DIR=$(pwd)/skp
       export BUILD_MODE=prove
     buildScript: |
-      rm -rf skp && mkdir -p skp
-      mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
-      gnatprove -P$1/kernel --warnings=error --report=all \
-        --RTS=${BOB_DEP_PATHS[muen::rts]}/usr/include/rts \
-        --target=$(GPR_TARGET) -XBUILD_MODE=prove \
-        $(MUEN_PROVE_EXTRA_OPTIONS)
+      muenProve $1/kernel
+      cp $1/obj/gnatprove/gnatprove.out .
     packageScript: |
       cp $1/gnatprove.out .

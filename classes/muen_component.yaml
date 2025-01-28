@@ -30,6 +30,15 @@ buildScript: |
       ${@:2}
   }
 
+  muenProve() {
+    gnatprove -P $1 \
+      -j${MAKE_JOBS:-$(nproc)} \
+      --target=${GPR_TARGET} \
+      ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+      --warnings=error \
+      ${GNATPROVE_EXTRA_ARGS:-}
+  }
+
   # $1 templates dir
   # $2 output file path
   muenStringTemplates () {

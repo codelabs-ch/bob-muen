@@ -39,12 +39,8 @@ multiPackage:
               NAME: "subject_one"
         buildVars: [OBJCOPY]
         buildScript: |
-          muenBuild $1/system/subjects/native/event_logger/event_logger
-
-          pushd install/usr/bin
-          ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
-                    --set-section-flags .stack=alloc,load,contents \
-                    event_logger.elf event_logger.bin
+          muenBuild $1/system/subjects/native/event_logger/event_logger.gpr
+          muenBuildBin event_logger.elf
         packageScript: |
           cp $1/install/usr/bin/event_logger.* .
       example:
@@ -64,13 +60,8 @@ multiPackage:
           mucgenspec -i $1/system/subjects/native/example/spec/example.xml \
               -p Example generated
 
-          muenBuild $1/system/subjects/native/example/example
-
-          pushd install/usr/bin
-          ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
-                    --set-section-flags .stack=alloc,load,contents \
-                    example.elf example.bin
-
+          muenBuild $1/system/subjects/native/example/example.gpr
+          muenBuildBin example.elf
         packageScript: |
           cp $1/install/usr/bin/example.* .
 

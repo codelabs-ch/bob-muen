@@ -4,7 +4,7 @@ depends:
   - if: $(ne,${RTS:-UNSET},UNSET)
     name: ${RTS}
 
-buildVars: [RTS, CROSS_COMPILE]
+buildVars: [OBJCOPY, RTS, CROSS_COMPILE]
 buildVarsWeak: [MAKE_JOBS]
 buildSetup: |
   export GPR_TARGET="${CROSS_COMPILE%"-"}"
@@ -37,6 +37,15 @@ buildScript: |
       ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
       --warnings=error \
       ${GNATPROVE_EXTRA_ARGS:-}
+  }
+
+  muenBuildBin() {
+    pushd install/usr/bin
+    ${OBJCOPY} -O binary \
+      --set-section-flags .bss=alloc,load,contents \
+      --set-section-flags .stack=alloc,load,contents \
+      $1 ${1%.elf}.bin
+    popd
   }
 
   # $1 templates dir

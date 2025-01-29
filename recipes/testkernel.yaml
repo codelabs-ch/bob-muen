@@ -47,7 +47,7 @@ buildTools: [mucheckelf, bootgen, mtools, dosfstools, uboot-tools]
 buildVars: [TARGET_CONFIG]
 buildScript: |
   cp $<<testkernel/xsct.tcl>> xsct.tcl
-  cp ${BOB_DEP_PATHS[muen::arm64-kernel-test]}/kernel.bin kernel_test.bin
+  cp ${BOB_DEP_PATHS[muen::arm64-kernel-test]}/kernel_test.bin .
 
   printf "tftpboot 0x0 kernel_test.bin\ndcache flush\ngo 0x0" > bootscript.cmd
   mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript.cmd bootscript.scr

@@ -11,6 +11,7 @@ depends:
   - muen::muenonarm-policy-files
 
 buildTools: [mugenspec]
+buildVars: [RTS]
 buildSetup: |
   export GPR_RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts
   export SKP_DIR=$(pwd)/skp
@@ -20,18 +21,13 @@ buildScript: |
 
 multiPackage:
   release:
-    buildVars: [OBJCOPY, RTS, MUEN_GDB_SUPPORT]
+    buildVars: [MUEN_GDB_SUPPORT]
     buildSetup: |
       export BUILD_MODE=release
       export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
     buildScript: |
-      muenBuild $1/kernel
-      pushd install/usr/bin
-      ${OBJCOPY} -O binary \
-        --set-section-flags .bss=alloc,load,contents \
-        --set-section-flags .stack=alloc,load,contents \
-        kernel.elf kernel.bin
-      popd
+      muenBuild $1/kernel.gpr
+      muenBuildBin kernel.elf
     packageScript: |
       cp $1/install/usr/bin/* .
   debug:
@@ -41,13 +37,8 @@ multiPackage:
       export DEBUG_LEVEL=Level_5
       export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
     buildScript: |
-      muenBuild $1/kernel
-      pushd install/usr/bin
-      ${OBJCOPY} -O binary \
-        --set-section-flags .bss=alloc,load,contents \
-        --set-section-flags .stack=alloc,load,contents \
-        kernel.elf kernel.bin
-      popd
+      muenBuild $1/kernel.gpr
+      muenBuildBin kernel.elf
     packageScript: |
       cp $1/install/usr/bin/* .
   test:
@@ -61,14 +52,8 @@ multiPackage:
       export GDB_SUPPORT=${MUEN_GDB_SUPPORT:-disabled}
     buildScript: |
       GPRBUILD_EXTRA_ARGS=("--implicit-with=aunit")
-      muenBuild $1/kernel
-      pushd install/usr/bin
-      mv kernel_test.elf kernel.elf
-      ${OBJCOPY} -O binary \
-        --set-section-flags .bss=alloc,load,contents \
-        --set-section-flags .stack=alloc,load,contents \
-        kernel.elf kernel.bin
-      popd
+      muenBuild $1/kernel.gpr
+      muenBuildBin kernel_test.elf
     packageScript: |
       cp $1/install/usr/bin/* .
   prove:

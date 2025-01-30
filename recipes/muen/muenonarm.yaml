@@ -65,14 +65,43 @@ multiPackage:
         packageScript: |
           cp $1/install/usr/bin/example.* .
 
-  bootgen_files:
-    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+  bootloader-binaries:
+    buildVars: [TARGET_PLATFORM]
     buildScript: |
-      rsync -a --delete $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/packaged/ .
-      cp $1/dev/demo/src/${TARGET_PLATFORM}/common/bootgen/* .
       cp $1/dev/demo/src/${TARGET_PLATFORM}/common/bootloader/* .
     packageScript: |
       cp $1/* .
+
+  bootgen-files:
+    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildScript: |
+      cp $1/dev/demo/src/${TARGET_PLATFORM}/common/bootgen/bootgen.bif .
+      cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/packaged/bootgen_test.config .
+    packageScript: |
+      cp $1/* .
+
+  gdb-xsct-files:
+    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildScript: |
+      cp $1/dev/demo/src/${TARGET_PLATFORM}/common/gdb/gdbinit.gtp .
+      cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/gdb/gdbinit_test.config .
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/gdb/gdbinit.config .
+        cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/gdb/xsct_test.tcl .
+      fi
+    packageScript: |
+      cp $1/* .
+
+  uboot-tftp-files:
+    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildScript: |
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/uboot/bootscript_test.cmd .
+      fi
+    packageScript: |
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/* .
+      fi
 
   devicetree:
     depends:

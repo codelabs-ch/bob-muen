@@ -6,8 +6,8 @@ depends:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/tools.git
-  branch: devel-armv8a-a2d4948f88d0-bob
-  commit: da17381e41476f98b5f91e3a89d84e4c63cbeaf2
+  branch: devel-armv8a-2ad39fb9d886-bob
+  commit: 327e2c4a0150356d1cb47ba9ae3c6617f141c263
 
 multiPackage:
   liballoc:

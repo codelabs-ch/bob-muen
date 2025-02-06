@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muen/arm64/kernel.git
-  branch: e0b84541c054-bob
-  commit: 1e6326aa76032b8b592bb217c18694d93de8eb48
+  branch: f2dc1d122dc8-bob
+  commit: d3c1f01a989b0e1a7f034bd5b4c72074a34f3401
 
 depends:
   - muen::common-muschedinfo

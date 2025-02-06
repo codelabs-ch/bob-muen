@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muenonarm.git
-  branch: 043c43873376-bob
-  commit: d3ad0f092d2fd05f749a564b6b9afb772d6e4d93
+  branch: c0d1450d63bf-bob
+  commit: a06e5d98e89efacc62773ef3a0b3f530125b0bda
 
 multiPackage:
   common:

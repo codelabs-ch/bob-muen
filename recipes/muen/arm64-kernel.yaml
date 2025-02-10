@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muen/arm64/kernel.git
   branch: f2dc1d122dc8-bob
-  commit: d3c1f01a989b0e1a7f034bd5b4c72074a34f3401
+  commit: a3c11011b5f5ba9a646a135e13c0bf368c0ea74c
 
 depends:
   - muen::common-muschedinfo
@@ -48,11 +48,16 @@ multiPackage:
     buildScript: *common_build
     packageScript: *common_pkg
   prove:
+    buildTools: [gnatprove]
     buildVars: [RTS]
     buildSetup: |
       export BUILD_MODE=prove
     buildScript: |
-      muenProve $1/kernel
-      cp $1/obj/gnatprove/gnatprove.out .
+      gnatprove -P $1/kernel -j${MAKE_JOBS:-$(nproc)} \
+        --debug-no-semaphore --target=${GPR_TARGET} \
+        ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+        --warnings=error -XPREFIX=$(pwd) \
+        ${GNATPROVE_EXTRA_ARGS:-} 2>&1 | tee gnatprove.log
     packageScript: |
-      cp $1/gnatprove.out .
+      cp $1/obj/gnatprove/gnatprove.out .
+      cp $1/gnatprove.log .

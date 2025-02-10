@@ -48,6 +48,10 @@ depends:
         use: [tools]
         forward: True
 
+      - name: adacore::gnatprove
+        use: [tools]
+        forward: True
+
       - name: muen::tools-mucbinsplit
         use: [tools]
         forward: True

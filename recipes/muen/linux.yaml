@@ -44,6 +44,9 @@ multiPackage:
             use: [tools]
 
     buildVars: [CROSS_COMPILE]
+    buildSetup: |
+      export HOSTCFLAGS="${HOSTCFLAGS} -I${BOB_DEP_PATHS['libs::openssl-dev']}/usr/include"
+      export HOSTLDFLAGS="${HOSTLDFLAGS} -L${BOB_DEP_PATHS['libs::openssl-dev']}/usr/lib"
     buildScript: |
       makeParallel LOCALVERSION=
 

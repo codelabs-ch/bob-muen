@@ -1,0 +1,10 @@
+{
+	"project_id" : "Muen Bob Recipes",
+	"conduit_uri" : "https://dev.codelabs.ch/",
+	"git.default-relative-commit" : "origin/main",
+	"arc.land.onto" : [ "main" ],
+	"arc.land.onto.default": "main",
+	"arc.land.strategy" : "merge",
+	"repository.callsign" : "MB",
+	"history.immutable" : true
+}

@@ -30,12 +30,17 @@ buildScript: |
       ${@:2}
   }
 
+  # $1 ELF file to use
+  # If NO_SUFFIX variable is set, do not append .bin suffix
   muenBuildBin() {
+    suffix=""
+    [ -z "${NO_SUFFIX:-}" ] && suffix=".bin"
+
     pushd install/usr/bin
     ${OBJCOPY} -O binary \
       --set-section-flags .bss=alloc,load,contents \
       --set-section-flags .stack=alloc,load,contents \
-      $1 ${1%.elf}.bin
+      $1 ${1%.elf}$suffix
     popd
   }
 

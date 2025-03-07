@@ -27,7 +27,7 @@ multiPackage:
       export BUILD_MODE=release
     buildScript: &common_build |
       muenBuild $1/kernel.gpr
-      muenBuildBin kernel${BIN_POSTFIX}.elf
+      NO_SUFFIX=1 muenBuildBin kernel${BIN_POSTFIX}.elf
     packageScript: &common_pkg |
       cp $1/install/usr/bin/* .
   debug:

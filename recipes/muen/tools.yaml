@@ -110,10 +110,15 @@ multiPackage:
           TEST_NAME: "libmutools"
 
   libmuxml:
+    inherit: [python3-usr]
     depends:
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
+
+      - name: python::lxml
+        tools:
+          target-toolchain: host-compat-toolchain
 
     buildTools: [libxslt-tools, tidy]
     buildSetup: |

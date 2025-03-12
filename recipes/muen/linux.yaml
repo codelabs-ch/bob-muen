@@ -13,7 +13,7 @@ checkoutSCM:
 depends:
   - muen::muenonarm-linux-config
 
-buildTools: [bison, flex, host-toolchain]
+buildTools: [bison, flex, m4, host-toolchain]
 buildVars: [ARCH, LINUX_CONFIG, LINUX_CUSTOM_CONFIG]
 buildScript: |
   # prevent timestamps in configuration

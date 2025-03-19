@@ -13,17 +13,20 @@ sandbox=""
 artifacts_dir=""
 bob_args=""
 deploy_to_hw=false
+recipes=()
 
-while getopts "a:b:ds" opt; do
+while getopts "a:b:dsr:" opt; do
 	case $opt in
 		a) artifacts_dir="$OPTARG" ;;
 		b) bob_args="$OPTARG" ;;
 		d) deploy_to_hw=true ;;
 		s) sandbox="--sandbox" ;;
+		r) IFS=',' read -r -a recipes <<< "$OPTARG" ;;
 		*)
 			echo "Usage: $0 [-a artifacts_dir] [-b bob_args] [-d] [-s]"
 			echo "  -d  Also deploy to hardware"
 			echo "  -s  Assume sandbox build"
+			echo "  -r  Run specific root recipes (comma separated)"
 			exit 1
 			;;
 	esac
@@ -44,14 +47,17 @@ mkdir -p $artifacts_dir
 bob layers update
 
 plans=()
-recipes=( $(bob ls | grep "demo-qemu-") )
 
-if [ "$deploy_to_hw" = true ]; then
-	recipes+=( $(bob ls | grep "demo-xilinx-") )
+if [ ${#recipes[@]} -eq 0 ]; then
+	recipes=($(bob ls | grep "demo-qemu-"))
+
+	if [ "$deploy_to_hw" = true ]; then
+		recipes+=($(bob ls | grep "demo-xilinx-"))
+	fi
 fi
 
 for r in "${recipes[@]}"; do
-	p=( $(find "${SCRIPTDIR}/nci-config/arm64" -name "*${r}.yaml") )
+	p=($(find "${SCRIPTDIR}/nci-config/arm64" -name "*${r}.yaml"))
 	if [[ -n "${p[0]}" ]]; then
 		plans+=("${p[0]}")
 	else

@@ -46,6 +46,7 @@ buildScript: |
 
   mkdir -p dev/pts etc mnt proc sys tmp
   mkdir -p var/log
+  mkdir -p var/run
   mkdir -p etc/network/if-pre-up.d
   mkdir -p etc/network/if-up.d
   mkdir -p etc/network/if-down.d

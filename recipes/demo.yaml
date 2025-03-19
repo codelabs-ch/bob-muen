@@ -123,7 +123,8 @@ buildScript: |
       # directories to avoid unnecessary copies.).
       cp ${BOB_DEP_PATHS[muen::muenonarm-bootloader-binaries]}/* .
 
-      cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel.* .
+      cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel.elf .
+      cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel .
       cp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/bin/* .
 
       cp ${BOB_DEP_PATHS[muen::muenonarm-devicetree]}/*.dtb .
@@ -185,7 +186,8 @@ buildScript: |
       # (a) Copy the required build results of previous steps to support
       # all deploy modes (i.e. gdb, xsct, sdcard and u-boot tftp)
       cp ${BOB_DEP_PATHS[muen::muenonarm-bootloader-binaries]}/* .
-      cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel_test.* .
+      cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel_test.elf .
+      cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel_test kernel_test.bin
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp)
@@ -229,13 +231,15 @@ packageScript: |
       cp $1/*.bit .
       cp $1/*.hdf .
 
+      cp $1/kernel .
+      cp $1/*.bin .
       cp $1/*.bin .
       cp $1/*.elf .
       cp $1/*.fill .
       cp $1/*.pad .
       cp $1/*.part .
-      cp $1/*.pt .
-      cp $1/*.sinfo .
+      cp $1/*_pt .
+      cp $1/*_sinfo .
 
       cp $1/*.dtb .
       cp $1/*.cpio.gz .

@@ -6,8 +6,8 @@ depends:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/tools.git
-  branch: devel-armv8a-2ad39fb9d886-bob
-  commit: 327e2c4a0150356d1cb47ba9ae3c6617f141c263
+  branch: devel-08ac0495a02d-bob
+  commit: a66d3b849acb642ad2f06163a287dac5d4aa70a1
 
 multiPackage:
   liballoc:
@@ -110,10 +110,15 @@ multiPackage:
           TEST_NAME: "libmutools"
 
   libmuxml:
+    inherit: [python3-usr]
     depends:
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
+
+      - name: python::lxml
+        tools:
+          target-toolchain: host-compat-toolchain
 
     buildTools: [libxslt-tools, tidy]
     buildSetup: |
@@ -127,9 +132,13 @@ multiPackage:
       for S in ${SCHEMA_FILES[@]}; do
         SCHEMA_FILE=$(echo ${S} | sed -e 's/_a//g;s/_b//g;s/_src//g').xsd
         xsltproc --path $1/libmuxml/schema/${S} --stringparam format ${S} \
-          ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/resolve.xsl $1/libmuxml/schema/${SCHEMA_FILE}   > generated/${S}.xsd
+          ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/resolve.xsl $1/libmuxml/schema/${SCHEMA_FILE} > generated/${S}.xsd
+
+        $1/libmuxml/schema_plugins/xsd_plugin_doc.py generated/${S}.xsd generated/${S}_extended.xsd
         ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_schema \
           generated/${S}.xsd generated/muxml-${S}_schema.ads
+        ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_extended_schema \
+          generated/${S}.xsd generated/muxml-${S}_extended_schema.ads
       done
     multiPackage:
       dev:

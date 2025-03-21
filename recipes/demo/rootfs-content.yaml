@@ -2,10 +2,16 @@ checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:rootfs-content.git
   branch: main
-  commit: 202b262861ef566ff7d116939360899c5ef121a7
+  commit: b9b01fea9027a627d0c47920cff3c8b52623783b
 
 buildScript: |
   rsync -a --delete $1/* .
 
+packageVars: [ARCH]
+packageTools: [target-toolchain]
 packageScript: |
-  rsync -a --delete $1/common/* $1/arm64/* .
+  if [[ ${ARCH} == *x86* ]]; then
+    rsync -a --delete $1/common/* $1/x86/* .
+  else
+    rsync -a --delete $1/common/* $1/arm64/* .
+  fi

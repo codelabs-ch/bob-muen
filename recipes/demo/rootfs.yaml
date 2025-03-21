@@ -11,7 +11,10 @@ depends:
   - net::openssh
   - utils::bash
   - utils::e2fsprogs
+  - utils::mingetty
+  - utils::s390-tools-ttyrun
   - utils::screen
+  - utils::ttysnoop
 
   - name: muen::linux-modules
     use: [environment, result]

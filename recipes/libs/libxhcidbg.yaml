@@ -1,0 +1,27 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/libxhcidbg.git
+  branch: muen-6706f6181745-bob
+  commit: fd213202d1dea095dfbd2b6a0704b6fa61482d7f
+
+depends:
+  - libs::libhwbase-dev
+
+buildTools: [mucgenspec]
+buildSetup: |
+  export LIBXHCI_GENERATED=$(pwd)/generated
+  mucgenspec -i $1/spec/libxhcidbg.xml generated
+
+buildScript: |
+  muenBuild $1/libxhcidbg
+
+multiPackage:
+  dev:
+    provideDeps: ['*-dev']
+    packageScript: |
+      gprInstallPackageDev
+  tgt:
+    packageScript: |
+      gprInstallPackageTgt

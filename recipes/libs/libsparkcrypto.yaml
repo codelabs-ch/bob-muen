@@ -1,4 +1,4 @@
-inherit: [make, cpackage, gpr]
+inherit: [muen_component]
 
 metaEnvironment:
   PD: "Cryptographic library written in SPARK"
@@ -14,77 +14,13 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/git/spark-crypto.git
   branch: master
-  commit: e1f18ce762802e48980f4b45cb7cfd3b7a89aa17
+  commit: 7326a3b8333e6962536a0b868ffd605cbcfc055b
 
-buildVars: [RTS, LIBSPARKCRYPTO_SHA_MODE, LIBSPARKCRYPTO_AES_MODE]
+buildVars: [LIBSPARKCRYPTO_SHA_MODE, LIBSPARKCRYPTO_AES_MODE]
 buildScript: |
-  __SRC=$1
-  build_lsc () {
-     mkdir -p lsc
-     pushd lsc
-     rsync -a --delete $__SRC/ .
-     BUILD_OPTS+=(
-        "MODE=release"
-        "RUNTIME=${RTS}"
-        "NO_APIDOC=1"
-        )
-
-     generateDefaultGpr
-     makeParallel ${BUILD_OPTS[@]} \
-      ${MAKE_TARGET:-} \
-      ${LIBSPARKCRYPTO_AES_MODE:+AES_MODE=$LIBSPARKCRYPTO_AES_MODE} \
-      ${LIBSPARKCRYPTO_SHA_MODE:+SHA_MODE=$LIBSPARKCRYPTO_SHA_MODE} \
-      $@
-     makeSequential ${BUILD_OPTS[@]} DESTDIR=$(pwd)/../install \
-      ${LIBSPARKCRYPTO_AES_MODE:+AES_MODE=$LIBSPARKCRYPTO_AES_MODE} \
-      ${LIBSPARKCRYPTO_SHA_MODE:+SHA_MODE=$LIBSPARKCRYPTO_SHA_MODE} \
-      install $@
-     popd
-  }
+  muenBuild $1/libsparkcrypto
 
 multiPackage:
-  # FIXME
-  #   test:
-  #      depends:
-  #         - adacore::gnat-aunit
-  #         - name: utils::test-runner
-  #           use: [tools]
-  #         - libs::openssl-dev
-  #         - use: []
-  #           depends:
-  #            - libs::openssl-tgt
-  #      environment:
-  #         OPENSSL_LINK_MODE: "no-shared"
-  #      buildSetup: |
-  #         export GNATMAKE_EXTRA="-largs -L${BOB_DEP_PATHS[libs::openssl-dev]}/usr/lib \
-  #                                -L${BOB_DEP_PATHS[libs::openssl-dev]}/usr/lib \
-  #                                -lpthread -margs"
-  #         export MAKE_TARGET="tests"
-  #         export TEST_ARGS="--xml > lsc_tests.xml"
-  #         export HOST_CFLAGS="-I${BOB_DEP_PATHS[libs::openssl-dev]}/usr/include \
-  #                             -Wl,-L${BOB_DEP_PATHS[libs::openssl-dev]}/usr/lib \
-  #                             -Wl,-lpthread \
-  #                             -Wl,-ldl"
-  #      buildVars: [CC]
-  #      buildScript: |
-  #         build_lsc NO_SPARK=1 NO_ISABELLE=1
-  #      packageTools: [test_runner, libxslt-tools]
-  #      packageScript: |
-  #         cppunit2junit libsparkcrypto $1/lsc/lsc_tests.xml lsc_tests.xml
-  # proof:
-  #    buildTools: [host-toolchain, spark, spark2005, isabelle, confgen]
-  #    buildScript: |
-  #       # make sure to find the gnat-gcc first.
-  #       export PATH=$(realpath ${BOB_TOOL_PATHS['gnat-toolchain']})/../bin_host:${PATH}
-  #       # build the target.cfg as done in the makefile.
-  #       confgen | sed -e 's/LOW_ORDER_FIRST/Low_Order_First/g' -e 's/HIGH_ORDER_FIRST/High_Order_First/g' > target.cfg
-  #       build_lsc NO_TESTS=1 TARGET_CFG=$(pwd)/target.cfg
-  #    packageScript: |
-  #       rsync -a --delete $1/lsc/out/proof/ .
-  #       echo "{}" > spark_db.json
   dev:
-    buildScript: |
-      build_lsc NO_SPARK=1 NO_TESTS=1
     packageScript: |
-      rsync -a --delete $1/install/ .
-      echo "GPR_PROJECT_PATH=." > .gpr_project
+      gprInstallPackageDev

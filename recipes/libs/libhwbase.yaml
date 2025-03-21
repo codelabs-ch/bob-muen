@@ -1,0 +1,28 @@
+inherit: [muen_component]
+
+depends:
+  - muen::common-libmusinfo-dev
+  - use: []
+    depends:
+      - muen::common-libmusinfo-tgt
+
+checkoutSCM:
+  scm: git
+  url: https://github.com/coreboot/libhwbase.git
+  branch: main
+  commit: d8fae235d53c0376ab320c3d84a9b414bffe9d64
+
+buildSetup: |
+  export LIBHWBASE_SRC=$1
+
+buildScript: |
+  cp $<<libhwbase/libhwbase.gpr>> libhwbase.gpr
+  muenBuild libhwbase.gpr
+
+multiPackage:
+  dev:
+    provideDeps: ['*-dev']
+    packageScript: gprInstallPackageDev
+  tgt:
+    provideDeps: ['*-tgt']
+    packageScript: installPackageTgt

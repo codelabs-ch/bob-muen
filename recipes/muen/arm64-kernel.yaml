@@ -7,7 +7,7 @@ checkoutSCM:
   commit: a3c11011b5f5ba9a646a135e13c0bf368c0ea74c
 
 depends:
-  - muen::common-muschedinfo
+  - muen::common-muschedinfo-dev
   - muen::muenonarm-policy-files
 
 buildTools: [mugenspec]

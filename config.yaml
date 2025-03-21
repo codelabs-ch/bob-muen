@@ -7,20 +7,20 @@ layers:
   - name: basement
     scm: git
     url: https://github.com/BobBuildTool/basement.git
-    commit: 287f937d683b01cd2f4b4fb4bba5f0c1396ad2f2
+    commit: fff9d8d0c454ac70d9edf6b0321b2da33d5e9a64
     branch: master
 
   - name: basement-gnu-linux
     scm: git
     url: https://github.com/BobBuildTool/basement-gnu-linux.git
-    commit: 27ca241263b28dac8dad62f50507d6eb3e444b81
+    commit: eadb4ef1ece46de2a999d9526009e3b55a968901
     branch: master
 
   - name: ada
     scm: git
     url: git@git.codelabs.ch:bob/ada.git
     branch: main
-    commit: f2c47aca5ac3981973923f2a43e531b4884d63f9
+    commit: af28817d6f38bc0ab4210547eb4b00793b388bfe
 
   - name: codelabs
     scm: git

@@ -110,7 +110,7 @@ multiPackage:
           TEST_NAME: "libmutools"
 
   libmuxml:
-    inherit: [python3-usr]
+    inherit: [python3]
     depends:
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts

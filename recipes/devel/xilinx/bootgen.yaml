@@ -4,6 +4,7 @@ checkoutSCM:
   scm: git
   url: https://github.com/Xilinx/bootgen.git
   branch: xlnx_rel_v2024.1
+  commit: 92e09bf37ea17d7b1f0e102a2548f27fb768651c
 
 depends:
   - libs::openssl-dev

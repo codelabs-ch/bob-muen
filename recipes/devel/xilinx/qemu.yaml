@@ -1,4 +1,4 @@
-inherit: [autotools, meson, patch, python3-usr_checkout]
+inherit: [autotools, meson, patch, python3-checkout]
 
 checkoutSCM:
   scm: git

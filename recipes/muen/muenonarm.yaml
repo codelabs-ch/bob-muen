@@ -148,7 +148,7 @@ multiPackage:
       cp -r $1/* .
 
   policy-files:
-    buildTools: [mucfgjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
+    buildTools: [mucfgcjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
     buildVars: [TARGET_CONFIG]
     buildScript: |
       rm -rf bin && mkdir bin

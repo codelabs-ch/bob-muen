@@ -49,9 +49,7 @@ multiPackage:
           - name: muen::muenonarm-common
             environment:
               NAME: "subject_one"
-          - muen::common-musinfo
-          - muen::common-muschedinfo
-          - muen::common-libmusinfo
+          - muen::common-libmusinfo-dev
         buildVars: [OBJCOPY, NAME, TARGET_PLATFORM, TARGET_CONFIG]
         buildTools: [mucgenspec, target-toolchain]
         buildSetup: |

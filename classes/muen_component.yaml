@@ -3,17 +3,22 @@ inherit: [gpr]
 depends:
   - if: $(ne,${RTS:-UNSET},UNSET)
     name: ${RTS}
+  - muen::common-gpr
+  - muen::build-cfg-gpr
 
 buildVars: [OBJCOPY, RTS, CROSS_COMPILE]
 buildVarsWeak: [MAKE_JOBS]
 buildSetup: |
   export GPR_TARGET="${CROSS_COMPILE%"-"}"
+  export BUILD_CFG_PATH=${BOB_DEP_PATHS[muen::build-cfg-gpr]}
+  export build=${MUEN_BUILD_MODE:-debug}
 buildScript: |
   muenBuild() {
     gprbuild -P $1 \
       -j${MAKE_JOBS:-$(nproc)} \
       --relocate-build-tree=build \
       -gnatef -s -k \
+      --create-map-file \
       --target=${GPR_TARGET} \
       ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
       ${GPRBUILD_EXTRA_ARGS:-} \

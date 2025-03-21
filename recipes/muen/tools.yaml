@@ -89,6 +89,13 @@ multiPackage:
     packageScript: |
       gprInstallPackageDev
 
+  libmupy:
+    buildScript: |
+      mkdir -p $(pwd)/${PYTHON3_DESTLIB}/site-packages/
+      cp -r $1/libmupy/* $(pwd)/${PYTHON3_DESTLIB}/site-packages/
+    packageScript: |
+      rsync -a --delete $1/ .
+
   libmutools:
     depends:
       - ada::ada-bfd-dev
@@ -109,6 +116,9 @@ multiPackage:
   libmuxml:
     inherit: [python3]
     depends:
+      - name: python::lxml
+        tools:
+           target-toolchain: host-compat-toolchain
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
@@ -116,6 +126,7 @@ multiPackage:
     buildTools: [libxslt-tools, tidy]
     buildSetup: |
       export LIBMUXML_GENERATED=$(pwd)/generated
+    buildVars: [ARCH]
     buildScript: |
       rm -rf generated && mkdir -p generated
       SCHEMA_FILES=("system_a" "system_b" "system_src"
@@ -133,6 +144,21 @@ multiPackage:
         ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_extended_schema \
           generated/${S}.xsd generated/muxml-${S}_extended_schema.ads
       done
+
+      if [[ ${ARCH} == x86_64 ]]; then
+        EXTENDED_SCHEMA_FILES=("system_a_extended" "system_b_extended" "system_src_extended"
+                               "vcpu_profile_extended" "system_config_extended"
+                               "hardware_config_extended" "component_extended")
+        for S in ${EXTENDED_SCHEMA_FILES[@]}; do
+          BASE_SCHEMA=${S%"_extended"}
+          $1/libmuxml/schema_plugins/xsd_plugin_doc.py \
+            generated/${BASE_SCHEMA}.xsd generated/${S}.xsd
+
+          ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_schema \
+            generated/${S}.xsd generated/muxml-${S}_schema.ads
+        done
+      fi
+
     multiPackage:
       dev:
         buildScript: muenBuild $1/libmuxml/libmuxml
@@ -219,7 +245,7 @@ multiPackage:
         packageScript: |
           gprInstallPackageTgt $1/install/
         provideTools:
-          mucfgjoin: "usr/bin"
+          mucfgcjoin: "usr/bin"
       test:
         <<: *simple_test
         privateEnvironment:
@@ -233,7 +259,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgcjoin/mucfgcjoin
+          muenBuild $1/mucfgcvresalloc/mucfgcvresalloc
         packageScript: |
           gprInstallPackageTgt $1/install/
         provideTools:
@@ -511,7 +537,7 @@ multiPackage:
 
   mugensinfo:
     depends:
-      - muen::common-musinfo
+      - muen::common-musinfo-dev
       - muen::tools-libmutools-dev
     multiPackage:
       "":
@@ -641,3 +667,37 @@ multiPackage:
         <<: *simple_test
         privateEnvironment:
           TEST_NAME: "muwalkpt"
+
+  muxmlfilter:
+    depends:
+      - muen::tools-libmulog-dev
+      - muen::tools-libmuxml-dev
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/muxmlfilter/muxmlfilter
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          muxmlfilter: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "muxmlfilter"
+
+  mucfgucode:
+    depends:
+      - muen::tools-libmutools-dev
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/mucfgucode/mucfgucode
+        packageScript: |
+          gprInstallPackageTgt
+        provideTools:
+          mucfgucode: "usr/bin"
+      test:
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "muxmlfilter"

@@ -1,13 +1,10 @@
-inherit: [muen_component]
-
-depends:
-  - muen::build-cfg-gpr
+inherit: [muen_component, python3]
 
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/tools.git
   branch: devel-08ac0495a02d-bob
-  commit: a66d3b849acb642ad2f06163a287dac5d4aa70a1
+  commit: cff817d94cd80f4b237353ff07d35f6125fa8893
 
 multiPackage:
   liballoc:
@@ -115,10 +112,6 @@ multiPackage:
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
-
-      - name: python::lxml
-        tools:
-          target-toolchain: host-compat-toolchain
 
     buildTools: [libxslt-tools, tidy]
     buildSetup: |

@@ -1,0 +1,128 @@
+From 98bc400ab18455b4f3e72c1d77af8e88940ecdcd Mon Sep 17 00:00:00 2001
+From: Ralf Hubert <ralf.hubert@secunet.com>
+Date: Mon, 24 Mar 2025 08:22:43 +0100
+Subject: [PATCH] add libsparkcrypto.gpr
+
+This gprfile is used for gprbuild + gprinstall.
+---
+ libsparkcrypto.gpr | 109 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 109 insertions(+)
+ create mode 100644 libsparkcrypto.gpr
+
+diff --git a/libsparkcrypto.gpr b/libsparkcrypto.gpr
+new file mode 100644
+index 0000000..d14188e
+--- /dev/null
++++ b/libsparkcrypto.gpr
+@@ -0,0 +1,109 @@
++project Libsparkcrypto
++is
++   type Mode_Type      		is ("debug", "release");
++   type Arch_Type      		is ("x86_64", "i686", "generic_be");
++   type Endianness_Type 		is ("little_endian", "big_endian");
++   type IO_Type        		is ("textio", "nullio");
++   type Runtime_Type   		is ("native", "zfp", "muen::rts");
++   type Optimization_Type	is ("s", "0", "1", "2", "3");
++   type AES_Mode_Type           is ("aes_sw", "aes_ni");
++
++   Mode      	 : Mode_Type := external ("mode", "release");
++   Arch      	 : Arch_Type := external ("arch", "x86_64");
++   Endianness 	 : Endianness_Type := external ("endianness", "little_endian");
++   IO        	 : IO_Type := "textio";
++   Runtime   	 : Runtime_Type := external ("RTS", "native");
++   AES_Mode      : AES_Mode_Type := external ("AES", "aes_sw");
++
++   Src         := "src/";
++   Default_Opt := "1";
++
++   Compiler_Switches := ();
++   Builder_Switches := ();
++
++   Style_Switches :=
++   ("-gnaty" &
++      "3" & -- indentation
++      "a" & -- attribute casing
++      "A" & -- array attribute indexes
++      "b" & -- no blanks at line end
++      "e" & -- end/exit labels
++      "f" & -- no form feeds/vertical tabs
++      "h" & -- no horizontal tabs
++      "i" & -- if-then layout
++      "k" & -- keyword casing
++      "l" & -- layout
++      "n" & -- casing of standard identifiers
++      "p" & -- pragma casing
++      "r" & -- identifier casing
++      "S" & -- lines after THEN or ELSE
++      "t" & -- token separation rules
++      "u" & -- no unnecessary blank lines
++      "x"   -- no extra parenthesis around conditionals
++   );
++
++   for Library_Name     use "sparkcrypto";
++   for Library_Kind     use "static";
++   for Library_Dir      use "out/build/adalib/" & Runtime;
++
++   for Object_Dir use "out/build/" & Runtime;
++
++   case Runtime is
++      when "native" =>
++         Builder_Switches := ();
++         IO := "textio";
++
++      when "zfp" =>
++         Builder_Switches := ("--RTS=zfp");
++         IO := "nullio";
++      when "muen::rts" =>
++         Builder_Switches := ();
++         IO := "nullio";
++
++   end case;
++
++   AES_Dir := ();
++   AES_Switches := ();
++
++   case AES_Mode is
++     when "aes_sw" =>
++       AES_Dir := ();
++       AES_Switches := ();
++     when "aes_ni" =>
++       AES_Dir := (Src & "ada/aes_ni");
++       AES_Switches := ("-maes");
++   end case;
++
++   for Source_Dirs use
++      (Src & "ada/" & IO,
++       Src & "ada/" & Arch,
++       Src & "ada/generic",
++       Src & "shared/" & Endianness,
++       Src & "shared/" & AES_Mode,
++       Src & "shared/generic") &
++      AES_Dir;
++
++   case Mode is
++      when "release" =>
++         Compiler_Switches := ("-gnatn", "-Winline", "-gnatp", "-funroll-loops");
++         Default_Opt := "3";
++
++      when "debug" =>
++         Compiler_Switches := ("-gnata");
++         Default_Opt := "0";
++
++   end case;
++
++   package Builder is
++      for Default_Switches ("Ada") use Builder_Switches;
++   end Builder;
++
++   Optimization : Optimization_Type := external ("opt", Default_Opt);
++
++   package Compiler is
++      for Local_Configuration_Pragmas use "build/warnings.adc";
++      for Default_Switches ("Ada") use  Style_Switches & Compiler_Switches & AES_Switches &
++         ("-O" & Optimization, "-ffunction-sections", "-fdata-sections", "-fcallgraph-info=su", "-gnatwa", "-gnatwe");
++   end Compiler;
++
++end Libsparkcrypto;
+--
+2.39.5

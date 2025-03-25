@@ -1,4 +1,4 @@
-inherit: [muen_component]
+inherit: [muen_component, patch]
 
 metaEnvironment:
   PD: "Cryptographic library written in SPARK"
@@ -15,6 +15,10 @@ checkoutSCM:
   url: https://git.codelabs.ch/git/spark-crypto.git
   branch: master
   commit: 7326a3b8333e6962536a0b868ffd605cbcfc055b
+
+checkoutDeterministic: True
+checkoutScript: |
+  patchApplySeries -p1 $<@libsparkcrypto/*.patch@>
 
 buildVars: [LIBSPARKCRYPTO_SHA_MODE, LIBSPARKCRYPTO_AES_MODE]
 buildScript: |

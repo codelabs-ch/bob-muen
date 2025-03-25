@@ -9,6 +9,7 @@ depends:
   - net::ethtool
   - net::iptables
   - net::openssh
+  - net::tcpdump
   - utils::bash
   - utils::e2fsprogs
   - utils::mingetty

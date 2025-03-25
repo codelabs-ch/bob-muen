@@ -1,5 +1,7 @@
 environment:
   GRUB2_BOOTSTRAP: "1"
+  GRUB2_TARGET: "i386"
+  GRUB2_PLATFORM: "pc"
 
 scmOverrides:
   - match:

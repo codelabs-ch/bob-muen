@@ -55,7 +55,7 @@ multiPackage:
 
 buildTools: [mucheckelf, mucfgmemhashes, mugensinfo, mugentau0cmds, tau0,
              sbs_tools, gnupg, grub2-tools, xorriso, mtools]
-buildVars: [SYSTEM, SBS_KEYS_PKG, MUEN_EFI]
+buildVars: [SYSTEM, SBS_KEYS_PKG, GRUB2_PLATFORM, GRUB2_TARGET, ARCH]
 buildScript: |
   DEPS=""
   for d in ${!BOB_DEP_PATHS[@]}; do
@@ -103,14 +103,14 @@ buildScript: |
   sbs_create -k $(pwd)/_keys -i muen.img.cmds -o muen.sbs
   sbs_inspect -i muen.sbs
 
-  MUEN_EFI="true"
-  if [[ ${MUEN_EFI:-UNSET} == true ]]; then
+  MUEN_EFI="false"
+  if [[ ${GRUB2_PLATFORM:-efi} == efi ]]; then
     GRUB_CFG=grub.cfg.efi
-    GRUB2_MODS_PATH="usr/lib/grub/x86_64-efi"
   else
     GRUB_CFG=grub.cfg
-    GRUB2_MODS_PATH="usr/lib/grub/i386-pc"
   fi
+
+  GRUB2_MODS_PATH="usr/lib/grub/${GRUB2_TARGET:-ARCH}-${GRUB2_PLATFORM:-efi}"
 
   # create signatures
   rm -f ${GRUB_CFG}.sig

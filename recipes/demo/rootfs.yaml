@@ -48,6 +48,10 @@ buildScript: |
   ln -sf /usr/bin/bash bin/bash
   ln -sf /usr/bin/bash bin/sh
 
+  # fake /dev/null for init process
+  mkdir dev
+  touch dev/null
+
   mkdir -p dev/pts etc mnt proc sys tmp
   mkdir -p var/log
   mkdir -p var/run

@@ -15,6 +15,7 @@ buildSetup: |
   mucgenspec -i $1/spec/libxhcidbg.xml generated
 
 buildScript: |
+  ln -snf $1/spec/libxhcidbg.xml .
   muenBuild $1/libxhcidbg
 
 multiPackage:
@@ -23,14 +24,10 @@ multiPackage:
     packageScript: |
       gprInstallPackageDev
   tgt:
-    privateEnvironment:
-      CSPECS_FILE: "generated/libxhcidbg.xml"
     packageVars: [CSPECS_FILE]
     packageScript: |
       gprInstallPackageTgt
-      if [[ -e $1/${CSPECS_FILE:-} ]]; then
-        mkdir -p usr/share/
-        cp $1/${CSPECS_FILE} usr/share
-        mkdir .bob
-        echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
-      fi
+      mkdir -p usr/share/
+      cp -L $1/libxhcidbg.xml usr/share
+      mkdir .bob
+      echo usr/share/libxhcidbg.xml > .bob/cspecs

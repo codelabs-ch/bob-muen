@@ -17,7 +17,7 @@ depends:
     depends:
       - libs::ncurses-dev
 
-buildTools: [bison, flex, m4, host-toolchain, target-toolchain]
+buildTools: [bison, flex, m4, host-toolchain, target-toolchain, perl]
 buildVars: [ARCH, LINUX_CONFIG, LINUX_CUSTOM_CONFIG]
 buildScript: |
   # prevent timestamps in configuration

@@ -7,6 +7,7 @@ depends:
   - demo::gnat-linux
   - libs::libc-tgt
   - net::ethtool
+  - net::iperf
   - net::iptables
   - net::openssh
   - net::tcpdump

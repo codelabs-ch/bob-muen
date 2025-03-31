@@ -13,10 +13,15 @@ depends:
   - net::tcpdump
   - utils::bash
   - utils::e2fsprogs
-  - utils::mingetty
-  - utils::s390-tools-ttyrun
   - utils::screen
-  - utils::ttysnoop
+
+  - if: "$(eq,${ARCH:-},x86_64)"
+    depends:
+      - demo::pingpong
+      - utils::mingetty
+      - utils::s390-tools-ttyrun
+      - utils::sysbench
+      - utils::ttysnoop
 
   - name: muen::linux-modules
     use: [environment, result]

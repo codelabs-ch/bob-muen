@@ -488,7 +488,7 @@ multiPackage:
         multiPackage: *common_dev_tgt
 
   policy-src:
-    buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM]
+    buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM, MUEN_UCODE_DIR]
     buildTools: [mucfgmerge]
     buildScript: |
       cat > system_config.xml << EOF
@@ -582,6 +582,7 @@ multiPackage:
   policy:
     inherit: [python3]
     depends:
+      - bsp::intel::microcode
       - demo::rootfs
       - muen::linux-image
       - muen::x86-kernel-components-ahci_drv
@@ -605,10 +606,17 @@ multiPackage:
       - name: python::lxml
         tools:
           target-toolchain: host-compat-toolchain
+      - name: utils::iucode-tool
+        use: [tools]
+        tools:
+          target-toolchain: host-compat-toolchain
     buildTools:
+      - acpica
+      - iucode-tool
       - mucfgalloc
       - mucfgcjoin
       - mucfgexpand
+      - mucfgucode
       - mucfgvresalloc
       - muxmlfilter
       - mugenspec
@@ -617,7 +625,6 @@ multiPackage:
       - mugenmsrstore
       - mugenacpi
       - mucfgvalidate
-      - acpica
     buildVars: [SYSTEM, HARDWARE, PLATFORM]
     buildScript: |
       # build the linux cspecs
@@ -647,6 +654,10 @@ multiPackage:
       # Filter to core schema
       muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
         ${SYSTEM}_with_va_filtered.xml
+
+      # MCU
+      mucfgucode -i ${SYSTEM}_with_va_filtered.xml \
+        -u ${BOB_DEP_PATHS['bsp::intel::microcode']} -o .
 
       # Expand
       mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml

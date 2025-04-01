@@ -71,16 +71,16 @@ multiPackage:
           # Strip all modules. Shamelessly ripped from builddeb...
           for module in $(find lib/modules/ -name *.ko -printf '%P\n'); do
               module=lib/modules/$module
-              mkdir -p $(dirname usr/lib/debug/$module)
+              mkdir -p $(dirname usr/lib/.debug/$module)
               # only keep debug symbols in the debug file
               if [[ ${BASEMENT_DEBUG:-0} != "0" ]] ; then
-                  $OBJCOPY --only-keep-debug $module usr/lib/debug/$module
+                  $OBJCOPY --only-keep-debug $module usr/lib/.debug/$module
               fi
               # strip original module from debug symbols
               $OBJCOPY --strip-debug $module
               # then add a link to those
               if [[ ${BASEMENT_DEBUG:-0} != "0" ]] ; then
-                  $OBJCOPY --add-gnu-debuglink=usr/lib/debug/$module $module
+                  $OBJCOPY --add-gnu-debuglink=usr/lib/.debug/$module $module
               fi
           done
 

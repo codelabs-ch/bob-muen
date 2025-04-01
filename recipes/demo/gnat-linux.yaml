@@ -1,3 +1,5 @@
+inherit: [strip]
+
 packageTools: [target-toolchain]
 packageScript: |
   mkdir -p usr/lib
@@ -11,3 +13,4 @@ packageScript: |
   ln -snf libgnat-*.so libgnat.so
   ln -snf libgnarl-*.so libgnarl.so
   popd
+  stripAll .

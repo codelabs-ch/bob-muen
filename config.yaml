@@ -26,4 +26,4 @@ layers:
     scm: git
     url: git@git.codelabs.ch:bob/codelabs.git
     branch: main
-    commit: 9a5dcdc3f4e348432d6b86616b725962e6c07bfd
+    commit: cd2a0aae917d3a5acb346a5b4524c62e07f3e5be

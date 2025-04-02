@@ -18,6 +18,8 @@ depends:
   - if: "$(eq,${ARCH:-},x86_64)"
     depends:
       - demo::pingpong
+      - libs::lvm2
+      - utils::cryptsetup
       - utils::mingetty
       - utils::s390-tools-ttyrun
       - utils::sysbench

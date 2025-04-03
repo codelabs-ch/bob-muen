@@ -3,7 +3,8 @@ __pycache__/
 dev
 work
 *.swp
-serial*.log
+serial*.out
+emulate.*
 layers/
 layers.attic/
 projects/

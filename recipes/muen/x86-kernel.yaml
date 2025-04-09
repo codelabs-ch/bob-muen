@@ -583,7 +583,6 @@ multiPackage:
     inherit: [python3]
     depends:
       - bsp::intel::microcode
-      - demo::rootfs
       - muen::linux-image
       - muen::x86-kernel-components-ahci_drv
       - muen::x86-kernel-components-controller
@@ -601,6 +600,10 @@ multiPackage:
       - muen::x86-kernel-components-vt
 
       - muen::x86-kernel-policy-src
+
+      - name: demo::rootfs
+        environment:
+          ROOTFS_ARCH: "x86_64"
 
       - muen::tools-libmupy
       - name: python::lxml

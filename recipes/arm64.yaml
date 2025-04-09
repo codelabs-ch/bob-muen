@@ -91,7 +91,9 @@ depends:
     depends:
       - muen::linux-image
       - muen::muenonarm-devicetree
-      - demo::rootfs
+      - name: demo::rootfs
+        environment:
+          ROOTFS_ARCH: "arm64"
 
   # (6) Build the native subjects of the Muen SK system for the build
   # modes release and debug only (not required for the test runner nor

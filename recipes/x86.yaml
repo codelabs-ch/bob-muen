@@ -131,11 +131,13 @@ buildScript: |
 
   tau0_main -i ${DEPS}:$(pwd) -o $(pwd) -n muen.img ${SYSTEM}_b_cmds.xml
 
-  rm -rf _keys && mkdir -p _keys
-  cp -r ${BOB_DEP_PATHS[${SBS_KEYS_PKG:-muen::sbs-keys}]}/* _keys
-  chmod 700 _keys
+  keydir=$(mktemp -d)
+  trap "rm -rf $keydir" EXIT
 
-  sbs_create -k $(pwd)/_keys -i muen.img.cmds -o muen.sbs
+  cp -r ${BOB_DEP_PATHS[${SBS_KEYS_PKG:-muen::sbs-keys}]}/* $keydir
+  chmod 700 $keydir
+
+  sbs_create -k $keydir -i muen.img.cmds -o muen.sbs
   sbs_inspect -i muen.sbs
 
   MUEN_EFI="false"
@@ -149,10 +151,11 @@ buildScript: |
 
   # create signatures
   rm -f ${GRUB_CFG}.sig
-  gpg --batch --digest-algo SHA512 -b --homedir $(pwd)/_keys \
+  gpg --batch --digest-algo SHA512 -b --homedir $keydir \
       -o ${GRUB_CFG}.sig \
       ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG}
 
+  rm -rf $keydir
   pkgdatadir=${BOB_DEP_PATHS['bsp::grub2']}/usr/share/grub/ \
   grub-mkrescue -d ${BOB_DEP_PATHS['bsp::grub2']}/${GRUB2_MODS_PATH} \
     --modules="gcry_rsa gcry_sha512 configfile csl pgp sbs normal part_msdos ext2 configfile normal" \

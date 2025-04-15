@@ -180,15 +180,23 @@ multiPackage:
           muenInstallApp idle
 
       isolation_tests:
-        inherit: [muen_component_app]
+        inherit: [muen_component_app, python3]
         depends:
           - muen::common-strings-dev
           - muen::common-libmusinfo-dev
           - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::tools-libmupy
           - use: []
             depends:
               - muen::x86-kernel-components-libmudebuglog-tgt
+          - name: python::lxml
+            tools:
+              target-toolchain: host-compat-toolchain
         buildScript: |
+          # Generate reference_values.ads
+          $1/components/isolation_tests/misc/reference_values.py \
+            --out generated/reference_values.ads \
+            --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
           muenBuildApp isolation_tests
         packageScript: |
           muenInstallApp isolation_tests

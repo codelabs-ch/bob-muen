@@ -2,11 +2,14 @@
 
 set -euxo pipefail
 
-command -v bob
+if ! command -v bob > /dev/null; then
+  echo "ERROR - bob build tool not in PATH or not installed"
+  exit 1
+fi
 
 SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-RECIPES=$(realpath $SCRIPTDIR/..)
+RECIPES=$(realpath "$SCRIPTDIR/..")
 NCI=$SCRIPTDIR/nci
 
 sandbox=""
@@ -32,15 +35,19 @@ while getopts "a:b:dsr:" opt; do
 	esac
 done
 
-pushd $RECIPES
+pushd "$RECIPES" > /dev/null || \
+  { echo "ERROR - path to recipes does not exist or is not a directory" ; \
+    exit 1; }
 
-# (1) Create artifacts_dir to save our output.
+# (1) Create artifacts_dir to save our output and update bob layers.
 if [ -z "$artifacts_dir" ]; then
 	artifacts_dir=$(mktemp -d /tmp/nci-XXXXXX)
 else
-	artifacts_dir=$(realpath $artifacts_dir)
+	artifacts_dir=$(realpath "$artifacts_dir")
 fi
-mkdir -p $artifacts_dir
+
+mkdir -p "$artifacts_dir"
+bob layers update
 
 # (2) Filter bob recipes for supported demo projects with qemu always
 # and hardware optional as well as find corresponding nci plans.
@@ -70,7 +77,7 @@ done
 bob dev \
 	${bob_args} \
 	${sandbox} \
-	${recipes[@]} | tee -a $artifacts_dir/bob.log
+	${recipes[@]} | tee -a "$artifacts_dir/bob.log"
 
 # (4) Add required QEMU tools and devicetrees to path.
 QEMU_PATH=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //devel::xilinx::qemu)/usr/bin
@@ -83,21 +90,23 @@ export DTB_PATH=$DTB_PATH
 nci_defines=()
 
 for r in "${recipes[@]}"; do
-	vname=$(echo ${r} | tr '[:lower:]' '[:upper:]' | tr '-' '_')_IMAGE_DIR
-	vvalue=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //${r})
-	nci_defines+=("-D${vname}=${vvalue}")
+	varname=$(echo "${r}" | tr '[:lower:]' '[:upper:]' | tr '-' '_')_IMAGE_DIR
+	varvalue="${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //${r})"
+	nci_defines+=("-D${varname}=${varvalue}")
 done
 
-popd
+popd > /dev/null
 
 # (6) Call nci application with generated plans and defines.
-pushd $NCI
+pushd "$NCI" > /dev/null || \
+  { echo "ERROR - path to nci does not exist or is not a directory" ; \
+    exit 1; }
 
 ARGS+="-a $artifacts_dir"
 
 ./nci run $ARGS \
-	-c ${plans[@]} \
-	${nci_defines[@]} \
-	-DCONFIG_DIR=$SCRIPTDIR/nci-config
+	-c "${plans[@]}" \
+	"${nci_defines[@]}" \
+	-DCONFIG_DIR="$SCRIPTDIR/nci-config"
 
-popd
+popd > /dev/null

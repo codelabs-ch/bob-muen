@@ -19,7 +19,7 @@ deploy_to_hw=false
 ext_recipes=()
 ext_plans=()
 
-while getopts "a:b:dsr:p:l" opt; do
+while getopts "a:b:dsr:p:gl" opt; do
 	case $opt in
 		a) artifacts_dir="$OPTARG" ;;
 		b) bob_args="$OPTARG" ;;
@@ -27,6 +27,16 @@ while getopts "a:b:dsr:p:l" opt; do
 		s) sandbox="--sandbox" ;;
 		r) IFS=',' read -r -a ext_recipes <<< "$OPTARG" ;;
 		p) IFS=',' read -r -a ext_plans <<< "$OPTARG" ;;
+		g)
+			pushd "$NCI" || \
+			{ echo "ERROR - path to nci does not exist or is not a directory" ; \
+			  exit 1; }
+			find "${SCRIPTDIR}/nci-config/arm64" -name "*.gen.yaml" -exec rm {} \;
+			ext_plans=($(find "${SCRIPTDIR}/nci-config/arm64" -name "*.yaml"))
+			./nci gen -c "${ext_plans[@]}"
+			popd
+			exit 0
+			;;
 		l)
 			ext_recipes=($(cd "$RECIPES" || exit ; bob ls | grep "demo-"))
 			ext_plans=($(ls "${SCRIPTDIR}/nci-config/arm64" | grep ".yaml"))
@@ -46,6 +56,7 @@ while getopts "a:b:dsr:p:l" opt; do
 			echo "  -s  Assume sandbox build"
 			echo "  -r  Run specific bob recipes with default plans (comma separated)"
 			echo "  -p  Run specific nci plans (comma separated)"
+			echo "  -g  Generate pre-rendered nci plan(s)"
 			echo "  -l  List all supported bob recipes and nci plans"
 			exit 1
 			;;

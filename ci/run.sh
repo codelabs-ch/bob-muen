@@ -19,7 +19,7 @@ deploy_to_hw=false
 ext_recipes=()
 ext_plans=()
 
-while getopts "a:b:dsr:p:gl" opt; do
+while getopts "a:b:dsr:p:glh" opt; do
 	case $opt in
 		a) artifacts_dir="$OPTARG" ;;
 		b) bob_args="$OPTARG" ;;
@@ -51,7 +51,9 @@ while getopts "a:b:dsr:p:gl" opt; do
 			exit 0
 			;;
 		*)
-			echo "Usage: $0 [-a artifacts_dir] [-b bob_args] [-d] [-s]"
+			echo "Usage: $0 [-a artifacts_dir] [-b bob_args] [-d] [-s] [-r recipe[,recipe]] [-p plan[,plans]] | -g | -l"
+			echo "  -a  Path to artifacts directory incl. bob log"
+			echo "  -b  Additional arguments for bob (e.g. \"-DMUEN_GDB_SUPPORT=enabled\")"
 			echo "  -d  Also deploy to hardware"
 			echo "  -s  Assume sandbox build"
 			echo "  -r  Run specific bob recipes with default plans (comma separated)"
@@ -67,7 +69,7 @@ pushd "$RECIPES" > /dev/null || \
   { echo "ERROR - path to recipes does not exist or is not a directory" ; \
     exit 1; }
 
-# (1) Create artifacts_dir to save our output and update bob layers.
+# Create artifacts_dir to save our output and update bob layers.
 if [ -z "$artifacts_dir" ]; then
 	artifacts_dir=$(mktemp -d /tmp/nci-XXXXXX)
 else
@@ -77,10 +79,10 @@ fi
 mkdir -p "$artifacts_dir"
 bob layers update
 
-# (2) If called without external recipes or plans, all supported qemu
-# recipes and, if deploy to hardware enabled, xilinx recipes are added
-# to the integration test runner. Else the external recipes are checked
-# and added, if supported.
+# If called without explicitly requested recipes or plans, all supported
+# qemu and, if deploy to hardware enabled, xilinx recipes are added to
+# the integration test runner. Else the external recipes are checked and
+# added, if supported.
 declare -A runner
 
 if [ ${#ext_recipes[@]} -eq 0 ] && [ ${#ext_plans[@]} -eq 0 ]; then
@@ -103,7 +105,7 @@ for r in "${ext_recipes[@]}"; do
   fi
 done
 
-# (3) For all bob recipes added to the test runner, find the default nci
+# For all bob recipes added to the test runner, find the default nci
 # plans with log deploy mode for prove, sdcard for qemu and tftp for
 # xilinx related recipes.
 for r in "${!runner[@]}"; do
@@ -125,9 +127,9 @@ for r in "${!runner[@]}"; do
   fi
 done
 
-# (4) Check the externally requested plans and find the corresponding
-# bob recipes, if supported. Finally exit, if no bob recipes and nci
-# plans could be found.
+# Check the explicitly requested plans and find the corresponding bob
+# recipes, if supported. Finally exit, if no bob recipes and nci plans
+# could be found.
 for p in "${ext_plans[@]}"; do
   if ls "${SCRIPTDIR}/nci-config/arm64" | grep -w "${p}.yaml" > /dev/null; then
     r=($(bob ls | grep "${p%-*}"))
@@ -146,10 +148,8 @@ if [ ${#runner[@]} -eq 0 ]; then
   exit 1
 fi
 
-# (5) Build all required bob recipes sequentially with in development
-# mode. If the the build process fails, remove the bob recipe and all
-# related nci plans from the test runner, but continue with successfully
-# build recipes and plans.
+# Build all requested bob recipes sequentially in bob develop mode.
+# If the the build process fails, abort the entire test run.
 for r in "${!runner[@]}"; do
   if ! bob dev ${bob_args} ${sandbox} "${r}" | tee -a "$artifacts_dir/bob.log"; then
      echo "ERROR - build failure for bob recipe '${r}' with nci plans '${runner[$r]}'"
@@ -157,14 +157,14 @@ for r in "${!runner[@]}"; do
   fi
 done
 
-# (6) Add required QEMU tools and devicetrees to path.
+# Add required QEMU tools and devicetrees to path.
 QEMU_PATH=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //devel::xilinx::qemu)/usr/bin
 DTB_PATH=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //devel::xilinx::qemu-devicetrees)
 
 export PATH=$QEMU_PATH:$PATH
 export DTB_PATH=$DTB_PATH
 
-# (7) Setup nci plans including environment variables.
+# Setup nci plans including environment variables.
 nci_plans=()
 nci_defines=()
 
@@ -177,7 +177,7 @@ done
 
 popd > /dev/null
 
-# (8) Call nci application with generated plans and defines.
+# Call nci application with generated plans and defines.
 pushd "$NCI" > /dev/null || \
   { echo "ERROR - path to nci does not exist or is not a directory" ; \
     exit 1; }

@@ -19,7 +19,7 @@ deploy_to_hw=false
 ext_recipes=()
 ext_plans=()
 
-while getopts "a:b:dsr:p:" opt; do
+while getopts "a:b:dsr:p:l" opt; do
 	case $opt in
 		a) artifacts_dir="$OPTARG" ;;
 		b) bob_args="$OPTARG" ;;
@@ -27,12 +27,26 @@ while getopts "a:b:dsr:p:" opt; do
 		s) sandbox="--sandbox" ;;
 		r) IFS=',' read -r -a ext_recipes <<< "$OPTARG" ;;
 		p) IFS=',' read -r -a ext_plans <<< "$OPTARG" ;;
+		l)
+			ext_recipes=($(cd "$RECIPES" || exit ; bob ls | grep "demo-"))
+			ext_plans=($(ls "${SCRIPTDIR}/nci-config/arm64" | grep ".yaml"))
+			echo "Bob Recipes:"
+			for r in "${ext_recipes[@]}"; do
+				echo "    ${r}"
+			done
+			echo "NCI Plans:"
+			for p in "${ext_plans[@]}"; do
+				echo "    ${p%.yaml}"
+			done
+			exit 0
+			;;
 		*)
 			echo "Usage: $0 [-a artifacts_dir] [-b bob_args] [-d] [-s]"
 			echo "  -d  Also deploy to hardware"
 			echo "  -s  Assume sandbox build"
 			echo "  -r  Run specific bob recipes with default plans (comma separated)"
 			echo "  -p  Run specific nci plans (comma separated)"
+			echo "  -l  List all supported bob recipes and nci plans"
 			exit 1
 			;;
 	esac

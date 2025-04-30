@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
 if ! command -v bob > /dev/null; then
   echo "ERROR - bob build tool not in PATH or not installed"
@@ -19,7 +19,7 @@ deploy_to_hw=false
 ext_recipes=()
 ext_plans=()
 
-while getopts "a:b:dsr:p:glh" opt; do
+while getopts "a:b:dsr:p:glhx" opt; do
 	case $opt in
 		a) artifacts_dir="$OPTARG" ;;
 		b) bob_args="$OPTARG" ;;
@@ -50,6 +50,7 @@ while getopts "a:b:dsr:p:glh" opt; do
 			done
 			exit 0
 			;;
+	  x) set -x ;;
 		*)
 			echo "Usage: $0 [-a artifacts_dir] [-b bob_args] [-d] [-s] [-r recipe[,recipe]] [-p plan[,plans]] | -g | -l"
 			echo "  -a  Path to artifacts directory incl. bob log"
@@ -60,6 +61,7 @@ while getopts "a:b:dsr:p:glh" opt; do
 			echo "  -p  Run specific nci plans (comma separated)"
 			echo "  -g  Generate pre-rendered nci plan(s)"
 			echo "  -l  List all supported bob recipes and nci plans"
+			echo "  -x  Enable print trace"
 			exit 1
 			;;
 	esac

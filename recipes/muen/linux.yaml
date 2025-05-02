@@ -39,7 +39,9 @@ multiPackage:
           target-toolchain: host-compat-toolchain
         depends:
           - libs::elfutils-libelf-dev
-          - libs::openssl-dev
+          - name: libs::openssl-dev
+            environment:
+              OPENSSL_ADDITIONAL_OPTIONS: ""
           - name: kernel::kmod
             use: [tools]
 

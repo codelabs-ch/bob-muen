@@ -50,13 +50,13 @@ while getopts "a:b:dsr:p:glhx" opt; do
 		p) IFS=',' read -r -a exp_plans <<< "$OPTARG" ;;
 		g)
 			find "${SCRIPTDIR}/nci-config/arm64" -name "*.gen.yaml" -exec rm {} \;
-			plans=($(find "${SCRIPTDIR}/nci-config/arm64" -name "*.yaml"))
+			readarray -t plans < <(find "${SCRIPTDIR}/nci-config/arm64" -name "*.yaml")
 			$NCI gen -c "${plans[@]}"
 			exit 0
 			;;
 		l)
-			recipes=($(cd "$RECIPES" || exit ; bob ls | grep -E "arm64-|x86-"))
-			plans=($(ls ${SCRIPTDIR}/nci-config/{arm64,x86}/*.yaml | rev | cut -d'/' -f1-2 | rev | tr '/' '-'))
+			readarray -t recipes < <(cd "$RECIPES" || exit ; bob ls | grep -E "arm64-|x86-")
+			readarray -t plans < <(ls ${SCRIPTDIR}/nci-config/{arm64,x86}/*.yaml | rev | cut -d'/' -f1-2 | rev | tr '/' '-')
 			echo "Bob Recipes:"
 			for r in "${recipes[@]}"; do
 				echo "    ${r}"
@@ -132,8 +132,8 @@ for r in "${!runner[@]}"; do
 	scenario="${r#${arch}-}"
 
 	if [ "${arch}" == "arm64" ]; then
-		p=($(find "${SCRIPTDIR}/nci-config/${arch}" -name "${scenario}-*.yaml" \
-			-not -name "*.gen.yaml"))
+		readarray -t p < <(find "${SCRIPTDIR}/nci-config/${arch}" -name "${scenario}-*.yaml" \
+			-not -name "*.gen.yaml")
 		found=1
 		for d in "${p[@]}"; do
 			# Select log file deployment for all prove plans, sdcard deployment
@@ -154,8 +154,8 @@ for r in "${!runner[@]}"; do
 			exit 1
 		fi
 	else
-		p=$(find "${SCRIPTDIR}/nci-config/${arch}" -name "${scenario}.yaml")
-		runner["${r}"]="${runner[${r}]:-}${p} "
+		plan=$(find "${SCRIPTDIR}/nci-config/${arch}" -name "${scenario}.yaml")
+		runner["${r}"]="${plan}"
 	fi
 done
 
@@ -165,8 +165,8 @@ done
 for p in "${exp_plans[@]}"; do
 	arch="${p%%-*}"
 	scenario="${p#${arch}-}"
-	if ls "${SCRIPTDIR}/nci-config/${arch}" 2> /dev/null | grep -w "${scenario}.yaml" > /dev/null; then
-		r=($(bob ls | grep "${p%-*}"))
+	if ls "${SCRIPTDIR}/nci-config/${arch}/${scenario}.yaml" > /dev/null; then
+		readarray -t r < <(bob ls | grep "${p%-*}")
 		if [[ -n "${r[0]}" ]]; then
 			runner["${r[0]}"]="${runner[${r[0]}]:-}${SCRIPTDIR}/nci-config/${arch}/${scenario}.yaml "
 		else
@@ -194,8 +194,8 @@ fi
 # Arch specific queries
 if search_prefix "arm64-" "${!runner[@]}"; then
 	# Add required QEMU tools and devicetrees to path.
-	qemu_path=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //devel::xilinx::qemu)/usr/bin
-	dtb_path=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //devel::xilinx::qemu-devicetrees)
+	qemu_path=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //devel::xilinx::qemu)/usr/bin
+	dtb_path=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //devel::xilinx::qemu-devicetrees)
 
 	export PATH=$qemu_path:$PATH
 	export DTB_PATH=$dtb_path
@@ -206,7 +206,7 @@ if search_prefix "x86-" "${!runner[@]}"; then
 		${bob_args} \
 		${sandbox} \
 		//muen::tools-mulog | tee -a $artifacts_dir/bob.log
-	mulog_dir=${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //muen::tools-mulog)
+	mulog_dir=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //muen::tools-mulog)
 	nci_defines+=( "-DMULOG_DIR=${mulog_dir}" )
 fi
 
@@ -214,11 +214,12 @@ fi
 nci_plans=()
 
 for r in "${!runner[@]}"; do
-	nci_plans+=( ${runner[${r}]} )
+	# shellcheck disable=SC2206
+	nci_plans+=( ${runner[${r}]} ) # we want shell whitespace expansion here
 	arch="${r%%-*}"
 	scenario="${r#${arch}-}"
 	varname=$(echo ${scenario} | tr '[:lower:]' '[:upper:]' | tr '-' '_')_IMAGE_DIR
-	varvalue="${RECIPES}/$(bob query-path --fail -f {dist} ${sandbox} //${r})"
+	varvalue="${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //${r})"
 	nci_defines+=( "-D${varname}=${varvalue}" )
 done
 

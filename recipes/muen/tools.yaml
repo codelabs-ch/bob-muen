@@ -362,7 +362,7 @@ multiPackage:
       test:
         <<: *simple_test
         privateEnvironment:
-          TEST_NAME: "mucfgvalidate"
+          TEST_NAME: "mucfgvresalloc"
 
   mucgenspec:
     depends:

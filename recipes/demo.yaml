@@ -103,6 +103,7 @@ depends:
   - if: !expr |
         "${MUEN_BUILD_MODE}" != "prove"
     depends:
+      - muen::muenonarm-xsct-swboot-file
       - muen::muenonarm-gdb-xsct-files
       - muen::muenonarm-bootgen-files
 
@@ -155,6 +156,9 @@ buildScript: |
       # files and bash commands from the legacy build system to generate
       # the required results.
       mugends -o . ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp ${BOB_DEP_PATHS[muen::muenonarm-xsct-swboot-file]}/xswboot.tcl .
+      fi
 
       # (c.i) gdb / xsct
       cp ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
@@ -191,6 +195,9 @@ buildScript: |
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp)
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp ${BOB_DEP_PATHS[muen::muenonarm-xsct-swboot-file]}/xswboot.tcl .
+      fi
 
       # (c.i) gdb / xsct
       cp ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
@@ -248,6 +255,7 @@ packageScript: |
       cp $1/gdbinit .
 
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/xswboot.tcl .
         cp $1/xsct.tcl .
         cp $1/bootscript.scr .
       fi
@@ -268,6 +276,7 @@ packageScript: |
       cp $1/gdbinit .
 
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/xswboot.tcl .
         cp $1/xsct.tcl .
         cp $1/bootscript.scr .
       fi

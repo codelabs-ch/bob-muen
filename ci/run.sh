@@ -116,8 +116,14 @@ for r in "${!runner[@]}"; do
   found=1
 
   for d in "${p[@]}"; do
+    # Select log file deployment for all prove plans, sdcard deployment
+    # for all qemu related plans, tftp deployment for debug and release
+    # mode of xilinx related plans and xsct deployment for xilinx unit
+    # test related plans as default nci plans.
     if [[ "$d" == *"prove-log"* || "$d" == *"qemu"*"sdcard"* || \
-          "$d" == *"xilinx"*"tftp"* ]]; then
+          "$d" == *"xilinx"*"debug-tftp"* || \
+          "$d" == *"xilinx"*"release-tftp"* || \
+          "$d" == *"xilinx"*"test-xsct"* ]]; then
       runner["${r}"]="${runner[${r}]:-}${d} "
       found=0
     fi

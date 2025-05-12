@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muenonarm.git
-  branch: c0d1450d63bf-bob
-  commit: a06e5d98e89efacc62773ef3a0b3f530125b0bda
+  branch: e2c0c01862fa-bob
+  commit: 0c8fecc4ad75d639c5e5a65eedff46800d9f8da7
 
 multiPackage:
   common:
@@ -97,6 +97,17 @@ multiPackage:
     buildScript: |
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
         cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/uboot/bootscript_test.cmd .
+      fi
+    packageScript: |
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/* .
+      fi
+
+  xsct-swboot-file:
+    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildScript: |
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/dev/demo/src/${TARGET_PLATFORM}/common/xsct/xswboot.tcl .
       fi
     packageScript: |
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then

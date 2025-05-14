@@ -23,5 +23,14 @@ multiPackage:
     packageScript: |
       gprInstallPackageDev
   tgt:
+    privateEnvironment:
+      CSPECS_FILE: "generated/libxhcidbg.xml"
+    packageVars: [CSPECS_FILE]
     packageScript: |
       gprInstallPackageTgt
+      if [[ -e $1/${CSPECS_FILE:-} ]]; then
+        mkdir -p usr/share/
+        cp $1/${CSPECS_FILE} usr/share
+        mkdir .bob
+        echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+      fi

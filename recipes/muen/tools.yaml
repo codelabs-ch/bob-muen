@@ -118,7 +118,7 @@ multiPackage:
     depends:
       - name: python::lxml
         tools:
-           target-toolchain: host-compat-toolchain
+          target-toolchain: host-compat-toolchain
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
@@ -701,3 +701,9 @@ multiPackage:
         <<: *simple_test
         privateEnvironment:
           TEST_NAME: "muxmlfilter"
+
+  mulog:
+    buildScript: |
+      cp -r $1/scripts/mulog.py .
+    packageScript: |
+      rsync -a --delete $1/ .

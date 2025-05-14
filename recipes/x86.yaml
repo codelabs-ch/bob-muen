@@ -22,6 +22,9 @@ depends:
   - name: utils::mtools
     use: [tools]
 
+  # required for nci x86
+  - name: muen::tools-mulog
+
   - ${SBS_KEYS_PKG:-muen::sbs-keys}
 
   - name: muen::tau0-static
@@ -46,15 +49,47 @@ depends:
   - muen::x86-kernel-grub-cfg
 
 multiPackage:
-  demo_system_vtd:
+  qemu:
     environment:
       SYSTEM: "demo_system_vtd"
       HARDWARE: "qemu-kvm"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
 
-buildTools: [mucheckelf, mucfgmemhashes, mugensinfo, mugentau0cmds, tau0,
-             sbs_tools, gnupg, grub2-tools, xorriso, mtools]
+  qemu-coreboot:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "qemu-kvm-coreboot"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "qemu-kvm-coreboot"
+
+  nuc6cayh-efi-integ:
+    environment:
+      SYSTEM: "integration_tests"
+      HARDWARE: "intel-nuc-6cayh"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "intel-nuc-6cayh"
+      GRUB2_TARGET: "x86_64"
+      GRUB2_PLATFORM: "efi"
+
+  ktqm77-integ:
+    environment:
+      SYSTEM: "integration_tests_kt"
+      HARDWARE: "kontron-ktqm77"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "kontron-ktqm77"
+
+buildTools:
+  - mucheckelf
+  - mucfgmemhashes
+  - mugensinfo
+  - mugentau0cmds
+  - tau0
+  - sbs_tools
+  - gnupg
+  - grub2-tools
+  - xorriso
+  - mtools
 buildVars: [SYSTEM, SBS_KEYS_PKG, GRUB2_PLATFORM, GRUB2_TARGET, ARCH]
 buildScript: |
   DEPS=""
@@ -117,7 +152,6 @@ buildScript: |
   gpg --batch --digest-algo SHA512 -b --homedir $(pwd)/_keys \
       -o ${GRUB_CFG}.sig \
       ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG}
-
 
   pkgdatadir=${BOB_DEP_PATHS['bsp::grub2']}/usr/share/grub/ \
   grub-mkrescue -d ${BOB_DEP_PATHS['bsp::grub2']}/${GRUB2_MODS_PATH} \

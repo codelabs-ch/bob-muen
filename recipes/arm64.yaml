@@ -1,7 +1,7 @@
 #
 # usage:
 #
-#   bob dev | build demo-{TARGET_PLATFORM}-{TARGET_CONFIG}-{BUILD_MODE}
+#   bob dev | build arm64-{TARGET_PLATFORM}-{TARGET_CONFIG}-{BUILD_MODE}
 #     [-D MUEN_GDB_SUPPORT=enabled|disabled] with
 #
 #   - TARGET_PLATFORM: xilinx-zcu104 or qemu-zcu102
@@ -297,7 +297,7 @@ packageScript: |
   esac
 
 multiPackage:
-  demo-qemu:
+  qemu:
     multiPackage:
       zcu102:
         depends:
@@ -332,7 +332,7 @@ multiPackage:
             multiPackage: *muen_build_mode
         packageToolsWeak: [qemu]
 
-  demo-xilinx:
+  xilinx:
     multiPackage:
       zcu104:
         environment:

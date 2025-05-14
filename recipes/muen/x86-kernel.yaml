@@ -10,10 +10,9 @@ multiPackage:
   # TODO: move to it's own recipe once the components part is separated
   # from the main repo
   components-isr_entries:
-        buildScript: |
-          cp $1/components/src/isr_entries.S .
-        packageScript:
-          cp $1/isr_entries.S .
+    buildScript: |
+      cp $1/components/src/isr_entries.S .
+    packageScript: cp $1/isr_entries.S .
 
   components:
     depends:
@@ -89,6 +88,7 @@ multiPackage:
                 depends:
                   - muen::x86-kernel-components-libmudebuglog-tgt
                   - muen::x86-kernel-components-libmutime-tgt
+                  - libs::libxhcidbg-tgt
             buildVars: [MUEN_POLICY_SRC]
             buildTools: [libxslt-tools]
             buildScript: |
@@ -320,8 +320,7 @@ multiPackage:
           - muen::x86-kernel-policy
         buildSetup: |
           export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}
-        buildScript:
-          muenBuildApp tau0
+        buildScript: muenBuildApp tau0
         packageVars: [OBJCOPY]
         packageScript: |
           ${OBJCOPY} -O binary \
@@ -416,7 +415,6 @@ multiPackage:
                 echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
               fi
 
-
       libmudebuglog:
         depends:
           - muen::common-libmusinfo-dev
@@ -429,7 +427,7 @@ multiPackage:
         buildTools: [mucgenspec, mucfgcvresalloc, muxmlfilter, libxslt-tools]
         buildSetup: |
           export LIBMUDEBUGLOG_GENERATED=$(pwd)/generated
-        buildVars:  [MUEN_POLICY_SRC]
+        buildVars: [MUEN_POLICY_SRC]
         buildScript: |
           mkdir -p generated
 
@@ -520,10 +518,9 @@ multiPackage:
       ln -snf ${SYSTEM}.xml policy_src.xml
 
   isr_entries:
-      buildScript: |
-        cp $1/kernel/src/asm/isrlist.S .
-      packageScript:
-        cp $1/* .
+    buildScript: |
+      cp $1/kernel/src/asm/isrlist.S .
+    packageScript: cp $1/* .
 
   "":
     environment:
@@ -582,7 +579,7 @@ multiPackage:
       cp $1/* .
       sed -i 's/CONFIG_LOCALVERSION="-muen"/# CONFIG_LOCALVERSION is not set/g' *
 
-  "policy":
+  policy:
     inherit: [python3]
     depends:
       - demo::rootfs
@@ -608,9 +605,20 @@ multiPackage:
       - name: python::lxml
         tools:
           target-toolchain: host-compat-toolchain
-    buildTools: [mucfgalloc, mucfgcjoin, mucfgexpand, mucfgvresalloc, muxmlfilter,
-                 mugenspec, mugensolo5, mugenzp, mugenmsrstore, mugenacpi, mucfgvalidate, acpica]
-    buildVars: [SYSTEM, HARDWARE]
+    buildTools:
+      - mucfgalloc
+      - mucfgcjoin
+      - mucfgexpand
+      - mucfgvresalloc
+      - muxmlfilter
+      - mugenspec
+      - mugensolo5
+      - mugenzp
+      - mugenmsrstore
+      - mugenacpi
+      - mucfgvalidate
+      - acpica
+    buildVars: [SYSTEM, HARDWARE, PLATFORM]
     buildScript: |
       # build the linux cspecs
       $1/components/linux/misc/linux-muen-gencspec.py \
@@ -650,9 +658,6 @@ multiPackage:
       for G in ${GENERATORS[@]}; do
         $G -o  $(pwd) ${SYSTEM}_b.xml
       done
-
-      # scheduiling plan
-      cp $1/policy/scheduling/static/${SYSTEM}-${HARDWARE}.xml scheduling_plans.xml
 
       # validate
       mucfgvalidate ${SYSTEM}_b.xml

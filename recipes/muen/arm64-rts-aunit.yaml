@@ -1,8 +1,10 @@
+inherit: [gpr]
+
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muen/arm64/rts-aunit.git
-  branch: rts-shared
-  commit: a3c8c74ae19b63cb797bebd339845db4f9b21321
+  branch: main
+  commit: b7f451eaeccbd0a4f555c09d1f1ace0d53dd627e
 
 privateEnvironment:
   FP_SUPPORT: "true"
@@ -10,8 +12,10 @@ privateEnvironment:
 buildTools: [target-toolchain, gprbuild]
 buildVars: [FP_SUPPORT]
 buildScript: |
-  # FIXME: OOT tree build is failing in gprinstall due to wrong path of
-  # runtime.xml
+  # Note: out-of-tree build requires setting up the obj folder
+  # structure correctly incl. copying the libgnat source files
+  # into the adainclude folder and copying and preprocessing
+  # the runtime.xml file.
   rsync -a --delete $1/ .
   mkdir -p obj/adainclude obj/adalib
   cp $1/src/libgnat/* obj/adainclude
@@ -22,13 +26,13 @@ buildScript: |
     sed -i 's/__FP_SUPPORT__//g' obj/runtime.xml
   fi
 
-  gprbuild -P zfp_aarch64 \
+  gprbuild -P rts_aunit \
     --target=aarch64-linux-gnu \
     --RTS=$(pwd)/obj \
     -XGPR_TARGET=aarch64-linux-gnu \
     --relocate-build-tree=build
 
-  gprinstall -Pzfp_aarch64 \
+  gprinstall -P rts_aunit \
     --relocate-build-tree=build \
     --target=aarch64-linux-gnu \
     --prefix=install/usr -p -f -m

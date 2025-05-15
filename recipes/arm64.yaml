@@ -16,9 +16,6 @@ environment:
   MUENBLOCK_BRANCH: "arm64"
   MUENBLOCK_COMMIT: "967d6b52f318bd9a8a397085b65047dfd6096660"
 
-  MUEN_COMMON_BRANCH: "devel-armv8a-8c50d03ff97e-bob"
-  MUEN_COMMON_COMMIT: "bd47a596284f170be45ddb8522a25140c1fbc19e"
-
   LINUX_CUSTOM_CONFIG: "muen::muenonarm-linux-config"
 
 depends:

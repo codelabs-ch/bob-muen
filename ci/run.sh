@@ -99,7 +99,7 @@ bob_color=""
 [ -t 1 ] && bob_color="--color=always"
 
 ansi_rgx=$'\033\\[[0-9;]*[a-zA-Z]'
-bob ${bob_color} layers update | tee >(sed -E "s/$ansi_rgx//g" > $artifacts_dir/bob.log)
+bob ${bob_color} layers update 2>&1 | tee >(sed -E "s/$ansi_rgx//g" > $artifacts_dir/bob.log)
 
 # If called without explicitly requested recipes or plans, all supported
 # qemu and, if deploy to hardware enabled, hardware recipes are added to
@@ -192,7 +192,7 @@ fi
 
 # Build all requested bob recipes.
 # If the the build process fails, abort the entire test run.
-if ! bob ${bob_color} dev ${bob_args} ${sandbox} "${!runner[@]}" | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log); then
+if ! bob ${bob_color} dev ${bob_args} ${sandbox} "${!runner[@]}" 2>&1 | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log); then
 	echo "ERROR - bob build failure"
 	exit 1
 fi
@@ -211,7 +211,7 @@ if search_prefix "x86-" "${!runner[@]}"; then
 	bob ${bob_color} dev \
 		${bob_args} \
 		${sandbox} \
-		//muen::tools-mulog | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log)
+		//muen::tools-mulog 2>&1 | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log)
 	mulog_dir=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //muen::tools-mulog)
 	nci_defines+=( "-DMULOG_DIR=${mulog_dir}" )
 fi

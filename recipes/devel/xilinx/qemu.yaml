@@ -44,7 +44,10 @@ buildScript: |
     --enable-gcrypt \
     --extra-cflags="${MESON_CFLAGS[*]} -Wno-error=maybe-uninitialized" \
     --extra-cxxflags="${MESON_CXXFLAGS[*]} -Wno-error=maybe-uninitialized" \
-    --extra-ldflags="${MESON_LDFLAGS[*]}"
+    --extra-ldflags="${MESON_LDFLAGS[*]}" \
+    --disable-docs \
+    --disable-gio \
+    --disable-containers
 
 packageScript: |
   rsync -a --delete $1/install/ .

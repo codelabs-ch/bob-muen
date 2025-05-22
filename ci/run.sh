@@ -87,6 +87,8 @@ done
 pushd "$RECIPES" > /dev/null
 trap 'popd > /dev/null' EXIT
 
+trap 'echo; echo CTRL-C pressed by user!; exit 1' SIGINT
+
 if [ -z "$artifacts_dir" ]; then
 	artifacts_dir=$(mktemp -d /tmp/nci-XXXXXX)
 fi

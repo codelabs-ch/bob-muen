@@ -49,9 +49,7 @@ multiPackage:
           - name: muen::muenonarm-common
             environment:
               NAME: "subject_one"
-          - muen::common-musinfo
-          - muen::common-muschedinfo
-          - muen::common-libmusinfo
+          - muen::common-libmusinfo-dev
         buildVars: [OBJCOPY, NAME, TARGET_PLATFORM, TARGET_CONFIG]
         buildTools: [mucgenspec, target-toolchain]
         buildSetup: |
@@ -150,7 +148,7 @@ multiPackage:
       cp -r $1/* .
 
   policy-files:
-    buildTools: [mucfgjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
+    buildTools: [mucfgcjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
     buildVars: [TARGET_CONFIG]
     buildScript: |
       rm -rf bin && mkdir bin

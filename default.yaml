@@ -1,2 +1,18 @@
+environment:
+  GRUB2_BOOTSTRAP: "1"
+  GRUB2_TARGET: "i386"
+  GRUB2_PLATFORM: "pc"
+  GNULIB_URL: https://github.com/coreutils/gnulib.git
+
+scmOverrides:
+  - match:
+      url: ${GNU_MIRROR}/grub/grub-2.12.tar.gz
+    del: [digestSHA256, stripComponents]
+    set:
+      scm: git
+      url: https://github.com/codelabs-ch/grub2.git
+      branch: bsbsc-2.12
+      commit: fe8a8695875718f051897d792d54e4ebc98568ce
+
 include:
   - user

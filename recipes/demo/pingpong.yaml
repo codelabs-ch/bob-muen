@@ -1,0 +1,11 @@
+inherit: [strip]
+
+buildTools: [target-toolchain]
+buildVars: [CC]
+buildScript: |
+  $CC -x c -O2 -funroll-loops -o pingpong $<@pingpong/pingpong.c@>
+
+packageScript: |
+  mkdir -p usr/bin
+  cp $1/pingpong usr/bin/pingpong
+  stripAll .

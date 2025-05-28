@@ -1,0 +1,690 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen.git
+  branch: devel-c5bc9f3df36f-bob
+  commit: 434bc50028d35436b5f8d3324f47b913d7ad4acc
+
+multiPackage:
+  # TODO: move to it's own recipe once the components part is separated
+  # from the main repo
+  components-isr_entries:
+    buildScript: |
+      cp $1/components/src/isr_entries.S .
+    packageScript: cp $1/isr_entries.S .
+
+  components:
+    depends:
+      - name: muen::common-common-dev
+
+    environment:
+      ISR_ENTRIES: "muen::x86-kernel-components-isr_entries"
+
+    multiPackage:
+      ahci_drv:
+        inherit: [muen_component_app]
+        depends:
+          - muen::x86-kernel-components-libmuchannel-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::common-strings-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmudebuglog-tgt
+        buildScript: |
+          muenBuildApp ahci_drv
+        packageScript: |
+          muenInstallApp ahci_drv
+        provideDeps: ['*-tgt']
+
+      controller:
+        inherit: [muen_component_app]
+        depends:
+          - muen::x86-kernel-components-libmucontroltypes-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::common-muinterrupts-dev
+          - muen::common-strings-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmucontrol-tgt
+              - muen::x86-kernel-components-libmudebuglog-tgt
+        buildScript: |
+          muenBuildApp controller
+        packageScript: |
+          muenInstallApp controller
+        provideDeps: ['*-tgt']
+
+      dbgserver:
+        multiPackage:
+          config-dev:
+            depends:
+              - ${MUEN_POLICY_SRC}
+            buildVars: [MUEN_POLICY_SRC]
+            buildTools: [libxslt-tools]
+            buildScript: |
+              mkdir -p install/usr/share
+              xsltproc -o install/usr/share/dbg_config.gpr \
+                      --stringparam GPRNAME dbg_config \
+                      --stringparam COMPONENTNAME dbgserver \
+                      $1/components/dbgserver/misc/gpr.xsl \
+                      ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+            packageScript: |
+              gprInstallPackageDev
+          "":
+            inherit: [python3, muen_component_app]
+            depends:
+              - muen::x86-kernel-components-dbgserver-config-dev
+              - muen::x86-kernel-components-libmutime-dev
+              - muen::x86-kernel-components-libmudebuglog-dev
+              - muen::common-debug-dev
+              - muen::common-crash_audit-dev
+              - muen::common-strings-dev
+              - libs::libxhcidbg-dev
+
+              - name: python::lxml
+                tools:
+                  target-toolchain: host-compat-toolchain
+              - use: []
+                depends:
+                  - muen::x86-kernel-components-libmudebuglog-tgt
+                  - muen::x86-kernel-components-libmutime-tgt
+                  - libs::libxhcidbg-tgt
+            buildVars: [MUEN_POLICY_SRC]
+            buildTools: [libxslt-tools]
+            buildScript: |
+              # generate dbg-subject_list.ads
+              $1/components/dbgserver/misc/extract-subject-names.py \
+                --out generated/dbg-subject_list.ads \
+                --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+              # generate logchannels.xml
+              xsltproc -o generated/logchannels.xml \
+                       --stringparam COMPONENTNAME dbgserver \
+                       $1/components/dbgserver/misc/logchannels.xsl \
+                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+              # generate subject_consoles.xml
+              xsltproc -o generated/subject_consoles.xml \
+                       --stringparam COMPONENTNAME dbgserver \
+                       $1/components/dbgserver/misc/subject_consoles.xsl \
+                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+              # generate config.xml
+              xsltproc -o generated/config.xml \
+                       --stringparam COMPONENTNAME dbgserver \
+                       $1/components/dbgserver/misc/config.xsl \
+                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+              muenBuildApp dbgserver
+            packageScript: |
+              muenInstallApp dbgserver
+            provideDeps: ['*-tgt']
+
+      dm:
+        inherit: [muen_component_app]
+        depends:
+          - muen::x86-kernel-components-libmudm-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::common-strings-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmudm-tgt
+              - muen::x86-kernel-components-libmudebuglog-tgt
+        buildScript: |
+          muenBuildApp dm
+        packageScript: |
+          muenInstallApp dm
+        provideDeps: ['*-tgt']
+
+      example:
+        multiPackage:
+          config-dev:
+            depends:
+              - ${MUEN_POLICY_SRC}
+            buildVars: [MUEN_POLICY_SRC]
+            buildTools: [libxslt-tools]
+            buildScript: |
+              mkdir -p install/usr/share
+              xsltproc -o install/usr/share/example_config.gpr \
+                      --stringparam GPRNAME example_config \
+                      $1/components/example/misc/gpr.xsl \
+                      ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+            packageScript: |
+              gprInstallPackageDev
+
+          "":
+            inherit: [muen_component_app]
+            depends:
+              - muen::x86-kernel-components-example-config-dev
+              - muen::x86-kernel-components-libmucontrol-dev
+              - muen::x86-kernel-components-libmudebuglog-dev
+              - muen::common-crash_audit-dev
+              - muen::common-debug-dev
+              - muen::common-mutimedevents-dev
+              - muen::common-strings-dev
+              - use: []
+                depends:
+                  - muen::x86-kernel-components-libmucontrol-tgt
+                  - muen::x86-kernel-components-libmudebuglog-tgt
+            buildScript: |
+              muenBuildApp example
+            packageScript: |
+              muenInstallApp example
+            provideDeps: ['*-tgt']
+
+      idle:
+        inherit: [muen_component_app]
+        buildScript: |
+          muenBuildApp idle
+        packageScript: |
+          muenInstallApp idle
+
+      isolation_tests:
+        inherit: [muen_component_app, python3]
+        depends:
+          - muen::common-strings-dev
+          - muen::common-libmusinfo-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::tools-libmupy
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmudebuglog-tgt
+          - name: python::lxml
+            tools:
+              target-toolchain: host-compat-toolchain
+        buildScript: |
+          # Generate reference_values.ads
+          $1/components/isolation_tests/misc/reference_values.py \
+            --out generated/reference_values.ads \
+            --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+          muenBuildApp isolation_tests
+        packageScript: |
+          muenInstallApp isolation_tests
+        provideDeps: ['*-tgt']
+
+      isolation_tests_monitor:
+        inherit: [muen_component_app]
+        depends:
+          - muen::common-strings-dev
+          - muen::common-libmusinfo-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmudebuglog-tgt
+        buildScript: |
+          muenBuildApp isolation_tests_monitor
+        packageScript: |
+          muenInstallApp isolation_tests_monitor
+        provideDeps: ['*-tgt']
+
+      muinit:
+        inherit: [muen_component]
+        depends:
+          - libs::libsparkcrypto-dev
+          - muen::common-libmusinfo-dev
+          - muen::x86-kernel-components-libmuinit-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmuinit-tgt
+        buildScript: |
+          muenBuild $1/components/muinit/muinit
+          cp $1/components/muinit/spec/muinit.xml .
+        provideDeps: ['*-tgt']
+        packageVars: [OBJCOPY]
+        packageScript: |
+          ${OBJCOPY} -O binary \
+            --set-section-flags .bss=alloc,load,contents \
+            --set-section-flags .stack=alloc,load,contents \
+            $1/install/usr/bin/muinit muinit
+          cp $1/muinit.xml .
+          mkdir -p .bob
+          echo "muinit.xml" > .bob/cspecs
+
+      ps2_drv:
+        inherit: [muen_component_app]
+        depends:
+          - muen::common-strings-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmudebuglog-tgt
+        buildScript: |
+          muenBuildApp ps2_drv
+        packageScript: |
+          muenInstallApp ps2_drv
+        provideDeps: ['*-tgt']
+
+      sl:
+        inherit: [muen_component_app]
+        depends:
+          - muen::common-libmusinfo-dev
+          - muen::x86-kernel-components-libmuinit-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmuinit-tgt
+        buildScript: |
+          muenBuildApp sl
+        packageScript: |
+          muenInstallApp sl
+
+      sm:
+        multiPackage:
+          config-dev:
+            depends:
+              - ${MUEN_POLICY_SRC}
+            buildVars: [MUEN_POLICY_SRC]
+            buildTools: [libxslt-tools]
+            buildScript: |
+              mkdir -p install/usr/share
+              xsltproc -o install/usr/share/config.gpr \
+                      --stringparam GPRNAME config \
+                      --stringparam COMPONENTNAME config \
+                      $1/components/sm/misc/gpr.xsl \
+                      ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+            packageScript: |
+              gprInstallPackageDev
+          "":
+            inherit: [muen_component_app, python3]
+            depends:
+              - muen::common-strings-dev
+              - muen::x86-kernel-components-libmucontrol-dev
+              - muen::x86-kernel-components-libmudebuglog-dev
+              - muen::x86-kernel-components-libmudm-dev
+              - muen::x86-kernel-components-libmutime-dev
+              - muen::x86-kernel-components-sm-config-dev
+
+              - name: python::lxml
+                tools:
+                  target-toolchain: host-compat-toolchain
+              - use: []
+                depends:
+                  - muen::x86-kernel-components-libmucontrol-tgt
+                  - muen::x86-kernel-components-libmudebuglog-tgt
+                  - muen::x86-kernel-components-libmudm-tgt
+                  - muen::x86-kernel-components-libmutime-tgt
+            buildTools: [libxslt-tools]
+            buildVars: [MUEN_POLICY_SRC]
+            buildScript: |
+              rm -rf generated && mkdir -p generated
+              # Generate cpu_values-target.ads
+              $1/components/sm/misc/cpu-values.py \
+                --out generated/cpu_values-target.ads \
+                --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+              # generate config.xml
+              xsltproc -o generated/config.xml \
+                       --stringparam COMPONENTNAME sm \
+                       $1/components/sm/misc/config.xsl \
+                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+              muenBuildApp sm
+            packageScript: |
+              muenInstallApp sm
+            provideDeps: ['*-tgt']
+
+      tau0:
+        inherit: [muen_component_app]
+        depends:
+          - muen::x86-kernel-policy
+        buildSetup: |
+          export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}
+        buildScript: muenBuildApp tau0
+        packageVars: [OBJCOPY]
+        packageScript: |
+          ${OBJCOPY} -O binary \
+            --set-section-flags .bss=alloc,load,contents \
+            --set-section-flags .stack=alloc,load,contents \
+            $1/install/usr/bin/tau0 tau0
+
+      time:
+        inherit: [muen_component_app]
+        depends:
+          - muen::common-libmusinfo-dev
+          - muen::common-strings-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::x86-kernel-components-libmucontrol-dev
+          - muen::x86-kernel-components-libmutime-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmucontrol-tgt
+              - muen::x86-kernel-components-libmudebuglog-tgt
+              - muen::x86-kernel-components-libmutime-tgt
+        buildScript: |
+          muenBuildApp time
+        packageScript: |
+          muenInstallApp time
+        provideDeps: ['*-tgt']
+
+      vt:
+        inherit: [muen_component_app]
+        depends:
+          - muen::common-debug-dev
+          - muen::common-libmusinfo-dev
+          - muen::common-strings-dev
+          - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::x86-kernel-components-libmutime-dev
+          - muen::x86-kernel-components-libmucontrol-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmucontrol-tgt
+              - muen::x86-kernel-components-libmudebuglog-tgt
+              - muen::x86-kernel-components-libmutime-tgt
+        buildScript: |
+          muenBuildApp vt
+        packageScript: |
+          muenInstallApp vt
+        provideDeps: ['*-tgt']
+
+      libmuchannel:
+        buildScript: |
+          muenBuild $1/components/libmuchannel/libmuchannel
+        multiPackage: &common_dev_tgt
+          dev:
+            packageScript: |
+              gprInstallPackageDev
+          tgt:
+            packageVars: [CSPECS_FILE]
+            packageScript: |
+              gprInstallPackageTgt
+              if [[ -e $1/${CSPECS_FILE:-} ]]; then
+                mkdir -p usr/share/
+                cp $1/${CSPECS_FILE} usr/share
+                mkdir .bob
+                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+              fi
+
+      libmucontroltypes:
+        buildScript: |
+          muenBuild $1/components/libmucontroltypes/libmucontroltypes
+        multiPackage: *common_dev_tgt
+
+      libmucontrol:
+        inherit: [muen_component_cspecs]
+        depends:
+          - muen::x86-kernel-components-libmucontroltypes-dev
+        privateEnvironment:
+          CSPECS_FILE: "generated/libmucontrol.xml"
+        buildScript: |
+          muenCspecs libmucontrol
+          muenBuild $1/components/libmucontrol/libmucontrol
+        multiPackage: &common_dev_tgt_provide
+          dev:
+            provideDeps: ['*-dev']
+            packageScript: |
+              gprInstallPackageDev
+          tgt:
+            packageVars: [CSPECS_FILE]
+            packageScript: |
+              gprInstallPackageTgt
+              if [[ -e $1/${CSPECS_FILE:-} ]]; then
+                mkdir -p usr/share/
+                cp $1/${CSPECS_FILE} usr/share
+                mkdir .bob
+                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+              fi
+
+      libmudebuglog:
+        depends:
+          - muen::common-libmusinfo-dev
+          - muen::x86-kernel-components-libmuchannel-dev
+          - ${MUEN_POLICY_SRC}
+
+        privateEnvironment:
+          CSPECS_FILE: "generated/libmudebuglog.xml"
+
+        buildTools: [mucgenspec, mucfgcvresalloc, muxmlfilter, libxslt-tools]
+        buildSetup: |
+          export LIBMUDEBUGLOG_GENERATED=$(pwd)/generated
+        buildVars: [MUEN_POLICY_SRC]
+        buildScript: |
+          mkdir -p generated
+
+          xsltproc -o generated/config.xml $1/components/libmudebuglog/misc/config.xsl \
+            ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+          mucfgcvresalloc $1/components/libmudebuglog/spec/libmudebuglog.xml \
+                          generated/libmudebuglog.xml \
+                          -I generated
+
+          muxmlfilter -isn Component_Ext -osn Component generated/libmudebuglog.xml \
+                      generated/libmudebuglog_filtered.xml
+          mucgenspec --input-spec generated/libmudebuglog_filtered.xml \
+                    $(pwd)/generated
+          muenBuild $1/components/libmudebuglog/libmudebuglog
+        multiPackage: *common_dev_tgt_provide
+
+      libmudm:
+        inherit: [muen_component_cspecs]
+        privateEnvironment:
+          CSPECS_FILE: "generated/libmudm.xml"
+        depends:
+          - muen::common-libmusinfo-dev
+        buildScript: |
+          muenCspecs libmudm
+          muenBuild  $1/components/libmudm/libmudm
+        multiPackage: *common_dev_tgt
+
+      libmuinit:
+        inherit: [muen_component_cspecs]
+        depends:
+          - muen::common-libmusinfo-dev
+          - muen::x86-kernel-components-libmucontrol-dev
+          - libs::libsparkcrypto-dev
+          - use: []
+            depends:
+              - muen::x86-kernel-components-libmucontrol-tgt
+        privateEnvironment:
+          CSPECS_FILE: "generated/libmuinit.xml"
+        buildScript: |
+          muenCspecs libmuinit
+          muenBuild  $1/components/libmuinit/libmuinit
+        multiPackage: *common_dev_tgt_provide
+
+      libmutime:
+        privateEnvironment:
+          CSPECS_FILE: "generated/libmutime.xml"
+        buildSetup: |
+          export LIBMUTIME_GENERATED=$(pwd)/generated
+        buildTools: [mucgenspec]
+        buildScript: |
+          mkdir -p generated
+          cp $1/components/libmutime/spec/libmutime.xml generated
+          mucgenspec --input-spec $1/components/libmutime/spec/libmutime.xml \
+                    $(pwd)/generated
+
+          muenBuild $1/components/libmutime/libmutime
+        multiPackage: *common_dev_tgt
+
+  policy-src:
+    buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM, MUEN_UCODE_DIR]
+    buildTools: [mucfgmerge]
+    buildScript: |
+      cat > system_config.xml << EOF
+      <system>
+       <config>
+        <string name="system"              value="${SYSTEM}.xml"/>
+        <string name="hardware"            value="hardware/${HARDWARE}.xml"/>
+        <string name="additional_hardware" value="hardware/${ADDITIONAL_HW}.xml"/>
+        <string name="platform"            value="platform/${PLATFORM}.xml"/>
+       </config>
+      </system>
+      EOF
+
+      # scheduling plan
+      if [[ -e $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml ]]; then
+        cp $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml scheduling_plans.xml
+      elif [[ -e $1/policy/scheduling/static/${SYSTEM}.xml ]]; then
+        cp $1/policy/scheduling/static/${SYSTEM}.xml scheduling_plans.xml
+      else
+        echo "No scheduling configuration for ${SYSTEM} (platform: ${PLATFORM})"
+        false
+      fi
+
+      mucfgmerge system_config.xml ${SYSTEM}.xml -I $1/policy:$1/policy/xml:.
+    packageScript: |
+      cp $1/${SYSTEM}.xml .
+      ln -snf ${SYSTEM}.xml policy_src.xml
+
+  isr_entries:
+    buildScript: |
+      cp $1/kernel/src/asm/isrlist.S .
+    packageScript: cp $1/* .
+
+  "":
+    environment:
+      ISR_ENTRIES: "muen::x86-kernel-isr_entries"
+    depends:
+      - muen::common-common-dev
+      - muen::common-crash_audit-dev
+      - name: muen::common-debug-dev
+        environment:
+          COMMON_DEBUG_WITHOUT_UART_STATE: "1"
+      - muen::common-muinterrupts-dev
+      - muen::common-muschedinfo-dev
+      - muen::common-mutimedevents-dev
+      - muen::common-strings-dev
+
+      - muen::x86-kernel-policy
+      - muen::x86-kernel-components-tau0
+
+    buildSetup: |
+      export linker_script=$1/kernel/kernel.ld
+      export POLICY_SRC_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}
+      export VERSION_DIR=$(pwd)/_version
+      mkdir -p $(pwd)/_version
+      cat > _version/sk-version.ads << EOF
+      --D @Interface
+      --D Muen version information.
+      package SK.Version is
+         Version_String : constant String :=
+           "$(git -C $1 describe --always --dirty="-UNCLEAN")";
+      end SK.Version;
+      EOF
+    buildScript: |
+      muenBuild $1/kernel/kernel
+    provideDeps: ['muen::x86-kernel-policy', '*tau0']
+    packageVars: [OBJCOPY]
+    packageScript: |
+      ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
+        --set-section-flags .stack=alloc,load,contents \
+        $1/install/usr/bin/kernel \
+        kernel
+      mkdir .debug
+      cp $1/install/usr/bin/kernel .debug/
+
+  grub-cfg:
+    buildScript: |
+      cp $1/emulate/grub* .
+      cp -r $1/emulate/keys .
+      cp $1/emulate/menu.lst .
+    packageScript: |
+      cp -r $1/* .
+
+  linux-config:
+    buildScript: |
+      cp $1/components/linux/config/* .
+    packageScript: |
+      cp $1/* .
+      sed -i 's/CONFIG_LOCALVERSION="-muen"/# CONFIG_LOCALVERSION is not set/g' *
+
+  policy:
+    inherit: [python3]
+    depends:
+      - bsp::intel::microcode
+      - muen::linux-image
+      - muen::x86-kernel-components-ahci_drv
+      - muen::x86-kernel-components-controller
+      - muen::x86-kernel-components-dbgserver
+      - muen::x86-kernel-components-dm
+      - muen::x86-kernel-components-example
+      - muen::x86-kernel-components-idle
+      - muen::x86-kernel-components-isolation_tests
+      - muen::x86-kernel-components-isolation_tests_monitor
+      - muen::x86-kernel-components-muinit
+      - muen::x86-kernel-components-ps2_drv
+      - muen::x86-kernel-components-sl
+      - muen::x86-kernel-components-sm
+      - muen::x86-kernel-components-time
+      - muen::x86-kernel-components-vt
+
+      - muen::x86-kernel-policy-src
+
+      - name: demo::rootfs
+        environment:
+          ROOTFS_ARCH: "x86_64"
+
+      - muen::tools-libmupy
+      - name: python::lxml
+        tools:
+          target-toolchain: host-compat-toolchain
+      - name: utils::iucode-tool
+        use: [tools]
+        tools:
+          target-toolchain: host-compat-toolchain
+    buildTools:
+      - acpica
+      - iucode-tool
+      - mucfgalloc
+      - mucfgcjoin
+      - mucfgexpand
+      - mucfgucode
+      - mucfgvresalloc
+      - muxmlfilter
+      - mugenspec
+      - mugensolo5
+      - mugenzp
+      - mugenmsrstore
+      - mugenacpi
+      - mucfgvalidate
+    buildVars: [SYSTEM, HARDWARE, PLATFORM]
+    buildScript: |
+      # build the linux cspecs
+      $1/components/linux/misc/linux-muen-gencspec.py \
+        ${BOB_DEP_PATHS[muen::linux-image]}/boot/bzImage \
+        $1/components/linux/spec/linux.xml \
+        --out_spec linux.xml \
+        --src_policy ${BOB_DEP_PATHS[muen::x86-kernel-policy-src]}/${SYSTEM}.xml
+      # --initramfs ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz \
+
+      CSPECS="$(pwd)/linux.xml"
+      # collect dependencies cspecs
+      for dep_name in ${!BOB_DEP_PATHS[@]}; do
+        dep_dir=${BOB_DEP_PATHS[${dep_name}]}
+        if [[ -e ${dep_dir}/.bob/cspecs ]]; then
+          CSPECS+=${CSPECS:+,}${dep_dir}/$(cat ${dep_dir}/.bob/cspecs)
+        fi
+      done
+      # Join
+      mucfgcjoin -i ${BOB_DEP_PATHS['muen::x86-kernel-policy-src']}/${SYSTEM}.xml \
+        -o ${SYSTEM}_with_comp.xml \
+        -c ${CSPECS}
+
+      # Allocate virtual memory
+      mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
+
+      # Filter to core schema
+      muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
+        ${SYSTEM}_with_va_filtered.xml
+
+      # MCU
+      mucfgucode -i ${SYSTEM}_with_va_filtered.xml \
+        -u ${BOB_DEP_PATHS['bsp::intel::microcode']} -o .
+
+      # Expand
+      mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
+
+      # Allocate physical memory
+      mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
+
+      GENERATORS=(mugenspec mugensolo5 mugenzp mugenmsrstore mugenacpi)
+      for G in ${GENERATORS[@]}; do
+        $G -o  $(pwd) ${SYSTEM}_b.xml
+      done
+
+      # validate
+      mucfgvalidate ${SYSTEM}_b.xml
+
+    provideDeps: ['*']
+    packageScript: |
+      rsync -a --delete $1/ .
+      echo "GPR_PROJECT_PATH=." >> .gpr_project

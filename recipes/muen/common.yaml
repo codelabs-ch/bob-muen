@@ -1,33 +1,99 @@
-inherit: [muen_component]
-
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/common.git
-  branch: devel-armv8a-8c50d03ff97e-bob
-  commit: bd47a596284f170be45ddb8522a25140c1fbc19e
-
-buildScript: |
-  rsync -a --delete $1/ .
+  branch: $(if-then-else,$(eq,${ARCH},arm64),devel-armv8a-8c50d03ff97e-bob,devel-93c2e7735aac-bob)
+  commit: $(if-then-else,$(eq,${ARCH},arm64),bd47a596284f170be45ddb8522a25140c1fbc19e,1ab74339de69157b0db97f079270b0e5e0abab6d)
 
 multiPackage:
-  musinfo:
-    buildScript: |
-      muenBuild $1/musinfo/musinfo
-    packageScript: |
-      gprInstallPackageDev
+  gpr:
+    inherit: [gpr]
 
-  muschedinfo:
+    buildVars: [ARCH]
     buildScript: |
-      muenBuild $1/muschedinfo/muschedinfo
+      if [[ ${ARCH} == x86_64 ]]; then
+        rsync -a --delete $1/gpr .
+      fi
     packageScript: |
-      gprInstallPackageDev
+      if [[ ${ARCH} == x86_64 ]]; then
+        gprInstallPackageDev $1/gpr
+      fi
 
-  libmusinfo:
-    depends:
-      - muen::common-musinfo
-      - muen::common-muschedinfo
-    buildScript: |
-      rm -rf install
-      muenBuild $1/libmusinfo/libmusinfo
-    packageScript: |
-      gprInstallPackageDev
+  "":
+    inherit: [muen_component]
+    multiPackage:
+      debug:
+        depends:
+          - muen::common-common-dev
+          - muen::common-strings-dev
+          - muen::common-crash_audit-dev
+        buildVars: [COMMON_DEBUG_WITHOUT_UART_STATE]
+        buildScript: |
+          muenBuild $1/debug/common_debug
+        multiPackage: &common_dev_tgt_provides
+          dev:
+            provideDeps: ['*-dev']
+            packageScript: gprInstallPackageDev
+          tgt:
+            provideDeps: ['*-tgt']
+            packageScript: gprInstallPackageTgt
+      crash_audit:
+        depends:
+          - muen::common-common-dev
+        buildScript: muenBuild $1/crash_audit/crash_audit
+        multiPackage: *common_dev_tgt_provides
+      common:
+        depends:
+          - ${ISR_ENTRIES}
+        buildVars: [ISR_ENTRIES]
+        buildScript: |
+          export ISR_ENTRIES_DIR="${BOB_DEP_PATHS[${ISR_ENTRIES}]}"
+          muenBuild $1/src/muen_common
+        multiPackage: &common_dev_tgt
+          dev:
+            packageScript: gprInstallPackageDev
+          tgt:
+            packageScript: gprInstallPackageTgt
+      strings:
+        depends:
+          - muen::common-common-dev
+        buildScript: muenBuild $1/strings/common_strings
+        multiPackage: *common_dev_tgt_provides
+
+      muinterrupts:
+        buildScript: |
+          muenBuild $1/muinterrupts/muinterrupts
+        multiPackage: *common_dev_tgt
+
+      musinfo:
+        buildScript: |
+          muenBuild $1/musinfo/musinfo
+        multiPackage: *common_dev_tgt
+
+      muschedinfo:
+        buildScript: |
+          muenBuild $1/muschedinfo/muschedinfo
+        multiPackage: *common_dev_tgt
+
+      mutimedevents:
+        buildScript: |
+          muenBuild $1/mutimedevents/mutimedevents
+        multiPackage: *common_dev_tgt
+
+      libmusinfo:
+        depends:
+          - muen::common-musinfo-dev
+          - muen::common-muschedinfo-dev
+          - use: []
+            depends:
+              - muen::common-musinfo-tgt
+              - muen::common-muschedinfo-tgt
+        buildScript: |
+          rm -rf install
+          muenBuild $1/libmusinfo/libmusinfo
+        multiPackage:
+          dev:
+            provideDeps: ['*-dev']
+            packageScript: gprInstallPackageDev
+          tgt:
+            provideDeps: ['*-tgt']
+            packageScript: gprInstallPackageTgt

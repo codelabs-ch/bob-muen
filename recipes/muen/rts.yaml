@@ -10,23 +10,28 @@ checkoutSCM:
   commit: 885cb0cdac1a6ee1b829c4c91c338badf769ecd3
 
 buildTools: [target-toolchain, gprbuild]
+buildVars: [ARCH, AUTOCONF_HOST]
 buildScript: |
   mkdir -p obj/adainclude obj/adalib
 
+  if [[ ${ARCH} == arm64 ]]; then
+    ARCH=aarch64
+  fi
+
   cp $1/src/*.ad* obj/adainclude
-  cp $1/src/aarch64/* obj/adainclude
+  cp -r $1/src/${ARCH}/* obj/adainclude
 
   gprbuild -P $1/rts \
-    --target=aarch64-linux-gnu \
+    --target=${AUTOCONF_HOST} \
     --RTS=$(pwd)/obj \
     --relocate-build-tree=build \
-    -XTARGET_ARCH=aarch64 \
+    -XTARGET_ARCH=${ARCH} \
     -XBUILD_CFG=${BOB_DEP_PATHS[muen::build-cfg-gpr]}
 
   gprinstall -P$1/rts --relocate-build-tree=build \
-    --target=aarch64-linux-gnu \
+    --target=${AUTOCONF_HOST} \
     --prefix=install/usr -p -f -m \
-    -XTARGET_ARCH=aarch64
+    -XTARGET_ARCH=${ARCH}
 
 packageScript: |
   mkdir -p usr/include/rts/adainclude

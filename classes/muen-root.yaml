@@ -124,3 +124,13 @@ depends:
       - name: muen::tools-muwalkpt
         use: [tools]
         forward: True
+      - name: muen::tools-muxmlfilter
+        use: [tools]
+        forward: True
+      - name: muen::tools-mucfgucode
+        use: [tools]
+        forward: True
+
+      - name: muen::sbs-tools
+        use: [tools]
+        forward: True

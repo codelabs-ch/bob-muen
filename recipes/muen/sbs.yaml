@@ -1,0 +1,29 @@
+inherit: [make, install]
+
+metaEnvironment:
+  PKG_DESCRIPTION: "Signed Block Stream (SBS) Tools"
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/sbs-tools.git
+  branch: master
+  commit: a1f69d799d6f34b09823c011140f5a91ab9134c8
+
+buildScript: |
+  rsync -a --delete $1/ .
+
+multiPackage:
+  keys:
+    packageScript: |
+      cp -r $1/data/gpg-homedir/* .
+  tools:
+    buildTools: [target-toolchain]
+    buildScript: |
+      makeParallel
+      make install DESTDIR=$(pwd)/install/usr
+
+    packageScript: |
+      installPackageBin $1/install/
+
+    provideTools:
+      sbs_tools: "usr/bin"

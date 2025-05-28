@@ -1,0 +1,32 @@
+inherit: [muen_component_app]
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/tau0.git
+  branch: devel-eab58a1a49a8-bob
+  commit: b6848162dba204abb90adc1bef6b1da56af8f743
+
+depends:
+  - adacore::xmlada-dev
+  - muen::build-cfg-scripts
+  - muen::tools-libmutools-dev
+
+buildTools: [libxslt-tools, tidy]
+buildScript: |
+  rm -rf generated && mkdir -p generated
+  # XSLT command_stream
+  xsltproc ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/resolve.xsl \
+           $1/schema/command_stream.xsd > generated/command_stream.xsd
+
+  # Xml2Ada command_stream
+  ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Tau0.command_stream_schema \
+    generated/command_stream.xsd generated/tau0-command_stream_schema.ads
+
+  export GENERATED=$(pwd)/generated
+  muenBuild $1/tau0
+
+packageScript: |
+  installPackageBin $1/install/
+
+provideTools:
+  tau0: "usr/bin"

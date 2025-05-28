@@ -7,11 +7,23 @@ depends:
   - demo::gnat-linux
   - libs::libc-tgt
   - net::ethtool
+  - net::iperf
   - net::iptables
   - net::openssh
+  - net::tcpdump
   - utils::bash
   - utils::e2fsprogs
   - utils::screen
+
+  - if: "$(eq,${ROOTFS_ARCH:-},x86_64)"
+    depends:
+      - demo::pingpong
+      - libs::lvm2
+      - utils::cryptsetup
+      - utils::mingetty
+      - utils::s390-tools-ttyrun
+      - utils::sysbench
+      - utils::ttysnoop
 
   - name: muen::linux-modules
     use: [environment, result]
@@ -27,7 +39,7 @@ depends:
     tools:
       target-toolchain: host-compat-toolchain
 
-buildTools: [kmod, target-toolchain]
+buildTools: [kmod]
 buildVars: [LINUX_VERSION]
 buildScript: |
   rm -rf rootfs .debug
@@ -40,9 +52,19 @@ buildScript: |
 
   pushd rootfs
 
+  rm -r usr/lib/gconv
+
+  # linux terminfo is required by clear command, remove everything else
+  find usr/share/terminfo/ -mindepth 1 -maxdepth 1 -type d ! -name "l" -exec rm -r {} +
+  find usr/share/terminfo/l -mindepth 1 -maxdepth 1 -type f ! -name "linux" -exec rm -r {} +
+
   ln -sf bin/busybox init
   ln -sf /usr/bin/bash bin/bash
   ln -sf /usr/bin/bash bin/sh
+
+  # fake /dev/null for init process
+  mkdir dev
+  touch dev/null
 
   mkdir -p dev/pts etc mnt proc sys tmp
   mkdir -p var/log

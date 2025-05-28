@@ -1,7 +1,7 @@
 #
 # usage:
 #
-#   bob dev | build demo-{TARGET_PLATFORM}-{TARGET_CONFIG}-{BUILD_MODE}
+#   bob dev | build arm64-{TARGET_PLATFORM}-{TARGET_CONFIG}-{BUILD_MODE}
 #     [-D MUEN_GDB_SUPPORT=enabled|disabled] with
 #
 #   - TARGET_PLATFORM: xilinx-zcu104 or qemu-zcu102
@@ -15,6 +15,8 @@ inherit: [muen-root]
 environment:
   MUENBLOCK_BRANCH: "arm64"
   MUENBLOCK_COMMIT: "967d6b52f318bd9a8a397085b65047dfd6096660"
+
+  LINUX_CUSTOM_CONFIG: "muen::muenonarm-linux-config"
 
 depends:
   # (1) Build all required tools depending on the build mode.
@@ -56,43 +58,45 @@ depends:
   # (3) Build the Muen ARM64 kernel binary either with the standard Muen
   # rts or the arm64-rts-aunit with AUnit support for build mode 'test'.
   - depends:
-    - if: !expr |
+      - if: !expr |
           "${MUEN_BUILD_MODE}" == "test"
-      environment:
-        RTS: "muen::arm64-rts-aunit"
-      depends:
-        - muen::arm64-kernel-${MUEN_BUILD_MODE}
-        - muen::muenonarm-policy-files
-    - if: !expr |
+        environment:
+          RTS: "muen::arm64-rts-aunit"
+        depends:
+          - muen::arm64-kernel-${MUEN_BUILD_MODE}
+          - muen::muenonarm-policy-files
+      - if: !expr |
           "${MUEN_BUILD_MODE}" != "test"
-      environment:
-        RTS: "muen::rts"
-      depends:
-        - muen::arm64-kernel-${MUEN_BUILD_MODE}
-        - muen::muenonarm-policy-files
+        environment:
+          RTS: "muen::rts"
+        depends:
+          - muen::arm64-kernel-${MUEN_BUILD_MODE}
+          - muen::muenonarm-policy-files
 
   # (4) Build the bootloader binaries for exception level 3 (currently
   # prebuilt binaries depending on hardware from muenonarm repository).
   - if: !expr |
-        "${MUEN_BUILD_MODE}" != "prove"
+      "${MUEN_BUILD_MODE}" != "prove"
     depends:
-    - muen::muenonarm-bootloader-binaries
+      - muen::muenonarm-bootloader-binaries
 
   # (5) Build the VM subjects (i.e. Linux subjects) of the Muen SK system
   # for the build modes release and debug only (not required for the test
   # runner nor the proofs).
   - if: !expr |
-        "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
+      "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
     depends:
       - muen::linux-image
       - muen::muenonarm-devicetree
-      - demo::rootfs
+      - name: demo::rootfs
+        environment:
+          ROOTFS_ARCH: "arm64"
 
   # (6) Build the native subjects of the Muen SK system for the build
   # modes release and debug only (not required for the test runner nor
   # the proofs). Currently, the standard Muen rts is used as runtime.
   - if: !expr |
-        "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
+      "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
     environment:
       RTS: "muen::rts"
     depends:
@@ -101,14 +105,14 @@ depends:
 
   # (7) Generate deployment scripts for all deploy modes.
   - if: !expr |
-        "${MUEN_BUILD_MODE}" != "prove"
+      "${MUEN_BUILD_MODE}" != "prove"
     depends:
       - muen::muenonarm-xsct-swboot-file
       - muen::muenonarm-gdb-xsct-files
       - muen::muenonarm-bootgen-files
 
   - if: !expr |
-        "${MUEN_BUILD_MODE}" == "test"
+      "${MUEN_BUILD_MODE}" == "test"
     depends:
       - muen::muenonarm-uboot-tftp-files
 

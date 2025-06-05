@@ -700,7 +700,7 @@ multiPackage:
       test:
         <<: *simple_test
         privateEnvironment:
-          TEST_NAME: "muxmlfilter"
+          TEST_NAME: "mucfgucode"
 
   mulog:
     buildScript: |

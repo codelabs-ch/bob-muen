@@ -43,4 +43,6 @@ packageScript: |
   __SRC_DIR=$1
   muenPackageTest () {
     cp $__SRC_DIR/build/test/gnattest.xml .
+    cp $__SRC_DIR/obj/*.gcda .
+    cp $__SRC_DIR/obj/*.gcno .
   }

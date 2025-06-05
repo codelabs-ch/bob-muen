@@ -1,5 +1,4 @@
 inherit: [muen-root]
-
 depends:
   - tools:
       target-toolchain: host-compat-gnat-toolchain
@@ -8,43 +7,11 @@ depends:
         use: [tools]
         forward: True
 
-      - muen::tools-liballoc-test
-      - muen::tools-libmucfgcheck-test
-      - muen::tools-libmucfgvcpu-test
-      - muen::tools-libmutools-test
-      - muen::tools-libmuxml-test
-      - muen::tools-libpaging-test
-      - muen::tools-mucbinsplit-test
-      - muen::tools-mucfgalloc-test
-      - muen::tools-mucfgcjoin-test
-      - muen::tools-mucfgcvresalloc-test
-      - muen::tools-mucfgexpand-test
-      - muen::tools-mucfgmemhashes-test
-      - muen::tools-mucfgmerge-test
-      - muen::tools-mucfgvalidate-test
-      - muen::tools-mucfgvresalloc-test
-      - muen::tools-mucgenspec-test
-      - muen::tools-mucheckelf-test
-      - muen::tools-mucheckstack-test
-      - muen::tools-mugenacpi-test
-      - muen::tools-mugends-test
-      - muen::tools-mugendts-test
-      - muen::tools-mugenmsrstore-test
-      - muen::tools-mugenpt-test
-      - muen::tools-mugensinfo-test
-      - muen::tools-mugensolo5-test
-      - muen::tools-mugenspec-test
-      #- muen::tools-mugentau0cmds-test
-      # failing due to entry_point mismatch. Tau0 not used on MOA.
-      # Disabling test for now
-      - muen::tools-mugenzp-test
-      - muen::tools-mupcspkrdbg-test
-      - muen::tools-muwalkpt-test
+      - muen::tools-tests
 
 buildScript: |
-  for T in ${!BOB_DEP_PATHS[@]}; do
-    mkdir -p $T
-    cp ${BOB_DEP_PATHS[$T]}/* $T
+  for t in ${@:2}; do
+    cp -r ${t}/* .
   done
 
 packageScript: |

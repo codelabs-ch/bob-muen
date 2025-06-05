@@ -3,8 +3,8 @@ inherit: [muen_component, python3]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/tools.git
-  branch: devel-08ac0495a02d-bob
-  commit: cff817d94cd80f4b237353ff07d35f6125fa8893
+  branch: devel-709594c12661-bob
+  commit: 89a27c3c71a65b854625720e92d32dc7626da005
 
 multiPackage:
   liballoc:
@@ -362,7 +362,7 @@ multiPackage:
       test:
         <<: *simple_test
         privateEnvironment:
-          TEST_NAME: "mucfgvalidate"
+          TEST_NAME: "mucfgvresalloc"
 
   mucgenspec:
     depends:
@@ -700,10 +700,62 @@ multiPackage:
       test:
         <<: *simple_test
         privateEnvironment:
-          TEST_NAME: "muxmlfilter"
+          TEST_NAME: "mucfgucode"
 
   mulog:
     buildScript: |
       cp -r $1/scripts/mulog.py .
+    packageScript: |
+      rsync -a --delete $1/ .
+
+  tests:
+    depends:
+      - muen::tools-liballoc-test
+      - muen::tools-libmucfgcheck-test
+      - muen::tools-libmucfgvcpu-test
+      - muen::tools-libmutools-test
+      - muen::tools-libmuxml-test
+      - muen::tools-libpaging-test
+      - muen::tools-mucbinsplit-test
+      - muen::tools-mucfgalloc-test
+      - muen::tools-mucfgcjoin-test
+      - muen::tools-mucfgcvresalloc-test
+      - muen::tools-mucfgexpand-test
+      - muen::tools-mucfgmemhashes-test
+      - muen::tools-mucfgmerge-test
+      - muen::tools-mucfgvalidate-test
+      - muen::tools-mucfgvresalloc-test
+      - muen::tools-mucgenspec-test
+      - muen::tools-mucheckelf-test
+      - muen::tools-mucheckstack-test
+      - muen::tools-mugenacpi-test
+      - muen::tools-mugends-test
+      - muen::tools-mugendts-test
+      - muen::tools-mugenmsrstore-test
+      - muen::tools-mugenpt-test
+      - muen::tools-mugensinfo-test
+      - muen::tools-mugensolo5-test
+      - muen::tools-mugenspec-test
+      - muen::tools-mugentau0cmds-test
+      - muen::tools-mugenzp-test
+      - muen::tools-mupcspkrdbg-test
+      - muen::tools-muwalkpt-test
+
+    buildVars: [BOB_PACKAGE_NAME]
+    buildScript: |
+      mkdir -p gcov
+      for T in ${!BOB_DEP_PATHS[@]}; do
+        if [[ $T == ${BOB_PACKAGE_NAME} ]] ||
+           [[ $T != muen::tools-*-test ]]; then
+          continue
+        fi
+        mkdir -p $T
+        cp ${BOB_DEP_PATHS[$T]}/gnattest.xml $T
+        gcov-tool merge -o gcov ${BOB_DEP_PATHS[$T]}/ gcov
+        cp ${BOB_DEP_PATHS[$T]}/*.gcno gcov
+      done
+      cd gcov
+      gcov *.gcda
+      rm *.gcda *.gcno
     packageScript: |
       rsync -a --delete $1/ .

@@ -7,7 +7,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux.git
   branch: $(if-then-else,$(eq,${ARCH},arm64),linux-6.1.35-muen-arm,linux-6.1.82-muen)
-  commit: $(if-then-else,$(eq,${ARCH},arm64),7b211f2c333cdf875c9a79c11e76a13b542f2d9a,2f09aaf01a9fa0d33e1a781e7fdd52002026b9b1)
+  commit: $(if-then-else,$(eq,${ARCH},arm64),16776ee513541f147bb3b310245947b73e536b41,2f09aaf01a9fa0d33e1a781e7fdd52002026b9b1)
   shallow: 50
 
 depends:

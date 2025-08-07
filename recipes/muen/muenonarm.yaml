@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muenonarm.git
-  branch: e2c0c01862fa-bob
-  commit: 30d4742bfb548c573da0eb2112521fe40e4c0817
+  branch: master
+  commit: f20901eb59517e0b009b120fb8b38166274b66da
 
 multiPackage:
   common:
@@ -148,13 +148,43 @@ multiPackage:
       cp -r $1/* .
 
   policy-files:
+    inherit: [python3]
+    depends:
+      - muen::linux-image
+      - muen::tools-libmupy
     buildTools: [mucfgcjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
     buildVars: [TARGET_CONFIG]
     buildScript: |
       rm -rf bin && mkdir bin
 
+      # Determine effective Linux image size from header
+      LINUX_SIZE=$(python3 - ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin << EOF
+      import os
+      import sys
+      import struct
+      sys.path.append(os.getcwd() + "/tools/libmupy")
+      import muutils
+      with open(sys.argv[1], 'rb') as image:
+        image.seek(16)
+        size = struct.unpack("<Q", image.read(8))[0]
+        size -= size % -4096
+        print(muutils.int_to_ada_hex(size))
+      EOF
+      )
+
+      # Build Linux cspec
+      cat > linux.xml << EOF
+      <component name="linux" profile="linux">
+        <provides>
+          <memory logical="binary" virtualAddress="16#0020_0000#" size="${LINUX_SIZE}" writable="true" executable="true" type="subject_binary">
+            <file filename="Image.bin" offset="none"/>
+          </memory>
+        </provides>
+      </component>
+      EOF
+
       mucfgcjoin -i $1/system/demo/src/policy/${TARGET_CONFIG}.xml \
-        -c $1/system/subjects/native/example/spec/example.xml \
+        -c $1/system/subjects/native/example/spec/example.xml,linux.xml \
         -o policy_src.xml
 
       mucfgexpand policy_src.xml policy_a.xml

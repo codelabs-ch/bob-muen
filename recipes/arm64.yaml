@@ -140,15 +140,12 @@ buildScript: |
       cp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/bin/* .
 
       cp ${BOB_DEP_PATHS[muen::muenonarm-devicetree]}/*.dtb .
+      cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin .
 
       if [[ ${TARGET_CONFIG} == "minimal" ]] ; then
-        cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin Image_linux.bin
         cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_linux.cpio.gz
       else
-        cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin Image_lnx1.bin
         cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx1.cpio.gz
-
-        cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin Image_lnx2.bin
         cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx2.cpio.gz
       fi
 

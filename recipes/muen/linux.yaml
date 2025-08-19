@@ -1,13 +1,13 @@
 inherit: [make]
 
 metaEnvironment:
-  PKG_VERSION: "$(if-then-else,$(eq,${ARCH},arm64),6.1.35,6.1.82)"
+  PKG_VERSION: "6.1.82"
 
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux.git
-  branch: $(if-then-else,$(eq,${ARCH},arm64),linux-6.1.35-muen-arm,linux-6.1.82-muen)
-  commit: $(if-then-else,$(eq,${ARCH},arm64),16776ee513541f147bb3b310245947b73e536b41,2f09aaf01a9fa0d33e1a781e7fdd52002026b9b1)
+  branch: $(if-then-else,$(eq,${ARCH},arm64),linux-6.1.82-muen-arm,linux-6.1.82-muen)
+  commit: $(if-then-else,$(eq,${ARCH},arm64),5d7821ecd20faf648149460c349429346aafccc5,2f09aaf01a9fa0d33e1a781e7fdd52002026b9b1)
   shallow: 50
 
 depends:

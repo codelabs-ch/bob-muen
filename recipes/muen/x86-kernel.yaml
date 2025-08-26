@@ -530,6 +530,8 @@ multiPackage:
       cp $1/kernel/src/asm/isrlist.S .
     packageScript: cp $1/* .
 
+  #### Kernel ##############################################################
+
   "":
     environment:
       ISR_ENTRIES: "muen::x86-kernel-isr_entries"
@@ -547,7 +549,6 @@ multiPackage:
 
       - muen::x86-kernel-policy
       - muen::x86-kernel-components-tau0
-
     buildSetup: |
       export linker_script=$1/kernel/kernel.ld
       export POLICY_SRC_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}
@@ -561,21 +562,52 @@ multiPackage:
            "$(git -C $1 describe --always --dirty="-UNCLEAN")";
       end SK.Version;
       EOF
-    buildScript: |
-      GPR_FILE=kernel
-      if [[ ${MUEN_BUILD_MODE} == debug ]]; then
-        GPR_FILE+=_debug
-      fi
-      muenBuild $1/kernel/$GPR_FILE
-    provideDeps: ['muen::x86-kernel-policy', '*tau0']
-    packageVars: [OBJCOPY]
-    packageScript: |
-      ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
-        --set-section-flags .stack=alloc,load,contents \
-        $1/install/usr/bin/kernel \
-        kernel
-      mkdir .debug
-      cp $1/install/usr/bin/kernel .debug/
+
+    multiPackage:
+      "":
+        buildScript: |
+          GPR_FILE=kernel
+          if [[ ${MUEN_BUILD_MODE} == debug ]]; then
+            GPR_FILE+=_debug
+          fi
+          muenBuild $1/kernel/$GPR_FILE
+        provideDeps: ['muen::x86-kernel-policy', '*tau0']
+        packageVars: [OBJCOPY]
+        packageScript: |
+          ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
+            --set-section-flags .stack=alloc,load,contents \
+            $1/install/usr/bin/kernel \
+            kernel
+          mkdir .debug
+          cp $1/install/usr/bin/kernel .debug/
+
+      proof:
+        buildTools: [gnatprove]
+        buildVars: [RTS]
+        buildSetup: |
+          export MUEN_BUILD_MODE=prove
+          export OBJ_DIR=$(pwd)/
+        buildScript: |
+          gnatprove -P $1/kernel/kernel.gpr \
+            -j${MAKE_JOBS:-$(nproc)} \
+            --debug-no-semaphore \
+            --target=${GPR_TARGET} \
+            ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+            -k \
+            --warnings=error \
+            --mode=all \
+            --no-inlining \
+            --proof=per_path:all \
+            --counterexamples=off \
+            --prover=all \
+            --timeout=10 \
+            --steps=0 \
+            ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
+        packageScript: |
+          cp $1/prove/gnatprove/gnatprove.out .
+          cp $1/gnatprove.log .
+
+  ##########################################################################
 
   grub-cfg:
     buildScript: |

@@ -44,6 +44,8 @@ depends:
       RTS: "muen::rts"
     depends:
       - muen::x86-kernel
+    if: !expr |
+      "${MUEN_BUILD_MODE:-}" != "prove"
 
   - bsp::grub2
   - muen::x86-kernel-grub-cfg
@@ -62,6 +64,13 @@ multiPackage:
       release:
         environment:
           MUEN_BUILD_MODE: "release"
+      proof:
+        environment:
+          MUEN_BUILD_MODE: "prove"
+        depends:
+          - name: muen::x86-kernel-proof
+            environment:
+              RTS: "muen::rts"
 
   qemu-coreboot:
     environment:

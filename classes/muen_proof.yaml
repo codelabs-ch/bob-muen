@@ -1,0 +1,24 @@
+buildTools: [gnatprove]
+buildVars: [RTS, GPR_FILE]
+buildSetup: |
+  export MUEN_BUILD_MODE=prove
+  export OBJ_DIR=$(pwd)/
+buildScript: |
+  gnatprove -P ${GPR_FILE} \
+    -j${MAKE_JOBS:-$(nproc)} \
+    --debug-no-semaphore \
+    --target=${GPR_TARGET} \
+    ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+    -k \
+    --warnings=error \
+    --mode=all \
+    --no-inlining \
+    --proof=per_path:all \
+    --counterexamples=off \
+    --prover=all \
+    --timeout=10 \
+    --steps=0 \
+    ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
+packageScript: |
+  cp $1/prove/gnatprove/gnatprove.out .
+  cp $1/gnatprove.log .

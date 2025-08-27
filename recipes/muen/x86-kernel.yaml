@@ -582,30 +582,9 @@ multiPackage:
           cp $1/install/usr/bin/kernel .debug/
 
       proof:
-        buildTools: [gnatprove]
-        buildVars: [RTS]
+        inherit: [muen_proof]
         buildSetup: |
-          export MUEN_BUILD_MODE=prove
-          export OBJ_DIR=$(pwd)/
-        buildScript: |
-          gnatprove -P $1/kernel/kernel.gpr \
-            -j${MAKE_JOBS:-$(nproc)} \
-            --debug-no-semaphore \
-            --target=${GPR_TARGET} \
-            ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
-            -k \
-            --warnings=error \
-            --mode=all \
-            --no-inlining \
-            --proof=per_path:all \
-            --counterexamples=off \
-            --prover=all \
-            --timeout=10 \
-            --steps=0 \
-            ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
-        packageScript: |
-          cp $1/prove/gnatprove/gnatprove.out .
-          cp $1/gnatprove.log .
+          export GPR_FILE=$1/kernel/kernel.gpr
 
   ##########################################################################
 

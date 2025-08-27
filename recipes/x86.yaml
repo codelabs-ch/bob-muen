@@ -6,7 +6,6 @@ environment:
   LINUX_CONFIG: "linux64-6.1"
 
 depends:
-
   - name: libs::glib-tools
     use: [tools]
     forward: True
@@ -22,11 +21,6 @@ depends:
   - name: utils::mtools
     use: [tools]
 
-  # required for nci x86
-  - name: muen::tools-mulog
-
-  - ${SBS_KEYS_PKG:-muen::sbs-keys}
-
   - name: muen::tau0-static
     tools:
       target-toolchain: host-compat-gnat-toolchain
@@ -40,16 +34,6 @@ depends:
       target-toolchain: host-compat-gnat-toolchain
       host-native-toolchain: host-compat-gnat-toolchain
 
-  - environment:
-      RTS: "muen::rts"
-    depends:
-      - muen::x86-kernel
-    if: !expr |
-      "${MUEN_BUILD_MODE:-}" != "prove"
-
-  - bsp::grub2
-  - muen::x86-kernel-grub-cfg
-
 multiPackage:
   qemu:
     environment:
@@ -58,10 +42,115 @@ multiPackage:
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
     multiPackage: &muen_build_mode
-      debug:
+      debug: &image_common
         environment:
           MUEN_BUILD_MODE: "debug"
+        depends:
+          # required for nci x86
+          - name: muen::tools-mulog
+
+          - ${SBS_KEYS_PKG:-muen::sbs-keys}
+
+          - bsp::grub2
+          - muen::x86-kernel-grub-cfg
+
+          - environment:
+              RTS: "muen::rts"
+            depends:
+              - muen::x86-kernel
+        buildTools:
+          - mucheckelf
+          - mucfgmemhashes
+          - mugensinfo
+          - mugentau0cmds
+          - tau0
+          - sbs_tools
+          - gnupg
+          - grub2-tools
+          - xorriso
+          - mtools
+        buildVars: [SYSTEM, SBS_KEYS_PKG, GRUB2_PLATFORM, GRUB2_TARGET, ARCH]
+        buildScript: |
+          DEPS=""
+          for d in ${!BOB_DEP_PATHS[@]}; do
+            echo $d
+            DIR=${BOB_DEP_PATHS[$d]}
+            DEPS+=":${DIR}"
+            if [ -e ${DIR}/kernel ]; then
+              echo "kernel found in: ${DIR}"
+            fi
+            if [ -d ${DIR}/usr/bin ]; then
+              DEPS+=":${DIR}/usr/bin"
+              if [ -e ${DIR}/usr/bin/kernel ]; then
+                echo "kernel found in: ${DIR}/usr/bin"
+              fi
+            fi
+            if [ -e ${DIR}/boot ]; then
+              DEPS+=":${DIR}/boot"
+
+              if [ -e ${DIR}/boot/kernel ]; then
+                echo "kernel found in: ${DIR}/boot"
+              fi
+            fi
+          done
+
+          mucheckelf ${BOB_DEP_PATHS[muen::x86-kernel-policy]}/${SYSTEM}_b.xml \
+            ${BOB_DEP_PATHS[muen::x86-kernel]}/.debug/kernel
+
+          mucfgmemhashes -i ${DEPS} \
+            ${BOB_DEP_PATHS[muen::x86-kernel-policy]}/${SYSTEM}_b.xml \
+            ${SYSTEM}_b.xml
+
+          mugensinfo -o $(pwd) \
+            ${SYSTEM}_b.xml
+
+          mugentau0cmds \
+            ${SYSTEM}_b.xml \
+            ${SYSTEM}_b_cmds.xml
+
+          tau0_main -i ${DEPS}:$(pwd) -o $(pwd) -n muen.img ${SYSTEM}_b_cmds.xml
+
+          keydir=$(mktemp -d)
+          trap "rm -rf $keydir" EXIT
+
+          cp -r ${BOB_DEP_PATHS[${SBS_KEYS_PKG:-muen::sbs-keys}]}/* $keydir
+          chmod 700 $keydir
+
+          sbs_create -k $keydir -i muen.img.cmds -o muen.sbs
+          sbs_inspect -i muen.sbs
+
+          MUEN_EFI="false"
+          if [[ ${GRUB2_PLATFORM:-efi} == efi ]]; then
+            GRUB_CFG=grub.cfg.efi
+          else
+            GRUB_CFG=grub.cfg
+          fi
+
+          GRUB2_MODS_PATH="usr/lib/grub/${GRUB2_TARGET:-ARCH}-${GRUB2_PLATFORM:-efi}"
+
+          # create signatures
+          rm -f ${GRUB_CFG}.sig
+          gpg --batch --digest-algo SHA512 -b --homedir $keydir \
+              -o ${GRUB_CFG}.sig \
+              ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG}
+
+          rm -rf $keydir
+          pkgdatadir=${BOB_DEP_PATHS['bsp::grub2']}/usr/share/grub/ \
+          grub-mkrescue -d ${BOB_DEP_PATHS['bsp::grub2']}/${GRUB2_MODS_PATH} \
+            --modules="gcry_rsa gcry_sha512 configfile csl pgp sbs normal part_msdos ext2 configfile normal" \
+            --pubkey ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/keys/testkey.pub \
+            -o muen.iso \
+            -v \
+            boot/grub/grub.cfg=${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG} \
+            boot/grub/grub.cfg.sig=${GRUB_CFG}.sig \
+            boot/kernel.csl=muen.img.cmds \
+            boot/kernel.sbs=muen.sbs \
+            boot/filo/menu.lst=${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/menu.lst
+
+        packageScript: |
+          cp $1/muen.iso .
       release:
+        <<: *image_common
         environment:
           MUEN_BUILD_MODE: "release"
       proof:
@@ -71,6 +160,14 @@ multiPackage:
           - name: muen::x86-kernel-proof
             environment:
               RTS: "muen::rts"
+        buildScript: |
+          for d in ${!BOB_DEP_PATHS[@]}; do
+            dirname=$(echo $d | sed 's/::/-/g')
+            mkdir $dirname
+            cp ${BOB_DEP_PATHS[$d]}/gnatprove.* $dirname/
+          done
+        packageScript: |
+          rsync -a --delete $1/ .
 
   qemu-coreboot:
     environment:
@@ -97,95 +194,3 @@ multiPackage:
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "kontron-ktqm77"
     multiPackage: *muen_build_mode
-
-buildTools:
-  - mucheckelf
-  - mucfgmemhashes
-  - mugensinfo
-  - mugentau0cmds
-  - tau0
-  - sbs_tools
-  - gnupg
-  - grub2-tools
-  - xorriso
-  - mtools
-buildVars: [SYSTEM, SBS_KEYS_PKG, GRUB2_PLATFORM, GRUB2_TARGET, ARCH]
-buildScript: |
-  DEPS=""
-  for d in ${!BOB_DEP_PATHS[@]}; do
-    echo $d
-    DIR=${BOB_DEP_PATHS[$d]}
-    DEPS+=":${DIR}"
-    if [ -e ${DIR}/kernel ]; then
-      echo "kernel found in: ${DIR}"
-    fi
-    if [ -d ${DIR}/usr/bin ]; then
-      DEPS+=":${DIR}/usr/bin"
-      if [ -e ${DIR}/usr/bin/kernel ]; then
-        echo "kernel found in: ${DIR}/usr/bin"
-      fi
-    fi
-    if [ -e ${DIR}/boot ]; then
-      DEPS+=":${DIR}/boot"
-
-      if [ -e ${DIR}/boot/kernel ]; then
-        echo "kernel found in: ${DIR}/boot"
-      fi
-    fi
-  done
-
-  mucheckelf ${BOB_DEP_PATHS[muen::x86-kernel-policy]}/${SYSTEM}_b.xml \
-    ${BOB_DEP_PATHS[muen::x86-kernel]}/.debug/kernel
-
-  mucfgmemhashes -i ${DEPS} \
-    ${BOB_DEP_PATHS[muen::x86-kernel-policy]}/${SYSTEM}_b.xml \
-    ${SYSTEM}_b.xml
-
-  mugensinfo -o $(pwd) \
-    ${SYSTEM}_b.xml
-
-  mugentau0cmds \
-    ${SYSTEM}_b.xml \
-    ${SYSTEM}_b_cmds.xml
-
-  tau0_main -i ${DEPS}:$(pwd) -o $(pwd) -n muen.img ${SYSTEM}_b_cmds.xml
-
-  keydir=$(mktemp -d)
-  trap "rm -rf $keydir" EXIT
-
-  cp -r ${BOB_DEP_PATHS[${SBS_KEYS_PKG:-muen::sbs-keys}]}/* $keydir
-  chmod 700 $keydir
-
-  sbs_create -k $keydir -i muen.img.cmds -o muen.sbs
-  sbs_inspect -i muen.sbs
-
-  MUEN_EFI="false"
-  if [[ ${GRUB2_PLATFORM:-efi} == efi ]]; then
-    GRUB_CFG=grub.cfg.efi
-  else
-    GRUB_CFG=grub.cfg
-  fi
-
-  GRUB2_MODS_PATH="usr/lib/grub/${GRUB2_TARGET:-ARCH}-${GRUB2_PLATFORM:-efi}"
-
-  # create signatures
-  rm -f ${GRUB_CFG}.sig
-  gpg --batch --digest-algo SHA512 -b --homedir $keydir \
-      -o ${GRUB_CFG}.sig \
-      ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG}
-
-  rm -rf $keydir
-  pkgdatadir=${BOB_DEP_PATHS['bsp::grub2']}/usr/share/grub/ \
-  grub-mkrescue -d ${BOB_DEP_PATHS['bsp::grub2']}/${GRUB2_MODS_PATH} \
-    --modules="gcry_rsa gcry_sha512 configfile csl pgp sbs normal part_msdos ext2 configfile normal" \
-    --pubkey ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/keys/testkey.pub \
-    -o muen.iso \
-    -v \
-    boot/grub/grub.cfg=${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG} \
-    boot/grub/grub.cfg.sig=${GRUB_CFG}.sig \
-    boot/kernel.csl=muen.img.cmds \
-    boot/kernel.sbs=muen.sbs \
-    boot/filo/menu.lst=${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/menu.lst
-
-packageScript: |
-  cp $1/muen.iso .

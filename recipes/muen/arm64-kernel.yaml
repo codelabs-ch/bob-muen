@@ -47,17 +47,9 @@ multiPackage:
       export BIN_POSTFIX=_test
     buildScript: *common_build
     packageScript: *common_pkg
-  prove:
-    buildTools: [gnatprove]
-    buildVars: [RTS]
+  proof:
+    inherit: [muen_proof]
     buildSetup: |
       export BUILD_MODE=prove
-    buildScript: |
-      gnatprove -P $1/kernel -j${MAKE_JOBS:-$(nproc)} \
-        --debug-no-semaphore --target=${GPR_TARGET} \
-        ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
-        --warnings=error -XPREFIX=$(pwd) \
-        ${GNATPROVE_EXTRA_ARGS:-} 2>&1 | tee gnatprove.log
-    packageScript: |
-      cp $1/obj/gnatprove/gnatprove.out .
-      cp $1/gnatprove.log .
+      export GPR_FILE=$1/kernel.gpr
+      export GNATPROVE_EXTRA_ARGS="-XPREFIX=$(pwd)"

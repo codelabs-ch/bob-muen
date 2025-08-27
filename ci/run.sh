@@ -139,7 +139,7 @@ for r in "${exp_recipes[@]}"; do
 done
 
 # For all bob recipes added to the test runner, find the matching nci
-# plans. For arm64, this means: log deploy mode for prove, sdcard for qemu and
+# plans. For arm64, this means: log deploy mode for proof, sdcard for qemu and
 # tftp for xilinx related recipes.
 #
 # On x86 we only support debug (for now).
@@ -152,11 +152,11 @@ for r in "${!runner[@]}"; do
 			-not -name "*.gen.yaml")
 		found=1
 		for d in "${p[@]}"; do
-			# Select log file deployment for all prove plans, sdcard deployment
+			# Select log file deployment for all proof plans, sdcard deployment
 			# for all qemu related plans, tftp deployment for debug and release
 			# mode of xilinx related plans and xsct deployment for xilinx unit
 			# test related plans as default nci plans.
-			if [[ "$d" == *"prove-log"* || "$d" == *"qemu"*"sdcard"* || \
+			if [[ "$d" == *"proof-log"* || "$d" == *"qemu"*"sdcard"* || \
 				"$d" == *"xilinx"*"debug-tftp"* || \
 				"$d" == *"xilinx"*"release-tftp"* || \
 				"$d" == *"xilinx"*"test-xsct"* ]]; then

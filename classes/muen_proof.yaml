@@ -1,8 +1,5 @@
 buildTools: [gnatprove]
-buildVars: [RTS, GPR_FILE]
-buildSetup: |
-  export MUEN_BUILD_MODE=prove
-  export OBJ_DIR=$(pwd)/
+buildVars: [RTS, GPR_FILE, GNATPROVE_EXTRA_ARGS]
 buildScript: |
   gnatprove -P ${GPR_FILE} \
     -j${MAKE_JOBS:-$(nproc)} \
@@ -10,15 +7,16 @@ buildScript: |
     --target=${GPR_TARGET} \
     ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
     -k \
-    --warnings=error \
-    --mode=all \
+    --report=statistics \
     --no-inlining \
-    --proof=per_path:all \
+    --mode=all \
+    --proof=progressive \
     --counterexamples=off \
     --prover=all \
     --timeout=10 \
     --steps=0 \
+    --warnings=error \
     ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
 packageScript: |
-  cp $1/prove/gnatprove/gnatprove.out .
+  cp $(find $1 -name gnatprove.out) .
   cp $1/gnatprove.log .

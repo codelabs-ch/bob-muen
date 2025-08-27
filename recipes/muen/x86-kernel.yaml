@@ -585,6 +585,8 @@ multiPackage:
         inherit: [muen_proof]
         buildSetup: |
           export GPR_FILE=$1/kernel/kernel.gpr
+          export MUEN_BUILD_MODE=prove
+          export OBJ_DIR=$(pwd)/
 
   ##########################################################################
 

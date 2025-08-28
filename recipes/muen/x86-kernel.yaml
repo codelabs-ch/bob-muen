@@ -15,6 +15,7 @@ multiPackage:
     packageScript: cp $1/isr_entries.S .
 
   components:
+    buildVars: [MUEN_BUILD_MODE]
     depends:
       - name: muen::common-common-dev
 
@@ -549,6 +550,7 @@ multiPackage:
 
       - muen::x86-kernel-policy
       - muen::x86-kernel-components-tau0
+    buildVars: [MUEN_BUILD_MODE]
     buildSetup: |
       export linker_script=$1/kernel/kernel.ld
       export POLICY_SRC_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}

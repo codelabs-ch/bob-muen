@@ -6,12 +6,14 @@ depends:
   - muen::common-gpr
   - muen::build-cfg-gpr
 
-buildVars: [OBJCOPY, RTS, CROSS_COMPILE, MUEN_BUILD_MODE]
+buildVars: [OBJCOPY, RTS, CROSS_COMPILE]
 buildVarsWeak: [MAKE_JOBS]
 buildSetup: |
   export GPR_TARGET="${CROSS_COMPILE%"-"}"
   export BUILD_CFG_PATH=${BOB_DEP_PATHS[muen::build-cfg-gpr]}
-  export MUEN_BUILD_MODE=${MUEN_BUILD_MODE}
+  if [[ ${MUEN_BUILD_MODE:-"0"} != "0" ]]; then
+    export MUEN_BUILD_MODE=${MUEN_BUILD_MODE}
+  fi
 buildScript: |
   muenBuild() {
     gprbuild -P $1 \

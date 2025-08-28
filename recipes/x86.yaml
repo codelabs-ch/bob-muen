@@ -157,9 +157,7 @@ multiPackage:
         environment:
           MUEN_BUILD_MODE: "prove"
         depends:
-          - name: muen::x86-kernel-proof
-            environment:
-              RTS: "muen::rts"
+          - muen::x86-kernel-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

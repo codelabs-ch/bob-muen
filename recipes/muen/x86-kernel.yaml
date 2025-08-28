@@ -585,6 +585,8 @@ multiPackage:
 
       proof:
         inherit: [muen_proof]
+        environment:
+          RTS: "muen::rts"
         buildSetup: |
           export GPR_FILE=$1/kernel/kernel.gpr
           export MUEN_BUILD_MODE=prove

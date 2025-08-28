@@ -536,7 +536,8 @@ multiPackage:
     depends:
       - muen::common-common-dev
       - muen::common-crash_audit-dev
-      - name: muen::common-debug-dev
+      - if: "$(eq,${MUEN_BUILD_MODE:-},debug)"
+        name: muen::common-debug-dev
         environment:
           COMMON_DEBUG_WITHOUT_UART_STATE: "1"
       - muen::common-muinterrupts-dev
@@ -561,7 +562,11 @@ multiPackage:
       end SK.Version;
       EOF
     buildScript: |
-      muenBuild $1/kernel/kernel
+      GPR_FILE=kernel
+      if [[ ${MUEN_BUILD_MODE} == debug ]]; then
+        GPR_FILE+=_debug
+      fi
+      muenBuild $1/kernel/$GPR_FILE
     provideDeps: ['muen::x86-kernel-policy', '*tau0']
     packageVars: [OBJCOPY]
     packageScript: |

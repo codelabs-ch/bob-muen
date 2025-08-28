@@ -55,6 +55,13 @@ multiPackage:
       HARDWARE: "qemu-kvm"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
+    multiPackage: &muen_build_mode
+      debug:
+        environment:
+          MUEN_BUILD_MODE: "debug"
+      release:
+        environment:
+          MUEN_BUILD_MODE: "release"
 
   qemu-coreboot:
     environment:
@@ -62,6 +69,7 @@ multiPackage:
       HARDWARE: "qemu-kvm-coreboot"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm-coreboot"
+    multiPackage: *muen_build_mode
 
   nuc6cayh-efi-integ:
     environment:
@@ -71,6 +79,7 @@ multiPackage:
       PLATFORM: "intel-nuc-6cayh"
       GRUB2_TARGET: "x86_64"
       GRUB2_PLATFORM: "efi"
+    multiPackage: *muen_build_mode
 
   ktqm77-integ:
     environment:
@@ -78,6 +87,7 @@ multiPackage:
       HARDWARE: "kontron-ktqm77"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "kontron-ktqm77"
+    multiPackage: *muen_build_mode
 
 buildTools:
   - mucheckelf

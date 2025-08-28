@@ -31,12 +31,12 @@ RECIPES=$(realpath "$SCRIPTDIR/..")
 NCI=$SCRIPTDIR/nci/nci
 
 # Default recipes to display with -l.
-recipes_r="^(arm64-|x86-.*(debug|proof))"
+recipes_r="^(arm64-|x86-)"
 # Default emulation only recipes.
-recipes_qemu_r="^(arm64-qemu|x86-qemu-.*(debug|proof))"
+recipes_qemu_r="^(arm64|x86)-qemu"
 # Default deployment recipes.
 recipes_hw_r="^(arm64-xilinx-|x86-.*)"
-recipes_hw_exclude_r="^(x86-qemu.*|x86.*-release)"
+recipes_hw_exclude_r="^(x86-qemu.*)"
 
 sandbox=""
 artifacts_dir=""
@@ -142,7 +142,7 @@ done
 # plans. For arm64, this means: log deploy mode for proof, sdcard for qemu and
 # tftp for xilinx related recipes.
 #
-# On x86 we only support debug (for now).
+# On x86 we only support debug and proof, others are skipped.
 for r in "${!runner[@]}"; do
 	arch="${r%%-*}"
 	scenario="${r#${arch}-}"
@@ -171,7 +171,12 @@ for r in "${!runner[@]}"; do
 		fi
 	else
 		plan=$(find "${SCRIPTDIR}/nci-config/${arch}" -name "${scenario}.yaml")
-		runner["${r}"]="${plan}"
+		if [ -z "$plan" ]; then
+			echo "INFO - no nci plan for recipe '$r', skipped"
+			unset 'runner["${r}"]'
+		else
+			runner["${r}"]="${plan}"
+		fi
 	fi
 done
 
@@ -180,9 +185,19 @@ done
 # could be found.
 for p in "${exp_plans[@]}"; do
 	arch="${p%%-*}"
+
+	if [ "${arch}" == "arm64" ]; then
+		# plan   : arm64-qemu-zcu102-minimal-debug-sdcard
+		# recipe : arm64-qemu-zcu102-minimal-debug
+		match="^${p%-*}$"
+	else
+		# 1:1 mapping of plans to recipes on x86.
+		match="^${p}$"
+	fi
+
 	scenario="${p#${arch}-}"
 	if ls "${SCRIPTDIR}/nci-config/${arch}/${scenario}.yaml" >/dev/null 2>&1; then
-		readarray -t r < <(bob ls | grep "${p%-*}")
+		readarray -t r < <(bob ls | grep "${match}")
 		if [ "${#r[@]}" -ne 1 ]; then
 			echo "ERROR - bob recipes count for plan '${p}' not 1: ${#r[@]}"
 			exit 1

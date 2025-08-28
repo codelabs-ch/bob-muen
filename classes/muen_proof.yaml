@@ -17,6 +17,7 @@ buildScript: |
     --debug-no-semaphore \
     --target=${GPR_TARGET} \
     ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+    -f \
     -k \
     --report=statistics \
     --no-inlining \

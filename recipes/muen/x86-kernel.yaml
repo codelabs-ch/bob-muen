@@ -452,11 +452,12 @@ multiPackage:
 
         privateEnvironment:
           CSPECS_FILE: "generated/libmudebuglog.xml"
+          GPR_PATH: "components/libmudebuglog/libmudebuglog"
 
         buildTools: [mucgenspec, mucfgcvresalloc, muxmlfilter, libxslt-tools]
         buildSetup: |
           export LIBMUDEBUGLOG_GENERATED=$(pwd)/generated
-        buildVars: [MUEN_POLICY_SRC]
+        buildVars: [MUEN_POLICY_SRC, GPR_PATH]
         buildScript: |
           mkdir -p generated
 
@@ -471,8 +472,12 @@ multiPackage:
                       generated/libmudebuglog_filtered.xml
           mucgenspec --input-spec generated/libmudebuglog_filtered.xml \
                     $(pwd)/generated
-          muenBuild $1/components/libmudebuglog/libmudebuglog
-        multiPackage: *common_dev_tgt_provide
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt_provide
+          proof: *common_proof_lib
 
       libmudm:
         inherit: [muen_component_cspecs]

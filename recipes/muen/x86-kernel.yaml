@@ -483,12 +483,18 @@ multiPackage:
         inherit: [muen_component_cspecs]
         privateEnvironment:
           CSPECS_FILE: "generated/libmudm.xml"
+          GPR_PATH: "components/libmudm/libmudm"
         depends:
           - muen::common-libmusinfo-dev
+        buildVars: [GPR_PATH]
         buildScript: |
           muenCspecs libmudm
-          muenBuild  $1/components/libmudm/libmudm
-        multiPackage: *common_dev_tgt
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild  $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt
+          proof: *common_proof_lib
 
       libmuinit:
         inherit: [muen_component_cspecs]

@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen.git
   branch: devel-c5bc9f3df36f-bob
-  commit: 434bc50028d35436b5f8d3324f47b913d7ad4acc
+  commit: 5d69a21b9cbcca8a5dba1b566dd4b866f4711f3a
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated

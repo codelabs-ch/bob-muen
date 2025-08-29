@@ -419,24 +419,30 @@ multiPackage:
           - muen::x86-kernel-components-libmucontroltypes-dev
         privateEnvironment:
           CSPECS_FILE: "generated/libmucontrol.xml"
+          GPR_PATH: "components/libmucontrol/libmucontrol"
+        buildVars: [GPR_PATH]
         buildScript: |
           muenCspecs libmucontrol
-          muenBuild $1/components/libmucontrol/libmucontrol
-        multiPackage: &common_dev_tgt_provide
-          dev:
-            provideDeps: ['*-dev']
-            packageScript: |
-              gprInstallPackageDev
-          tgt:
-            packageVars: [CSPECS_FILE]
-            packageScript: |
-              gprInstallPackageTgt
-              if [[ -e $1/${CSPECS_FILE:-} ]]; then
-                mkdir -p usr/share/
-                cp $1/${CSPECS_FILE} usr/share
-                mkdir .bob
-                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
-              fi
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: &common_dev_tgt_provide
+              dev:
+                provideDeps: ['*-dev']
+                packageScript: |
+                  gprInstallPackageDev
+              tgt:
+                packageVars: [CSPECS_FILE]
+                packageScript: |
+                  gprInstallPackageTgt
+                  if [[ -e $1/${CSPECS_FILE:-} ]]; then
+                    mkdir -p usr/share/
+                    cp $1/${CSPECS_FILE} usr/share
+                    mkdir .bob
+                    echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+                  fi
+          proof: *common_proof_lib
 
       libmudebuglog:
         depends:

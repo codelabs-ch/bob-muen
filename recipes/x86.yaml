@@ -162,6 +162,7 @@ multiPackage:
             depends:
               - muen::common-common-proof
               - muen::common-strings-proof
+          - muen::common-libmusinfo-proof
 
           - muen::x86-kernel-proof
 

@@ -106,13 +106,19 @@ multiPackage:
             depends:
               - muen::common-musinfo-tgt
               - muen::common-muschedinfo-tgt
-        buildScript: |
-          rm -rf install
-          muenBuild $1/libmusinfo/libmusinfo
+        privateEnvironment:
+          GPR_PATH: "libmusinfo/libmusinfo"
+        buildVars: [GPR_PATH]
         multiPackage:
-          dev:
-            provideDeps: ['*-dev']
-            packageScript: gprInstallPackageDev
-          tgt:
-            provideDeps: ['*-tgt']
-            packageScript: gprInstallPackageTgt
+          "":
+            buildScript: |
+              rm -rf install
+              muenBuild $1/${GPR_PATH}
+            multiPackage:
+              dev:
+                provideDeps: ['*-dev']
+                packageScript: gprInstallPackageDev
+              tgt:
+                provideDeps: ['*-tgt']
+                packageScript: gprInstallPackageTgt
+          proof: *common_proof

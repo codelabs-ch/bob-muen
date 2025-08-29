@@ -507,10 +507,16 @@ multiPackage:
               - muen::x86-kernel-components-libmucontrol-tgt
         privateEnvironment:
           CSPECS_FILE: "generated/libmuinit.xml"
+          GPR_PATH: "components/libmuinit/libmuinit"
+        buildVars: [GPR_PATH]
         buildScript: |
           muenCspecs libmuinit
-          muenBuild  $1/components/libmuinit/libmuinit
-        multiPackage: *common_dev_tgt_provide
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild  $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt_provide
+          proof: *common_proof_lib
 
       libmutime:
         privateEnvironment:

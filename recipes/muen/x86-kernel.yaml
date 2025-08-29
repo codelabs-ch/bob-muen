@@ -377,22 +377,36 @@ multiPackage:
         provideDeps: ['*-tgt']
 
       libmuchannel:
-        buildScript: |
-          muenBuild $1/components/libmuchannel/libmuchannel
-        multiPackage: &common_dev_tgt
-          dev:
-            packageScript: |
-              gprInstallPackageDev
-          tgt:
-            packageVars: [CSPECS_FILE]
-            packageScript: |
-              gprInstallPackageTgt
-              if [[ -e $1/${CSPECS_FILE:-} ]]; then
-                mkdir -p usr/share/
-                cp $1/${CSPECS_FILE} usr/share
-                mkdir .bob
-                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
-              fi
+        privateEnvironment:
+          GPR_PATH: "components/libmuchannel/libmuchannel"
+        buildVars: [GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: &common_dev_tgt
+              dev:
+                packageScript: |
+                  gprInstallPackageDev
+              tgt:
+                packageVars: [CSPECS_FILE]
+                packageScript: |
+                  gprInstallPackageTgt
+                  if [[ -e $1/${CSPECS_FILE:-} ]]; then
+                    mkdir -p usr/share/
+                    cp $1/${CSPECS_FILE} usr/share
+                    mkdir .bob
+                    echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+                  fi
+          proof: &common_proof_lib
+            inherit: [muen_proof]
+            environment:
+              RTS: "muen::rts"
+            buildSetup: |
+              export GPR_FILE=$1/${GPR_PATH}
+              export MUEN_BUILD_MODE=prove
+              export OBJ_DIR=$(pwd)/obj/
+              export LIB_DIR=$(pwd)/lib/
 
       libmucontroltypes:
         buildScript: |

@@ -158,6 +158,8 @@ multiPackage:
           MUEN_BUILD_MODE: "prove"
         depends:
           - muen::x86-kernel-proof
+
+          - muen::x86-kernel-components-libmuchannel-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

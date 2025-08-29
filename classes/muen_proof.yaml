@@ -1,8 +1,14 @@
 buildTools: [gnatprove]
 buildNetAccess: True # memcached server
-buildVars: [RTS, GPR_FILE, GNATPROVE_EXTRA_ARGS]
+buildVars:
+  - RTS
+  - GPR_FILE
+  - GNATPROVE_EXTRA_ARGS
+  - GNATPROVE_PROVERS
+  - GNATPROVE_STEPS
+  - GNATPROVE_TIMEOUT
 buildVarsWeak: [GNATPROVE_MEMCACHED, GNATPROVE_MEMCACHED_SERVER]
-buildScript: |
+buildSetup: |
   if [[ "${GNATPROVE_MEMCACHED:-1}" != "0" ]]; then
     if [[ "${GNATPROVE_MEMCACHED_SERVER:-0}" != "0" ]]; then
       MEMCACHED_SERVER=${GNATPROVE_MEMCACHED_SERVER}
@@ -12,6 +18,7 @@ buildScript: |
     echo "Using memcached server @ ${MEMCACHED_SERVER}"
     GNATPROVE_EXTRA_ARGS+=" --memcached-server=${MEMCACHED_SERVER}"
   fi
+buildScript: |
   gnatprove -P ${GPR_FILE} \
     -j${MAKE_JOBS:-$(nproc)} \
     --debug-no-semaphore \
@@ -24,9 +31,9 @@ buildScript: |
     --mode=all \
     --proof=progressive \
     --counterexamples=off \
-    --prover=all \
-    --timeout=10 \
-    --steps=0 \
+    --prover=${GNATPROVE_PROVERS:-z3,cvc4,alt-ergo} \
+    --timeout=${GNATPROVE_TIMEOUT:-10} \
+    --steps=${GNATPROVE_STEPS:-0} \
     --warnings=error \
     ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
 packageScript: |

@@ -521,6 +521,8 @@ multiPackage:
       libmutime:
         privateEnvironment:
           CSPECS_FILE: "generated/libmutime.xml"
+          GPR_PATH: "components/libmutime/libmutime"
+        buildVars: [GPR_PATH]
         buildSetup: |
           export LIBMUTIME_GENERATED=$(pwd)/generated
         buildTools: [mucgenspec]
@@ -529,9 +531,15 @@ multiPackage:
           cp $1/components/libmutime/spec/libmutime.xml generated
           mucgenspec --input-spec $1/components/libmutime/spec/libmutime.xml \
                     $(pwd)/generated
-
-          muenBuild $1/components/libmutime/libmutime
-        multiPackage: *common_dev_tgt
+        multiPackage:
+          "":
+            buildScript: muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt
+          proof:
+            <<: *common_proof_lib
+            privateEnvironment:
+              GNATPROVE_STEPS: "200000"
+              GNATPROVE_TIMEOUT: "0"
 
   policy-src:
     buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM, MUEN_UCODE_DIR]

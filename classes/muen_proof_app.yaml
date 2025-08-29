@@ -1,0 +1,7 @@
+inherit: [muen_proof, muen_component_cspecs]
+buildVars: [COMP_NAME, GPR_PATH]
+buildSetup: |
+  export GPR_FILE=$1/${GPR_PATH}
+  export MUEN_BUILD_MODE=prove
+  export OBJ_DIR=$(pwd)/obj/
+  muenCspecs ${COMP_NAME}

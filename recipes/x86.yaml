@@ -173,6 +173,8 @@ multiPackage:
           # TODO: T767
           # - muen::x86-kernel-components-libmuinit-proof
           - muen::x86-kernel-components-libmutime-proof
+
+          - muen::x86-kernel-components-ahci_drv-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

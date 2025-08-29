@@ -44,15 +44,27 @@ multiPackage:
       common:
         depends:
           - ${ISR_ENTRIES}
-        buildVars: [ISR_ENTRIES]
+        privateEnvironment:
+          GPR_PATH: "src/muen_common"
+        buildVars: [ISR_ENTRIES, GPR_PATH]
         buildScript: |
           export ISR_ENTRIES_DIR="${BOB_DEP_PATHS[${ISR_ENTRIES}]}"
-          muenBuild $1/src/muen_common
-        multiPackage: &common_dev_tgt
-          dev:
-            packageScript: gprInstallPackageDev
-          tgt:
-            packageScript: gprInstallPackageTgt
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: &common_dev_tgt
+              dev:
+                packageScript: gprInstallPackageDev
+              tgt:
+                packageScript: gprInstallPackageTgt
+          proof: &common_proof
+            inherit: [muen_proof]
+            buildSetup: |
+              export GPR_FILE=$1/${GPR_PATH}
+              export MUEN_BUILD_MODE=prove
+              export OBJ_DIR=$(pwd)/obj/
+              export LIB_DIR=$(pwd)/lib/
       strings:
         depends:
           - muen::common-common-dev

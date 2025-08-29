@@ -68,8 +68,15 @@ multiPackage:
       strings:
         depends:
           - muen::common-common-dev
-        buildScript: muenBuild $1/strings/common_strings
-        multiPackage: *common_dev_tgt_provides
+        privateEnvironment:
+          GPR_PATH: "strings/common_strings"
+        buildVars: [GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt_provides
+          proof: *common_proof
 
       muinterrupts:
         buildScript: |

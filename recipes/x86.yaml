@@ -161,6 +161,7 @@ multiPackage:
               ISR_ENTRIES: "muen::x86-kernel-components-isr_entries"
             depends:
               - muen::common-common-proof
+              - muen::common-strings-proof
 
           - muen::x86-kernel-proof
 

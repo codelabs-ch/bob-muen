@@ -334,7 +334,7 @@ multiPackage:
             packageScript: |
               gprInstallPackageDev
           "":
-            inherit: [muen_component_app, python3]
+            inherit: [python3]
             depends:
               - muen::common-strings-dev
               - muen::x86-kernel-components-libmucontrol-dev
@@ -366,11 +366,20 @@ multiPackage:
                        --stringparam COMPONENTNAME sm \
                        $1/components/sm/misc/config.xsl \
                        ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
-
-              muenBuildApp sm
-            packageScript: |
-              muenInstallApp sm
-            provideDeps: ['*-tgt']
+            multiPackage:
+              "":
+                inherit: [muen_component_app]
+                buildScript: |
+                  muenBuildApp sm
+                packageScript: |
+                  muenInstallApp sm
+                provideDeps: ['*-tgt']
+              proof:
+                inherit: [muen_proof_app]
+                environment:
+                  RTS: "muen::rts"
+                  COMP_NAME: "sm"
+                  GPR_PATH: "components/sm/sm"
 
       tau0:
         inherit: [muen_component_app]
@@ -456,6 +465,8 @@ multiPackage:
               export MUEN_BUILD_MODE=prove
               export OBJ_DIR=$(pwd)/obj/
               export LIB_DIR=$(pwd)/lib/
+            buildScript: |
+              muenProof
 
       libmucontroltypes:
         buildScript: |
@@ -685,6 +696,8 @@ multiPackage:
           export GPR_FILE=$1/kernel/kernel.gpr
           export MUEN_BUILD_MODE=prove
           export OBJ_DIR=$(pwd)/
+        buildScript: |
+          muenProof
 
   ##########################################################################
 

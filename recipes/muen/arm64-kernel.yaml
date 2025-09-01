@@ -53,3 +53,5 @@ multiPackage:
       export BUILD_MODE=prove
       export GPR_FILE=$1/kernel.gpr
       export GNATPROVE_EXTRA_ARGS="-XPREFIX=$(pwd)"
+    buildScript: |
+      muenProof

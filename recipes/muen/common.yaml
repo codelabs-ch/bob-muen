@@ -65,6 +65,8 @@ multiPackage:
               export MUEN_BUILD_MODE=prove
               export OBJ_DIR=$(pwd)/obj/
               export LIB_DIR=$(pwd)/lib/
+            buildScript: |
+              muenProof
       strings:
         depends:
           - muen::common-common-dev

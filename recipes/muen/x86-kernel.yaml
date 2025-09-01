@@ -47,7 +47,6 @@ multiPackage:
               GPR_PATH: "components/ahci_drv/ahci_drv"
 
       controller:
-        inherit: [muen_component_app]
         depends:
           - muen::x86-kernel-components-libmucontroltypes-dev
           - muen::x86-kernel-components-libmudebuglog-dev
@@ -57,11 +56,20 @@ multiPackage:
             depends:
               - muen::x86-kernel-components-libmucontrol-tgt
               - muen::x86-kernel-components-libmudebuglog-tgt
-        buildScript: |
-          muenBuildApp controller
-        packageScript: |
-          muenInstallApp controller
-        provideDeps: ['*-tgt']
+        multiPackage:
+          "":
+            inherit: [muen_component_app]
+            buildScript: |
+              muenBuildApp controller
+            packageScript: |
+              muenInstallApp controller
+            provideDeps: ['*-tgt']
+          proof:
+            inherit: [muen_proof_app]
+            environment:
+              RTS: "muen::rts"
+              COMP_NAME: "controller"
+              GPR_PATH: "components/controller/controller"
 
       dbgserver:
         multiPackage:

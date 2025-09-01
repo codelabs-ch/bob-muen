@@ -251,7 +251,6 @@ multiPackage:
         provideDeps: ['*-tgt']
 
       muinit:
-        inherit: [muen_component]
         depends:
           - libs::libsparkcrypto-dev
           - muen::common-libmusinfo-dev
@@ -259,19 +258,29 @@ multiPackage:
           - use: []
             depends:
               - muen::x86-kernel-components-libmuinit-tgt
-        buildScript: |
-          muenBuild $1/components/muinit/muinit
-          cp $1/components/muinit/spec/muinit.xml .
-        provideDeps: ['*-tgt']
-        packageVars: [OBJCOPY]
-        packageScript: |
-          ${OBJCOPY} -O binary \
-            --set-section-flags .bss=alloc,load,contents \
-            --set-section-flags .stack=alloc,load,contents \
-            $1/install/usr/bin/muinit muinit
-          cp $1/muinit.xml .
-          mkdir -p .bob
-          echo "muinit.xml" > .bob/cspecs
+        multiPackage:
+          "":
+            inherit: [muen_component]
+            buildScript: |
+              muenBuild $1/components/muinit/muinit
+              cp $1/components/muinit/spec/muinit.xml .
+            provideDeps: ['*-tgt']
+            packageVars: [OBJCOPY]
+            packageScript: |
+              ${OBJCOPY} -O binary \
+                --set-section-flags .bss=alloc,load,contents \
+                --set-section-flags .stack=alloc,load,contents \
+                $1/install/usr/bin/muinit muinit
+              cp $1/muinit.xml .
+              mkdir -p .bob
+              echo "muinit.xml" > .bob/cspecs
+          proof:
+            inherit: [muen_proof_app]
+            environment:
+              RTS: "muen::rts"
+              COMP_NAME: "muinit"
+              GPR_PATH: "components/muinit/muinit"
+              GNATPROVE_FILES: "muinit_main.adb"
 
       ps2_drv:
         inherit: [muen_component_app]

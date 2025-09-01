@@ -178,7 +178,6 @@ multiPackage:
               gprInstallPackageDev
 
           "":
-            inherit: [muen_component_app]
             depends:
               - muen::x86-kernel-components-example-config-dev
               - muen::x86-kernel-components-libmucontrol-dev
@@ -191,11 +190,20 @@ multiPackage:
                 depends:
                   - muen::x86-kernel-components-libmucontrol-tgt
                   - muen::x86-kernel-components-libmudebuglog-tgt
-            buildScript: |
-              muenBuildApp example
-            packageScript: |
-              muenInstallApp example
-            provideDeps: ['*-tgt']
+            multiPackage:
+              "":
+                inherit: [muen_component_app]
+                buildScript: |
+                  muenBuildApp example
+                packageScript: |
+                  muenInstallApp example
+                provideDeps: ['*-tgt']
+              proof:
+                inherit: [muen_proof_app]
+                environment:
+                  RTS: "muen::rts"
+                  COMP_NAME: "example"
+                  GPR_PATH: "components/example/example"
 
       idle:
         inherit: [muen_component_app]

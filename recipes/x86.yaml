@@ -177,6 +177,7 @@ multiPackage:
           - muen::x86-kernel-components-ahci_drv-proof
           - muen::x86-kernel-components-controller-proof
           - muen::x86-kernel-components-dm-proof
+          - muen::x86-kernel-components-example-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

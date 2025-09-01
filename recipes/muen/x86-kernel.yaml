@@ -297,17 +297,25 @@ multiPackage:
         provideDeps: ['*-tgt']
 
       sl:
-        inherit: [muen_component_app]
         depends:
           - muen::common-libmusinfo-dev
           - muen::x86-kernel-components-libmuinit-dev
           - use: []
             depends:
               - muen::x86-kernel-components-libmuinit-tgt
-        buildScript: |
-          muenBuildApp sl
-        packageScript: |
-          muenInstallApp sl
+        multiPackage:
+          "":
+            inherit: [muen_component_app]
+            buildScript: |
+              muenBuildApp sl
+            packageScript: |
+              muenInstallApp sl
+          proof:
+            inherit: [muen_proof_app]
+            environment:
+              RTS: "muen::rts"
+              COMP_NAME: "sl"
+              GPR_PATH: "components/sl/sl"
 
       sm:
         multiPackage:

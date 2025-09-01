@@ -7,6 +7,7 @@ buildVars:
   - GNATPROVE_PROVERS
   - GNATPROVE_STEPS
   - GNATPROVE_TIMEOUT
+  - GNATPROVE_FILES
 buildVarsWeak: [GNATPROVE_MEMCACHED, GNATPROVE_MEMCACHED_SERVER]
 buildSetup: |
   if [[ "${GNATPROVE_MEMCACHED:-1}" != "0" ]]; then
@@ -17,6 +18,10 @@ buildSetup: |
     fi
     echo "Using memcached server @ ${MEMCACHED_SERVER}"
     GNATPROVE_EXTRA_ARGS+=" --memcached-server=${MEMCACHED_SERVER}"
+  fi
+  if [[ "${GNATPROVE_FILES:-0}" != "0" ]]; then
+    echo "Main unit override: '${GNATPROVE_FILES}'"
+    GNATPROVE_EXTRA_ARGS+=" ${GNATPROVE_FILES}"
   fi
 buildScript: |
   gnatprove -P ${GPR_FILE} \

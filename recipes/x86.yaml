@@ -181,6 +181,7 @@ multiPackage:
           - muen::x86-kernel-components-muinit-proof
           - muen::x86-kernel-components-sl-proof
           - muen::x86-kernel-components-sm-proof
+          - muen::x86-kernel-components-time-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

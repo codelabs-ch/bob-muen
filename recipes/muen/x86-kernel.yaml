@@ -408,11 +408,19 @@ multiPackage:
               - muen::x86-kernel-components-libmucontrol-tgt
               - muen::x86-kernel-components-libmudebuglog-tgt
               - muen::x86-kernel-components-libmutime-tgt
-        buildScript: |
-          muenBuildApp time
-        packageScript: |
-          muenInstallApp time
-        provideDeps: ['*-tgt']
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuildApp time
+            packageScript: |
+              muenInstallApp time
+            provideDeps: ['*-tgt']
+          proof:
+            inherit: [muen_proof_app]
+            environment:
+              RTS: "muen::rts"
+              COMP_NAME: "time"
+              GPR_PATH: "components/time/time"
 
       vt:
         inherit: [muen_component_app]

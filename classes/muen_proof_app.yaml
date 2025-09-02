@@ -4,4 +4,5 @@ buildSetup: |
   export GPR_FILE=$1/${GPR_PATH}
   export MUEN_BUILD_MODE=prove
   export OBJ_DIR=$(pwd)/obj/
+  export EXEC_DIR=$(pwd)/bin/
   muenCspecs ${COMP_NAME}

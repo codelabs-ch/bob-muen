@@ -166,6 +166,11 @@ multiPackage:
 
           - muen::x86-kernel-proof
 
+          - if: $(ne,${TAU0_PROOF:-UNSET},UNSET)
+            name: muen::tau0-static-proof
+            tools:
+              target-toolchain: host-compat-gnat-toolchain
+
           - muen::x86-kernel-components-libmuchannel-proof
           - muen::x86-kernel-components-libmucontrol-proof
           - muen::x86-kernel-components-libmudebuglog-proof

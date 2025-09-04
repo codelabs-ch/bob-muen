@@ -30,6 +30,14 @@ SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RECIPES=$(realpath "$SCRIPTDIR/..")
 NCI=$SCRIPTDIR/nci/nci
 
+# Default recipes to display with -l.
+recipes_r="^(arm64-|x86-)"
+# Default emulation only recipes.
+recipes_qemu_r="^(arm64|x86)-qemu"
+# Default deployment recipes.
+recipes_hw_r="^(arm64-xilinx-|x86-.*)"
+recipes_hw_exclude_r="^(x86-qemu.*)"
+
 sandbox=""
 artifacts_dir=""
 bob_args=""
@@ -55,7 +63,7 @@ while getopts "a:b:dsr:p:glhx" opt; do
 			exit 0
 			;;
 		l)
-			readarray -t recipes < <(cd "$RECIPES" || exit ; bob ls | grep -E "arm64-|x86-")
+			readarray -t recipes < <(cd "$RECIPES" || exit ; bob ls | grep -E "$recipes_r")
 			readarray -t plans < <(ls ${SCRIPTDIR}/nci-config/{arm64,x86}/*.yaml | rev | cut -d'/' -f1-2 | rev | tr '/' '-')
 			echo "Bob Recipes:"
 			for r in "${recipes[@]}"; do
@@ -110,12 +118,12 @@ bob ${bob_color} layers update 2>&1 | tee >(sed -E "s/$ansi_rgx//g" > $artifacts
 declare -A runner
 
 if [ ${#exp_recipes[@]} -eq 0 ] && [ ${#exp_plans[@]} -eq 0 ]; then
-	for r in $(bob ls | grep -E "^(arm64|x86)-qemu"); do
+	for r in $(bob ls | grep -E "$recipes_qemu_r"); do
 		runner["${r}"]=""
 	done
 
 	if [ "$deploy_to_hw" = true ]; then
-		for r in $(bob ls | grep -E "arm64-xilinx-|x86-"); do
+		for r in $(bob ls | grep -E "$recipes_hw_r" | grep -vE "$recipes_hw_exclude_r"); do
 			runner["${r}"]=""
 		done
 	fi
@@ -131,10 +139,10 @@ for r in "${exp_recipes[@]}"; do
 done
 
 # For all bob recipes added to the test runner, find the matching nci
-# plans. For arm64, this means: log deploy mode for prove, sdcard for qemu and
+# plans. For arm64, this means: log deploy mode for proof, sdcard for qemu and
 # tftp for xilinx related recipes.
 #
-# On x86 we have a 1:1 matching of recipes to plans for now.
+# On x86 we only support debug and proof, others are skipped.
 for r in "${!runner[@]}"; do
 	arch="${r%%-*}"
 	scenario="${r#${arch}-}"
@@ -144,11 +152,11 @@ for r in "${!runner[@]}"; do
 			-not -name "*.gen.yaml")
 		found=1
 		for d in "${p[@]}"; do
-			# Select log file deployment for all prove plans, sdcard deployment
+			# Select log file deployment for all proof plans, sdcard deployment
 			# for all qemu related plans, tftp deployment for debug and release
 			# mode of xilinx related plans and xsct deployment for xilinx unit
 			# test related plans as default nci plans.
-			if [[ "$d" == *"prove-log"* || "$d" == *"qemu"*"sdcard"* || \
+			if [[ "$d" == *"proof-log"* || "$d" == *"qemu"*"sdcard"* || \
 				"$d" == *"xilinx"*"debug-tftp"* || \
 				"$d" == *"xilinx"*"release-tftp"* || \
 				"$d" == *"xilinx"*"test-xsct"* ]]; then
@@ -163,7 +171,12 @@ for r in "${!runner[@]}"; do
 		fi
 	else
 		plan=$(find "${SCRIPTDIR}/nci-config/${arch}" -name "${scenario}.yaml")
-		runner["${r}"]="${plan}"
+		if [ -z "$plan" ]; then
+			echo "INFO - no nci plan for recipe '$r', skipped"
+			unset 'runner["${r}"]'
+		else
+			runner["${r}"]="${plan}"
+		fi
 	fi
 done
 
@@ -172,9 +185,23 @@ done
 # could be found.
 for p in "${exp_plans[@]}"; do
 	arch="${p%%-*}"
+
+	if [ "${arch}" == "arm64" ]; then
+		# plan   : arm64-qemu-zcu102-minimal-debug-sdcard
+		# recipe : arm64-qemu-zcu102-minimal-debug
+		match="^${p%-*}$"
+	else
+		# 1:1 mapping of plans to recipes on x86.
+		match="^${p}$"
+	fi
+
 	scenario="${p#${arch}-}"
-	if ls "${SCRIPTDIR}/nci-config/${arch}/${scenario}.yaml" > /dev/null; then
-		readarray -t r < <(bob ls | grep "${p%-*}")
+	if ls "${SCRIPTDIR}/nci-config/${arch}/${scenario}.yaml" >/dev/null 2>&1; then
+		readarray -t r < <(bob ls | grep "${match}")
+		if [ "${#r[@]}" -ne 1 ]; then
+			echo "ERROR - bob recipes count for plan '${p}' not 1: ${#r[@]}"
+			exit 1
+		fi
 		if [[ -n "${r[0]}" ]]; then
 			runner["${r[0]}"]="${runner[${r[0]}]:-}${SCRIPTDIR}/nci-config/${arch}/${scenario}.yaml "
 		else
@@ -213,8 +240,8 @@ if search_prefix "x86-" "${!runner[@]}"; then
 	bob ${bob_color} dev \
 		${bob_args} \
 		${sandbox} \
-		//muen::tools-mulog 2>&1 | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log)
-	mulog_dir=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //muen::tools-mulog)
+		/x86-qemu-debug/muen::tools-mulog 2>&1 | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log)
+	mulog_dir=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} /x86-qemu-debug/muen::tools-mulog)
 	nci_defines+=( "-DMULOG_DIR=${mulog_dir}" )
 fi
 

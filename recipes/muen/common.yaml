@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/common.git
   branch: $(if-then-else,$(eq,${ARCH},arm64),devel-armv8a-8c50d03ff97e-bob,devel-93c2e7735aac-bob)
-  commit: $(if-then-else,$(eq,${ARCH},arm64),bd47a596284f170be45ddb8522a25140c1fbc19e,1ab74339de69157b0db97f079270b0e5e0abab6d)
+  commit: $(if-then-else,$(eq,${ARCH},arm64),bd47a596284f170be45ddb8522a25140c1fbc19e,0adce842164a9647b73f4f89d1cca14a855f8637)
 
 multiPackage:
   gpr:
@@ -44,20 +44,41 @@ multiPackage:
       common:
         depends:
           - ${ISR_ENTRIES}
-        buildVars: [ISR_ENTRIES]
+        privateEnvironment:
+          GPR_PATH: "src/muen_common"
+        buildVars: [ISR_ENTRIES, GPR_PATH]
         buildScript: |
           export ISR_ENTRIES_DIR="${BOB_DEP_PATHS[${ISR_ENTRIES}]}"
-          muenBuild $1/src/muen_common
-        multiPackage: &common_dev_tgt
-          dev:
-            packageScript: gprInstallPackageDev
-          tgt:
-            packageScript: gprInstallPackageTgt
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: &common_dev_tgt
+              dev:
+                packageScript: gprInstallPackageDev
+              tgt:
+                packageScript: gprInstallPackageTgt
+          proof: &common_proof
+            inherit: [muen_proof]
+            buildSetup: |
+              export GPR_FILE=$1/${GPR_PATH}
+              export MUEN_BUILD_MODE=prove
+              export OBJ_DIR=$(pwd)/obj/
+              export LIB_DIR=$(pwd)/lib/
+            buildScript: |
+              muenProof
       strings:
         depends:
           - muen::common-common-dev
-        buildScript: muenBuild $1/strings/common_strings
-        multiPackage: *common_dev_tgt_provides
+        privateEnvironment:
+          GPR_PATH: "strings/common_strings"
+        buildVars: [GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt_provides
+          proof: *common_proof
 
       muinterrupts:
         buildScript: |
@@ -87,13 +108,18 @@ multiPackage:
             depends:
               - muen::common-musinfo-tgt
               - muen::common-muschedinfo-tgt
-        buildScript: |
-          rm -rf install
-          muenBuild $1/libmusinfo/libmusinfo
+        privateEnvironment:
+          GPR_PATH: "libmusinfo/libmusinfo"
+        buildVars: [GPR_PATH]
         multiPackage:
-          dev:
-            provideDeps: ['*-dev']
-            packageScript: gprInstallPackageDev
-          tgt:
-            provideDeps: ['*-tgt']
-            packageScript: gprInstallPackageTgt
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage:
+              dev:
+                provideDeps: ['*-dev']
+                packageScript: gprInstallPackageDev
+              tgt:
+                provideDeps: ['*-tgt']
+                packageScript: gprInstallPackageTgt
+          proof: *common_proof

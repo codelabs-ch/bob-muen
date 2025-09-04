@@ -1,0 +1,48 @@
+buildTools: [gnatprove]
+buildNetAccess: True # memcached server
+buildVars:
+  - GPR_FILE
+  - GNATPROVE_EXTRA_ARGS
+  - GNATPROVE_PROVERS
+  - GNATPROVE_STEPS
+  - GNATPROVE_TIMEOUT
+  - GNATPROVE_FILES
+  - RTS
+buildVarsWeak: [GNATPROVE_MEMCACHED, GNATPROVE_MEMCACHED_SERVER]
+buildSetup: |
+  if [[ "${GNATPROVE_MEMCACHED:-1}" != "0" ]]; then
+    if [[ "${GNATPROVE_MEMCACHED_SERVER:-0}" != "0" ]]; then
+      MEMCACHED_SERVER=${GNATPROVE_MEMCACHED_SERVER}
+    else
+      MEMCACHED_SERVER=localhost:11211
+    fi
+    echo "Using memcached server @ ${MEMCACHED_SERVER}"
+    GNATPROVE_EXTRA_ARGS+=" --memcached-server=${MEMCACHED_SERVER}"
+  fi
+  if [[ "${GNATPROVE_FILES:-0}" != "0" ]]; then
+    echo "Main unit override: '${GNATPROVE_FILES}'"
+    GNATPROVE_EXTRA_ARGS+=" ${GNATPROVE_FILES}"
+  fi
+buildScript: |
+  muenProof() {
+    gnatprove -P ${GPR_FILE} \
+      -j${MAKE_JOBS:-$(nproc)} \
+      --debug-no-semaphore \
+      --target=${GPR_TARGET} \
+      ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+      -f \
+      -k \
+      --report=statistics \
+      --no-inlining \
+      --mode=all \
+      --proof=progressive \
+      --counterexamples=off \
+      --prover=${GNATPROVE_PROVERS:-z3,cvc4,alt-ergo} \
+      --timeout=${GNATPROVE_TIMEOUT:-10} \
+      --steps=${GNATPROVE_STEPS:-0} \
+      --warnings=error \
+      ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
+  }
+packageScript: |
+  cp $(find $1 -name gnatprove.out) .
+  cp $1/gnatprove.log .

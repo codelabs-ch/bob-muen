@@ -1,10 +1,10 @@
 inherit: [muen_proof, muen_component_cspecs]
-buildVars: [COMP_NAME, GPR_PATH]
+buildVars: [COMPONENT_NAME, GPR_PATH]
 buildSetup: |
   export GPR_FILE=$1/${GPR_PATH}
   export MUEN_BUILD_MODE=prove
   export OBJ_DIR=$(pwd)/obj/
   export EXEC_DIR=$(pwd)/bin/
 buildScript: |
-  muenCspecs ${COMP_NAME}
+  muenCspecs ${COMPONENT_NAME}
   muenProof

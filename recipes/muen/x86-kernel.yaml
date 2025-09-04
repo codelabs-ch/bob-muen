@@ -43,7 +43,7 @@ multiPackage:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
-              COMP_NAME: "ahci_drv"
+              COMPONENT_NAME: "ahci_drv"
               GPR_PATH: "components/ahci_drv/ahci_drv"
 
       controller:
@@ -68,7 +68,7 @@ multiPackage:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
-              COMP_NAME: "controller"
+              COMPONENT_NAME: "controller"
               GPR_PATH: "components/controller/controller"
 
       dbgserver:
@@ -158,7 +158,7 @@ multiPackage:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
-              COMP_NAME: "dm"
+              COMPONENT_NAME: "dm"
               GPR_PATH: "components/dm/dm"
 
       example:
@@ -202,7 +202,7 @@ multiPackage:
                 inherit: [muen_proof_app]
                 environment:
                   RTS: "muen::rts"
-                  COMP_NAME: "example"
+                  COMPONENT_NAME: "example"
                   GPR_PATH: "components/example/example"
 
       idle:
@@ -278,7 +278,7 @@ multiPackage:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
-              COMP_NAME: "muinit"
+              COMPONENT_NAME: "muinit"
               GPR_PATH: "components/muinit/muinit"
               GNATPROVE_FILES: "muinit_main.adb"
 
@@ -314,7 +314,7 @@ multiPackage:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
-              COMP_NAME: "sl"
+              COMPONENT_NAME: "sl"
               GPR_PATH: "components/sl/sl"
 
       sm:
@@ -378,7 +378,7 @@ multiPackage:
                 inherit: [muen_proof_app]
                 environment:
                   RTS: "muen::rts"
-                  COMP_NAME: "sm"
+                  COMPONENT_NAME: "sm"
                   GPR_PATH: "components/sm/sm"
 
       tau0:
@@ -419,7 +419,7 @@ multiPackage:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
-              COMP_NAME: "time"
+              COMPONENT_NAME: "time"
               GPR_PATH: "components/time/time"
 
       vt:

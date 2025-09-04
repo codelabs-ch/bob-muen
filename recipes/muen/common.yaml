@@ -114,7 +114,6 @@ multiPackage:
         multiPackage:
           "":
             buildScript: |
-              rm -rf install
               muenBuild $1/${GPR_PATH}
             multiPackage:
               dev:

@@ -186,7 +186,8 @@ multiPackage:
           # - muen::x86-kernel-components-libmuinit-proof
           - muen::x86-kernel-components-libmutime-proof
 
-          - muen::x86-kernel-components-ahci_drv-proof
+          - muen::x86-kernel-components-storage_drv-ahci-proof
+          - muen::x86-kernel-components-storage_drv-nvme-proof
           - muen::x86-kernel-components-controller-proof
           - muen::x86-kernel-components-dm-proof
           - muen::x86-kernel-components-example-proof

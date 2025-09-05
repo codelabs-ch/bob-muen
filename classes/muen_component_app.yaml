@@ -3,7 +3,7 @@ inherit: [muen_component, muen_component_cspecs]
 buildTools: [mucheckstack]
 buildSetup: |
   muenBuildApp() {
-    muenCspecs $1
+    muenCspecs "$1" "${2:-}"
     GPRBUILD_EXTRA_ARGS="
       -Xlinker_script=${__SRC}/components/component.ld \
       -Xstacksize=8192" \
@@ -18,7 +18,8 @@ packageTools: [mucbinsplit]
 packageSetup: |
   __SRC=$1
   muenInstallApp() {
-    mucbinsplit -i ${__SRC}/generated/$1.xml \
+    IN_XML=${__SRC}/generated/${2:-${1}.xml}
+    mucbinsplit -i ${IN_XML} \
                 -b ${__SRC}/install/usr/bin/$1 \
                 -o $1.xml .
     mkdir -p .bob

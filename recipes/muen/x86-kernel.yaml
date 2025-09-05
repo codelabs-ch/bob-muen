@@ -23,29 +23,71 @@ multiPackage:
       ISR_ENTRIES: "muen::x86-kernel-components-isr_entries"
 
     multiPackage:
-      ahci_drv:
+      storage_drv:
+        inherit: [muen_component_app]
         depends:
           - muen::x86-kernel-components-libmuchannel-dev
           - muen::x86-kernel-components-libmudebuglog-dev
+          - muen::x86-kernel-components-libmutime-dev
           - muen::common-strings-dev
           - use: []
             depends:
               - muen::x86-kernel-components-libmudebuglog-tgt
-        multiPackage:
-          "":
-            inherit: [muen_component_app]
-            buildScript: |
-              muenBuildApp ahci_drv
-            packageScript: |
-              muenInstallApp ahci_drv
-            provideDeps: ['*-tgt']
-          proof:
-            inherit: [muen_proof_app]
-            environment:
-              RTS: "muen::rts"
-              COMPONENT_NAME: "ahci_drv"
-              GPR_PATH: "components/ahci_drv/ahci_drv"
+        buildVars: [DRIVE_KIND]
+        buildSetup: |
+          export BASE_DIR=${MUEN_STORAGE_BASE_DIR:-$(pwd)/src}
+          if [ $DRIVE_KIND = NVME ]
+          then
+            export IS_NVME_VARIANT="true"
+          else
+            export IS_NVME_VARIANT="false"
+          fi
+          export MUEN_STORAGE_DRV_CSPECS=$(pwd)/generated
+          export MUEN_STORAGE_DRV_PORTS_CFG=$(pwd)/generated
 
+          sed -e "s/%%%IS_NVME_VARIANT%%%/${IS_NVME_VARIANT}/g" \
+              -e "s/%%%COMPONENT_NAME%%%/storage_drv_${DRIVE_KIND,,}/g" \
+              $1/components/storage_drv/spec/storage_drv.xml > storage_drv.xml
+        buildScript: |
+          buildApp () {
+            muenBuildApp storage_drv $(pwd)/storage_drv.xml
+          }
+        packageScript: |
+          packageApp () {
+            muenInstallApp storage_drv-${DRIVE_KIND,,} storage_drv.xml
+          }
+
+        multiPackage:
+          ahci:
+            environment:
+              DRIVE_KIND: "AHCI"
+            multiPackage:
+              "":
+                buildScript: buildApp $1
+                packageScript: packageApp
+                provideDeps: ['*-tgt']
+              proof:
+                inherit: [muen_proof_app]
+                buildSetup: export XML_PATH=$(pwd)/storage_drv.xml
+                environment:
+                  RTS: "muen::rts"
+                  COMPONENT_NAME: "storage_drv"
+                  GPR_PATH: "components/storage_drv/storage_drv"
+          nvme:
+            environment:
+              DRIVE_KIND: "NVME"
+            multiPackage:
+              "":
+                buildScript: buildApp $1
+                packageScript: packageApp
+                provideDeps: ['*-tgt']
+              proof:
+                inherit: [muen_proof_app]
+                buildSetup: export XML_PATH=$(pwd)/storage_drv.xml
+                environment:
+                  RTS: "muen::rts"
+                  COMPONENT_NAME: "storage_drv"
+                  GPR_PATH: "components/storage_drv/storage_drv"
       controller:
         depends:
           - muen::x86-kernel-components-libmucontroltypes-dev
@@ -796,7 +838,8 @@ multiPackage:
     depends:
       - bsp::intel::microcode
       - muen::linux-image
-      - muen::x86-kernel-components-ahci_drv
+      - muen::x86-kernel-components-storage_drv-ahci
+      - muen::x86-kernel-components-storage_drv-nvme
       - muen::x86-kernel-components-controller
       - muen::x86-kernel-components-dbgserver
       - muen::x86-kernel-components-dm

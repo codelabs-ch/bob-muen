@@ -38,13 +38,17 @@ multiPackage:
               muenBuildApp ahci_drv
             packageScript: |
               muenInstallApp ahci_drv
-            provideDeps: ['*-tgt']
+            provideDeps: ["*-tgt"]
           proof:
             inherit: [muen_proof_app]
             environment:
               RTS: "muen::rts"
               COMPONENT_NAME: "ahci_drv"
               GPR_PATH: "components/ahci_drv/ahci_drv"
+
+      #storage_drv:
+      #  depends:
+      #    - muen::storage_drv
 
       controller:
         depends:
@@ -63,7 +67,7 @@ multiPackage:
               muenBuildApp controller
             packageScript: |
               muenInstallApp controller
-            provideDeps: ['*-tgt']
+            provideDeps: ["*-tgt"]
           proof:
             inherit: [muen_proof_app]
             environment:
@@ -135,7 +139,7 @@ multiPackage:
               muenBuildApp dbgserver
             packageScript: |
               muenInstallApp dbgserver
-            provideDeps: ['*-tgt']
+            provideDeps: ["*-tgt"]
 
       dm:
         depends:
@@ -153,7 +157,7 @@ multiPackage:
               muenBuildApp dm
             packageScript: |
               muenInstallApp dm
-            provideDeps: ['*-tgt']
+            provideDeps: ["*-tgt"]
           proof:
             inherit: [muen_proof_app]
             environment:
@@ -197,7 +201,7 @@ multiPackage:
                   muenBuildApp example
                 packageScript: |
                   muenInstallApp example
-                provideDeps: ['*-tgt']
+                provideDeps: ["*-tgt"]
               proof:
                 inherit: [muen_proof_app]
                 environment:
@@ -233,7 +237,7 @@ multiPackage:
           muenBuildApp isolation_tests
         packageScript: |
           muenInstallApp isolation_tests
-        provideDeps: ['*-tgt']
+        provideDeps: ["*-tgt"]
 
       isolation_tests_monitor:
         inherit: [muen_component_app]
@@ -248,7 +252,7 @@ multiPackage:
           muenBuildApp isolation_tests_monitor
         packageScript: |
           muenInstallApp isolation_tests_monitor
-        provideDeps: ['*-tgt']
+        provideDeps: ["*-tgt"]
 
       muinit:
         depends:
@@ -264,7 +268,7 @@ multiPackage:
             buildScript: |
               muenBuild $1/components/muinit/muinit
               cp $1/components/muinit/spec/muinit.xml .
-            provideDeps: ['*-tgt']
+            provideDeps: ["*-tgt"]
             packageVars: [OBJCOPY]
             packageScript: |
               ${OBJCOPY} -O binary \
@@ -294,7 +298,7 @@ multiPackage:
           muenBuildApp ps2_drv
         packageScript: |
           muenInstallApp ps2_drv
-        provideDeps: ['*-tgt']
+        provideDeps: ["*-tgt"]
 
       sl:
         depends:
@@ -373,7 +377,7 @@ multiPackage:
                   muenBuildApp sm
                 packageScript: |
                   muenInstallApp sm
-                provideDeps: ['*-tgt']
+                provideDeps: ["*-tgt"]
               proof:
                 inherit: [muen_proof_app]
                 environment:
@@ -414,7 +418,7 @@ multiPackage:
               muenBuildApp time
             packageScript: |
               muenInstallApp time
-            provideDeps: ['*-tgt']
+            provideDeps: ["*-tgt"]
           proof:
             inherit: [muen_proof_app]
             environment:
@@ -440,7 +444,7 @@ multiPackage:
           muenBuildApp vt
         packageScript: |
           muenInstallApp vt
-        provideDeps: ['*-tgt']
+        provideDeps: ["*-tgt"]
 
       libmuchannel:
         privateEnvironment:
@@ -497,7 +501,7 @@ multiPackage:
               muenBuild $1/${GPR_PATH}
             multiPackage: &common_dev_tgt_provide
               dev:
-                provideDeps: ['*-dev']
+                provideDeps: ["*-dev"]
                 packageScript: |
                   gprInstallPackageDev
               tgt:
@@ -686,7 +690,7 @@ multiPackage:
             GPR_FILE+=_debug
           fi
           muenBuild $1/kernel/$GPR_FILE
-        provideDeps: ['muen::x86-kernel-policy', '*tau0']
+        provideDeps: ["muen::x86-kernel-policy", "*tau0"]
         packageVars: [OBJCOPY]
         packageScript: |
           ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
@@ -729,6 +733,7 @@ multiPackage:
     depends:
       - bsp::intel::microcode
       - muen::linux-image
+      # - muen::storage_drv
       - muen::x86-kernel-components-ahci_drv
       - muen::x86-kernel-components-controller
       - muen::x86-kernel-components-dbgserver
@@ -821,7 +826,7 @@ multiPackage:
       # validate
       mucfgvalidate ${SYSTEM}_b.xml
 
-    provideDeps: ['*']
+    provideDeps: ["*"]
     packageScript: |
       rsync -a --delete $1/ .
       echo "GPR_PROJECT_PATH=." >> .gpr_project

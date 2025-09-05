@@ -21,6 +21,11 @@ depends:
   - name: utils::mtools
     use: [tools]
 
+  - name: muen::storage_drv
+    tools:
+      target-toolchain: host-compat-gnat-toolchain
+    use: [tools]
+
   - name: muen::tau0-static
     tools:
       target-toolchain: host-compat-gnat-toolchain
@@ -179,6 +184,7 @@ multiPackage:
           # - muen::x86-kernel-components-libmuinit-proof
           - muen::x86-kernel-components-libmutime-proof
 
+          - muen::storage_drv-proof
           - muen::x86-kernel-components-ahci_drv-proof
           - muen::x86-kernel-components-controller-proof
           - muen::x86-kernel-components-dm-proof

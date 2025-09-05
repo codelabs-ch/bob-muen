@@ -13,11 +13,28 @@ buildSetup: |
     mucheckstack -P${__SRC}/components/${1}/${1} -l8192
   }
 
+  muenBuildStorageDrv() {
+    muenCspecs $1
+    GPRBUILD_EXTRA_ARGS="
+      -Xlinker_script=${__SRC}/component.ld \
+      -Xstacksize=8192" \
+    muenBuild ${__SRC}/${1}/${1}
+
+    mucheckstack -P${__SRC}/${1}/${1} -l8192
+  }
+
 packageTools: [mucbinsplit]
 packageSetup: |
   __SRC=$1
   muenInstallApp() {
     mucbinsplit -i ${__SRC}/generated/$1.xml \
+                -b ${__SRC}/install/usr/bin/$1 \
+                -o $1.xml .
+    mkdir -p .bob
+    echo "$1.xml" > .bob/cspecs
+  }
+  muenInstallStorageDrv() {
+    mucbinsplit -i ${__SRC}/$1.xml \
                 -b ${__SRC}/install/usr/bin/$1 \
                 -o $1.xml .
     mkdir -p .bob

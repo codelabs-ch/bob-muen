@@ -31,3 +31,27 @@ buildSetup: |
                  generated
     fi
   }
+
+  muenCspecsStorageDrv() {
+    SPEC=${__SRC}/${1}/spec/${1}.xml
+    if [ -e ${__SRC}/${1}/spec/${1}.xsl ]; then
+      xsltproc -o generated/${1}.xml \
+         ${__SRC}/${1}/spec/${1}.xsl \
+         ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+      SPEC=generated/${1}.xml
+    fi
+
+    if [ -e ${SPEC} ]; then
+      # cspecs
+      mucfgcvresalloc  ${SPEC} \
+        generated/${1}.xml -I generated
+
+      # Filter xml cspecs
+      muxmlfilter -isn Component_Ext -osn Component \
+        generated/${1}.xml generated/${1}_filtered.xml
+
+      # Generate cspecs
+      mucgenspec -i generated/${1}_filtered.xml \
+                 generated
+    fi
+  }

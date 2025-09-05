@@ -6,5 +6,5 @@ buildSetup: |
   export OBJ_DIR=$(pwd)/obj/
   export EXEC_DIR=$(pwd)/bin/
 buildScript: |
-  muenCspecs ${COMPONENT_NAME}
+  muenCspecs ${COMPONENT_NAME} "${XML_PATH:-}"
   muenProof

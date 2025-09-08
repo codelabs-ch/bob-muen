@@ -23,32 +23,52 @@ multiPackage:
       ISR_ENTRIES: "muen::x86-kernel-components-isr_entries"
 
     multiPackage:
-      ahci_drv:
-        depends:
-          - muen::x86-kernel-components-libmuchannel-dev
-          - muen::x86-kernel-components-libmudebuglog-dev
-          - muen::common-strings-dev
-          - use: []
-            depends:
-              - muen::x86-kernel-components-libmudebuglog-tgt
+      storage_drv:
         multiPackage:
           "":
             inherit: [muen_component_app]
-            buildScript: |
-              muenBuildApp ahci_drv
-            packageScript: |
-              muenInstallApp ahci_drv
-            provideDeps: ["*-tgt"]
-          proof:
-            inherit: [muen_proof_app]
-            environment:
-              RTS: "muen::rts"
-              COMPONENT_NAME: "ahci_drv"
-              GPR_PATH: "components/ahci_drv/ahci_drv"
+            depends:
+              - muen::x86-kernel-components-libmuchannel-dev
+              - muen::x86-kernel-components-libmudebuglog-dev
+              - muen::x86-kernel-components-libmutime-dev
+              - muen::common-strings-dev
+              - muen::x86-kernel-components-storage_drv-cspecs
+              - use: []
+                depends:
+                  - muen::x86-kernel-components-libmudebuglog-tgt
+            multiPackage:
+              "":
+                buildSetup: |
+                  export BASE_DIR=${MUEN_STORAGE_BASE_DIR:-$(pwd)/src}
+                  export MUEN_STORAGE_DRV_CSPECS=${BOB_DEP_PATHS['muen::x86-kernel-components-storage_drv-cspecs']}
+                  export MUEN_STORAGE_DRV_PORTS_CFG=${MUEN_STORAGE_DRV_PORTS_CFG_OVERRIDE:-${BOB_DEP_PATHS['muen::x86-kernel-components-storage_drv-cspecs']}}
+                  export DRIVE_KIND="NVME"
 
-      #storage_drv:
-      #  depends:
-      #    - muen::storage_drv
+                buildScript: |
+                  muenBuildApp storage_drv
+                packageScript: |
+                  muenInstallApp storage_drv
+                provideDeps: ["*-tgt"]
+              proof:
+                inherit: [muen_proof_app]
+                environment:
+                  RTS: "muen::rts"
+                  COMPONENT_NAME: "storage_drv"
+                  GPR_PATH: "components/storage_drv/storage_drv"
+          cspecs:
+            inherit: [muen_component_cspecs]
+            buildVars: [SLOTS, STORAGE_PORT]
+            buildScript: |
+              muenCspecs storage_drv
+              #muenBuild $1/src/storage_drv.gpr
+              #xsltproc -o ports_config.ads $1/src/src/ports_config.ads policy-src.xml
+              # packageScript: |
+              #   mlpPackageCspecs
+              #   cp $1/ports_config.ads . 
+
+              #storage_drv:
+              #  depends:
+              #    - muen::storage_drv
 
       controller:
         depends:
@@ -734,7 +754,7 @@ multiPackage:
       - bsp::intel::microcode
       - muen::linux-image
       # - muen::storage_drv
-      - muen::x86-kernel-components-ahci_drv
+      - muen::x86-kernel-components-storage_drv
       - muen::x86-kernel-components-controller
       - muen::x86-kernel-components-dbgserver
       - muen::x86-kernel-components-dm

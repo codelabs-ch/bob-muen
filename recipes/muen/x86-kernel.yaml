@@ -2,9 +2,9 @@ inherit: [muen_component]
 
 checkoutSCM:
   scm: git
-  url: https://git.codelabs.ch/muen.git
-  branch: devel-c5bc9f3df36f-bob
-  commit: 5d69a21b9cbcca8a5dba1b566dd4b866f4711f3a
+  url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
+  branch: ${MUEN_X86_KNL_BRANCH:-devel-c5bc9f3df36f-bob}
+  commit: ${MUEN_X86_KNL_COMMIT:-5d69a21b9cbcca8a5dba1b566dd4b866f4711f3a}
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated

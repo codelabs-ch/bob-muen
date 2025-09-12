@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muenonarm.git
   branch: e2c0c01862fa-bob
-  commit: 0c8fecc4ad75d639c5e5a65eedff46800d9f8da7
+  commit: 30d4742bfb548c573da0eb2112521fe40e4c0817
 
 multiPackage:
   common:
@@ -12,7 +12,7 @@ multiPackage:
     buildSetup: |
       export BSP_DIR=${BOB_DEP_PATHS[muen::muenonarm-bsp]}
     buildScript: |
-      muenBuild $1/system/common/common
+      muenBuild $1/system/common/arm64_common
     packageScript: |
       gprInstallPackageDev
   bsp:

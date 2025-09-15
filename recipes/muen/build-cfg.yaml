@@ -3,14 +3,15 @@ inherit: [gpr]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/build-cfg.git
-  branch: devel-build-cfg
-  commit: c349fe9cd8c3dbac95f2ba7fbb5a27b138afe2a7
+  branch: devel
+  commit: 7b8f4bbb1318a019b05324aa17ac4d92537d98c5
 
 buildScript: |
   rsync -a --delete $1/ .
 
 multiPackage:
   gpr:
+    buildVars: [ARCH]
     packageScript: |
       gprInstallPackageDev $1/gpr "*"
   scripts:

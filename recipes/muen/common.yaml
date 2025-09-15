@@ -1,25 +1,20 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/common.git
-  branch: $(if-then-else,$(eq,${ARCH},arm64),devel-armv8a-8c50d03ff97e-bob,devel-93c2e7735aac-bob)
-  commit: $(if-then-else,$(eq,${ARCH},arm64),bd47a596284f170be45ddb8522a25140c1fbc19e,0adce842164a9647b73f4f89d1cca14a855f8637)
+  branch: devel-93c2e7735aac-bob
+  commit: 6c74323864cf42289559f97a354d7e611211bcad
 
 multiPackage:
   gpr:
     inherit: [gpr]
-
-    buildVars: [ARCH]
     buildScript: |
-      if [[ ${ARCH} == x86_64 ]]; then
-        rsync -a --delete $1/gpr .
-      fi
+      rsync -a --delete $1/gpr .
     packageScript: |
-      if [[ ${ARCH} == x86_64 ]]; then
-        gprInstallPackageDev $1/gpr
-      fi
+      gprInstallPackageDev $1/gpr
 
   "":
     inherit: [muen_component]
+    buildVars: [ARCH, MUEN_BUILD_MODE]
     multiPackage:
       debug:
         depends:

@@ -13,6 +13,12 @@ buildSetup: |
   export BUILD_CFG_PATH=${BOB_DEP_PATHS[muen::build-cfg-gpr]}
   if [[ ${MUEN_BUILD_MODE:-"0"} != "0" ]]; then
     export MUEN_BUILD_MODE=${MUEN_BUILD_MODE}
+    if [[ ${MUEN_BUILD_MODE} == "test" ]]; then
+      # arm64 on-target aunit tests use more Ada features.
+      echo "Setting custom restrictions"
+      export GLOBAL_RESTRICTIONS="restrictions-aunit.adc"
+      export LOCAL_RESTRICTIONS="restrictions-prove.adc"
+    fi
   fi
 buildScript: |
   muenBuild() {

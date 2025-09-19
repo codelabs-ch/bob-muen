@@ -1,32 +1,32 @@
 checkoutSCM:
   scm: git
-  url: git@git.codelabs.ch:muenonarm.git
-  branch: master
-  commit: f20901eb59517e0b009b120fb8b38166274b66da
+  url: git@git.codelabs.ch:muen/arm64/systems.git
+  branch: main
+  commit: ed20f44ad91282849191c1a9c0d552ab01f09c1b
 
 multiPackage:
   common:
     inherit: [muen_component]
     depends:
-      - muen::muenonarm-bsp
+      - muen::arm64-systems-bsp
     buildSetup: |
-      export BSP_DIR=${BOB_DEP_PATHS[muen::muenonarm-bsp]}
+      export BSP_DIR=${BOB_DEP_PATHS[muen::arm64-systems-bsp]}
     buildScript: |
-      muenBuild $1/system/common/arm64_common
+      muenBuild $1/bsp/common/arm64_common
     packageScript: |
       gprInstallPackageDev
   bsp:
-    buildVars: [CROSS_COMPILE, OBJCOPY, NAME, TARGET_PLATFORM, TARGET_CONFIG]
+    buildVars: [CROSS_COMPILE, OBJCOPY, NAME, TARGET_CONFIG]
     buildTools: [target-toolchain]
     buildScript: |
-      ${CROSS_COMPILE}gnatprep -v $1/system/platform/src/board.adb \
+      ${CROSS_COMPILE}gnatprep -v $1/bsp/platform/src/board.adb \
         board.adb \
-        $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/subjects/native/${NAME}/bsp.conf
+        $1/bsp/config/${TARGET_CONFIG}/${NAME}/bsp.conf
 
-      ${CROSS_COMPILE}gnatprep -v $1/system/platform/src/board.ads \
+      ${CROSS_COMPILE}gnatprep -v $1/bsp/platform/src/board.ads \
         board.ads \
-        $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/subjects/native/${NAME}/bsp.conf
-      cp $1/system/platform/src/driver/* .
+        $1/bsp/config/${TARGET_CONFIG}/${NAME}/bsp.conf
+      cp $1/bsp/platform/src/driver/* .
     packageScript: |
       rsync -a --delete $1/ .
   subjects:
@@ -34,19 +34,19 @@ multiPackage:
       event_logger:
         inherit: [muen_component]
         depends:
-          - name: muen::muenonarm-common
+          - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
         buildVars: [OBJCOPY]
         buildScript: |
-          muenBuild $1/system/subjects/native/event_logger/event_logger.gpr
+          muenBuild $1/subjects/event_logger/event_logger.gpr
           muenBuildBin event_logger.elf
         packageScript: |
           cp $1/install/usr/bin/event_logger.* .
       example:
         inherit: [muen_component]
         depends:
-          - name: muen::muenonarm-common
+          - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
           - muen::common-libmusinfo-dev
@@ -55,10 +55,10 @@ multiPackage:
         buildSetup: |
           export GEN_DIR=$(pwd)/generated
         buildScript: |
-          mucgenspec -i $1/system/subjects/native/example/spec/example.xml \
+          mucgenspec -i $1/subjects/example/spec/example.xml \
               -p Example generated
 
-          muenBuild $1/system/subjects/native/example/example.gpr
+          muenBuild $1/subjects/example/example.gpr
           muenBuildBin example.elf
         packageScript: |
           cp $1/install/usr/bin/example.* .
@@ -66,35 +66,33 @@ multiPackage:
   bootloader-binaries:
     buildVars: [TARGET_PLATFORM]
     buildScript: |
-      cp $1/dev/demo/src/${TARGET_PLATFORM}/common/bootloader/* .
+      cp $1/deployment/${TARGET_PLATFORM}/common/bootloader/* .
     packageScript: |
       cp $1/* .
 
   bootgen-files:
-    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
     buildScript: |
-      cp $1/dev/demo/src/${TARGET_PLATFORM}/common/bootgen/bootgen.bif .
-      cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/packaged/bootgen_test.config .
+      cp $1/deployment/common/bootgen/* .
     packageScript: |
       cp $1/* .
 
   gdb-xsct-files:
     buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
     buildScript: |
-      cp $1/dev/demo/src/${TARGET_PLATFORM}/common/gdb/gdbinit.gtp .
-      cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/gdb/gdbinit_test.config .
+      cp $1/deployment/${TARGET_PLATFORM}/common/gdb/gdbinit.gtp .
+      cp $1/deployment/${TARGET_PLATFORM}/common/gdb/gdbinit_test.config .
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/gdb/gdbinit.config .
-        cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/gdb/xsct_test.tcl .
+        cp $1/deployment/${TARGET_PLATFORM}/common/gdb/xsct_test.tcl .
+        cp $1/deployment/${TARGET_PLATFORM}/${TARGET_CONFIG}/gdb/gdbinit.config .
       fi
     packageScript: |
       cp $1/* .
 
   uboot-tftp-files:
-    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildVars: [TARGET_PLATFORM]
     buildScript: |
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp $1/dev/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/deployment/uboot/bootscript_test.cmd .
+        cp $1/deployment/${TARGET_PLATFORM}/common/uboot/bootscript_test.cmd .
       fi
     packageScript: |
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
@@ -105,21 +103,27 @@ multiPackage:
     buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
     buildScript: |
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp $1/dev/demo/src/${TARGET_PLATFORM}/common/xsct/xswboot.tcl .
+        cp $1/deployment/${TARGET_PLATFORM}/common/xsct/xswboot.tcl .
       fi
     packageScript: |
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
         cp $1/* .
       fi
 
+  linux-config:
+    buildScript: |
+      cp $1/linux/kernel.config .
+    packageScript: |
+      cp $1/* .
+
   devicetree:
     depends:
-      - muen::muenonarm-policy-files
+      - muen::arm64-systems-policy-files
       - muen::linux-dt-bindings
     buildTools: [mugendts, dtc, target-toolchain]
     buildVars: [CC]
     buildScript: |
-      mugendts -o . ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
       for F in *.dts; do
         F=$(basename ${F%.dts})
         ${CC} -I ${BOB_DEP_PATHS[muen::linux-dt-bindings]} -E \
@@ -131,21 +135,6 @@ multiPackage:
       done
     packageScript: |
       rsync -a --delete $1/ .
-
-  linux-config:
-    buildScript: |
-      cp $1/system/demo/src/qemu_zcu102/minimal/subjects/linux/kernel.config .
-    packageScript: |
-      cp $1/* .
-
-  test:
-    buildVars: [TARGET_CONFIG, TARGET_PLATFORM, MUEN_BUILD_MODE]
-    buildScript: |
-      mkdir -p rts-config
-      cp $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/kernel/${MUEN_BUILD_MODE}/reset_values.ads ./rts-config
-      cp $1/system/demo/src/${TARGET_PLATFORM}/${TARGET_CONFIG}/kernel/rts/* ./rts-config
-    packageScript: |
-      cp -r $1/* .
 
   policy-files:
     inherit: [python3]
@@ -183,8 +172,8 @@ multiPackage:
       </component>
       EOF
 
-      mucfgcjoin -i $1/system/demo/src/policy/${TARGET_CONFIG}.xml \
-        -c $1/system/subjects/native/example/spec/example.xml,linux.xml \
+      mucfgcjoin -i $1/policy/${TARGET_CONFIG}.xml \
+        -c $1/subjects/example/spec/example.xml,linux.xml \
         -o policy_src.xml
 
       mucfgexpand policy_src.xml policy_a.xml
@@ -196,5 +185,13 @@ multiPackage:
       mugenpt -o bin policy_b.xml
 
       mugensinfo -o bin policy_b.xml
+    packageScript: |
+      cp -r $1/* .
+
+  test:
+    buildVars: [TARGET_PLATFORM]
+    buildScript: |
+      cp $1/rts-aunit-config/common/* .
+      cp $1/rts-aunit-config/${TARGET_PLATFORM}/* .
     packageScript: |
       cp -r $1/* .

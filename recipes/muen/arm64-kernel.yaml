@@ -8,7 +8,7 @@ checkoutSCM:
 
 depends:
   - muen::common-muschedinfo-dev
-  - muen::muenonarm-policy-files
+  - muen::arm64-systems-policy-files
 
 buildTools: [mugenspec]
 buildVars: [MUEN_GDB_SUPPORT, RTS]
@@ -19,7 +19,7 @@ buildSetup: |
   export BIN_POSTFIX=""
 buildScript: |
   rm -rf skp && mkdir -p skp
-  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
 
 multiPackage:
   release:
@@ -39,9 +39,9 @@ multiPackage:
   test:
     depends:
       - adacore::aunit-dev
-      - muen::muenonarm-test
+      - muen::arm64-systems-test
     buildSetup: |
-      export RTS_CONFIG=${BOB_DEP_PATHS[muen::muenonarm-test]}/rts-config
+      export RTS_CONFIG=${BOB_DEP_PATHS[muen::arm64-systems-test]}
       export GPRBUILD_EXTRA_ARGS=("--implicit-with=aunit")
       export BUILD_MODE=test
       export BIN_POSTFIX=_test

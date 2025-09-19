@@ -16,7 +16,7 @@ environment:
   MUENBLOCK_BRANCH: "arm64"
   MUENBLOCK_COMMIT: "967d6b52f318bd9a8a397085b65047dfd6096660"
 
-  LINUX_CUSTOM_CONFIG: "muen::muenonarm-linux-config"
+  LINUX_CUSTOM_CONFIG: "muen::arm64-systems-linux-config"
 
 depends:
   # (1) Build all required tools depending on the build mode.
@@ -64,28 +64,28 @@ depends:
           RTS: "muen::arm64-rts-aunit"
         depends:
           - muen::arm64-kernel-${MUEN_BUILD_MODE}
-          - muen::muenonarm-policy-files
+          - muen::arm64-systems-policy-files
       - if: !expr |
           "${MUEN_BUILD_MODE}" == "prove"
         environment:
           RTS: "muen::rts"
         depends:
           - muen::arm64-kernel-proof
-          - muen::muenonarm-policy-files
+          - muen::arm64-systems-policy-files
       - if: !expr |
           "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
         environment:
           RTS: "muen::rts"
         depends:
           - muen::arm64-kernel-${MUEN_BUILD_MODE}
-          - muen::muenonarm-policy-files
+          - muen::arm64-systems-policy-files
 
   # (4) Build the bootloader binaries for exception level 3 (currently
   # prebuilt binaries depending on hardware from muenonarm repository).
   - if: !expr |
       "${MUEN_BUILD_MODE}" != "prove"
     depends:
-      - muen::muenonarm-bootloader-binaries
+      - muen::arm64-systems-bootloader-binaries
 
   # (5) Build the VM subjects (i.e. Linux subjects) of the Muen SK system
   # for the build modes release and debug only (not required for the test
@@ -94,7 +94,7 @@ depends:
       "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
     depends:
       - muen::linux-image
-      - muen::muenonarm-devicetree
+      - muen::arm64-systems-devicetree
       - name: demo::rootfs
         environment:
           ROOTFS_ARCH: "arm64"
@@ -107,21 +107,21 @@ depends:
     environment:
       RTS: "muen::rts"
     depends:
-      - muen::muenonarm-subjects-example
-      - muen::muenonarm-subjects-event_logger
+      - muen::arm64-systems-subjects-example
+      - muen::arm64-systems-subjects-event_logger
 
   # (7) Generate deployment scripts for all deploy modes.
   - if: !expr |
       "${MUEN_BUILD_MODE}" != "prove"
     depends:
-      - muen::muenonarm-xsct-swboot-file
-      - muen::muenonarm-gdb-xsct-files
-      - muen::muenonarm-bootgen-files
+      - muen::arm64-systems-xsct-swboot-file
+      - muen::arm64-systems-gdb-xsct-files
+      - muen::arm64-systems-bootgen-files
 
   - if: !expr |
       "${MUEN_BUILD_MODE}" == "test"
     depends:
-      - muen::muenonarm-uboot-tftp-files
+      - muen::arm64-systems-uboot-tftp-files
 
 buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools]
 buildVars: [MUEN_BUILD_MODE, TARGET_CONFIG, TARGET_PLATFORM]
@@ -133,13 +133,13 @@ buildScript: |
       # be able to use the mugends tool (TODO: mugends needs all our dep
       # in the CWD. Maybe we can extend the tool to handle multiple search
       # directories to avoid unnecessary copies.).
-      cp ${BOB_DEP_PATHS[muen::muenonarm-bootloader-binaries]}/* .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-bootloader-binaries]}/* .
 
       cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel.elf .
       cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel .
-      cp ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/bin/* .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/bin/* .
 
-      cp ${BOB_DEP_PATHS[muen::muenonarm-devicetree]}/*.dtb .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-devicetree]}/*.dtb .
       cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin .
 
       if [[ ${TARGET_CONFIG} == "minimal" ]] ; then
@@ -150,34 +150,34 @@ buildScript: |
       fi
 
       if [[ ${TARGET_CONFIG} == minimal ]]; then
-        cp ${BOB_DEP_PATHS[muen::muenonarm-subjects-event_logger]}/event_logger.bin subject_one.bin
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-event_logger]}/event_logger.bin subject_one.bin
       else
-        cp ${BOB_DEP_PATHS[muen::muenonarm-subjects-example]}/example.bin subject_one.bin
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-example]}/example.bin subject_one.bin
       fi
 
       # (b) Validate the resulting kernel binary against the policy.
-      mucheckelf ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml ./kernel.elf
+      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml ./kernel.elf
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp) by first calling
       # mugends to generate the respective commands and then using these
       # files and bash commands from the legacy build system to generate
       # the required results.
-      mugends -o . ${BOB_DEP_PATHS[muen::muenonarm-policy-files]}/policy_b.xml
+      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp ${BOB_DEP_PATHS[muen::muenonarm-xsct-swboot-file]}/xswboot.tcl .
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-xsct-swboot-file]}/xswboot.tcl .
       fi
 
       # (c.i) gdb / xsct
-      cp ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
         # overwrite gdbinit.config for hardware xsct deployment
-        cp ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/gdbinit.config .
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit.config .
       fi
       sed -i -e "/__GDB_MAIN__/{r $(pwd)/gdbinit.config" -e "d}" gdbinit
 
       # (c.ii) sdcard and qemu boot image
-      cp ${BOB_DEP_PATHS[muen::muenonarm-bootgen-files]}/* .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-bootgen-files]}/* .
       sed -i -e "/__BIF_MAIN__/{r $(pwd)/bootgen.config" -e "d}" bootgen.bif
 
       bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
@@ -197,26 +197,26 @@ buildScript: |
     test)
       # (a) Copy the required build results of previous steps to support
       # all deploy modes (i.e. gdb, xsct, sdcard and u-boot tftp)
-      cp ${BOB_DEP_PATHS[muen::muenonarm-bootloader-binaries]}/* .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-bootloader-binaries]}/* .
       cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel_test.elf .
       cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel_test kernel_test.bin
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp)
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp ${BOB_DEP_PATHS[muen::muenonarm-xsct-swboot-file]}/xswboot.tcl .
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-xsct-swboot-file]}/xswboot.tcl .
       fi
 
       # (c.i) gdb / xsct
-      cp ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
-      sed -i -e "/__GDB_MAIN__/{r ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/gdbinit_test.config" -e "d}" gdbinit
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
+      sed -i -e "/__GDB_MAIN__/{r ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit_test.config" -e "d}" gdbinit
 
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp ${BOB_DEP_PATHS[muen::muenonarm-gdb-xsct-files]}/xsct_test.tcl ./xsct.tcl
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/xsct_test.tcl ./xsct.tcl
       fi
 
       # (c.ii) sdcard and qemu boot image
-      cp ${BOB_DEP_PATHS[muen::muenonarm-bootgen-files]}/* .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-bootgen-files]}/* .
       sed -i -e "/__BIF_MAIN__/{r $(pwd)/bootgen_test.config" -e "d}" bootgen.bif
 
       bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
@@ -229,7 +229,7 @@ buildScript: |
 
       # (c.iii) u-boot tftp script
       if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp ${BOB_DEP_PATHS[muen::muenonarm-uboot-tftp-files]}/* .
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-uboot-tftp-files]}/* .
         mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript_test.cmd bootscript.scr
       fi
       ;;
@@ -244,7 +244,9 @@ packageScript: |
     release|debug)
       # Build binaries
       cp $1/*.bit .
-      cp $1/*.hdf .
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/*.hdf .
+      fi
 
       cp $1/kernel .
       cp $1/*.bin .
@@ -278,7 +280,9 @@ packageScript: |
       cp $1/*.bin .
       cp $1/*.elf .
       cp $1/*.bit .
-      cp $1/*.hdf .
+      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+        cp $1/*.hdf .
+      fi
 
       # Deployment scripts (gdb / xsct, sdcard, tftp)
       cp $1/gdbinit .

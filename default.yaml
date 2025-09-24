@@ -3,6 +3,7 @@ environment:
   GRUB2_TARGET: "i386"
   GRUB2_PLATFORM: "pc"
   GNULIB_URL: https://github.com/coreutils/gnulib.git
+  GNU_MIRROR: https://mirror.init7.net/gnu/
 
 scmOverrides:
   - match:

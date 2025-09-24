@@ -34,7 +34,7 @@ depends:
     use: [tools]
     forward: True
 
-  - name: utils::uboot-tools
+  - name: bsp::uboot-tools
     use: [tools]
 
   - name: libs::glib-tools

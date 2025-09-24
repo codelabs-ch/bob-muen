@@ -1,4 +1,4 @@
-bobMinimumVersion: "1.0"
+bobMinimumVersion: "1.1.0rc1"
 
 # Keep ssh-agent working.
 layersWhitelist: ["SSH_AGENT_PID", "SSH_AUTH_SOCK"]
@@ -13,7 +13,7 @@ layers:
   - name: basement-gnu-linux
     scm: git
     url: https://github.com/BobBuildTool/basement-gnu-linux.git
-    commit: 7c2d05cc6f50f43e81134286c2b17392ee688d51
+    commit: 1f9be7ea25154bdc6539b439931e260f464ad345
     branch: master
 
   - name: ada

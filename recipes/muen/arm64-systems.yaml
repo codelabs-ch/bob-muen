@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muen/arm64/systems.git
-  branch: main
-  commit: ed20f44ad91282849191c1a9c0d552ab01f09c1b
+  branch: devel-remove-lowmem
+  commit: cdd4a9243d1d90e0f6ccd33b7a5d4e9141963a28
 
 multiPackage:
   common:

@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:muen/arm64/systems.git
-  branch: main
-  commit: 435ab0e6342d1ee02293651307fb0697a136e07b
+  branch: devel-gnat-25.1
+  commit: c9a0165aa14b065533f6fe75e955a7c3f2618aeb
 
 multiPackage:
   common:

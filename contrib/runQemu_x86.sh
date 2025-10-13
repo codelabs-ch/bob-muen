@@ -14,6 +14,11 @@ else
 	SANDBOX=""
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+$SCRIPT_DIR/create_simple_qemu_disk.sh
+QEMU_DISK="$SCRIPT_DIR/qemu_gpt.img"
+
 QUERY=$1
 DIST_DIR=$(bob query-path --fail -f '{dist}' ${SANDBOX} ${QUERY})
 ISOFILE=$DIST_DIR/muen.iso
@@ -46,7 +51,10 @@ QEMU_CMD="${QEMU} \
 	-device usb-tablet,bus=xhci.0 \
 	-device rtl8139,bus=pcie.0,addr=4.0,netdev=net1 \
 	-netdev user,id=net1,net=192.168.253.0/24,dhcpstart=192.168.253.100 \
-	-display curses"
+	-drive file=${QEMU_DISK},format=raw,if=none,id=nvm \
+    -device nvme,serial=deadbeef,drive=nvm \
+	-display curses \
+	-d guest_errors,unimp,mmu,int -D qemu.log -no-reboot -monitor stdio"
 
 if [[ ${efi} == "efi" ]]; then
 	QEMU_CMD="$QEMU_CMD -bios OVMF.fd"
@@ -59,6 +67,7 @@ if [[ -n "$qpid" ]] && ps -p $qpid > /dev/null; then
 fi
 rm -f emulate.*
 rm -f serial.out
+rm -f qemu.log
 
 echo "Using command '$QEMU_CMD'" > emulate.cmd
 screen -L -Logfile emulate.out -dmS kvm-muen ${QEMU_CMD} -pidfile emulate.pid

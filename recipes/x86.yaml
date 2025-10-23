@@ -26,6 +26,13 @@ depends:
       target-toolchain: host-compat-gnat-toolchain
     use: [tools]
 
+  # kernel metric
+  - name: adacore::libadalang-tools
+    use: [tools]
+    forward: True
+    tools:
+      target-toolchain: host-compat-gnat-toolchain
+
   # build an x86_64 linux gnu compiler with ada enabled
   - name: devel::cross-toolchain-x86_64-linux-gnu-ada
     use: [tools]

@@ -26,6 +26,13 @@ depends:
       target-toolchain: host-compat-gnat-toolchain
     use: [tools]
 
+  # kernel metric
+  - name: adacore::libadalang-tools
+    use: [tools]
+    forward: True
+    tools:
+      target-toolchain: host-compat-gnat-toolchain
+
   # build an x86_64 linux gnu compiler with ada enabled
   - name: devel::cross-toolchain-x86_64-linux-gnu-ada
     use: [tools]
@@ -220,4 +227,21 @@ multiPackage:
       HARDWARE: "kontron-ktqm77"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "kontron-ktqm77"
-    multiPackage: *muen_build_mode
+    multiPackage:
+      <<: *muen_build_mode
+      metrics:
+        environment:
+          MUEN_BUILD_MODE: "release"
+        depends:
+          - environment:
+              RTS: "muen::rts"
+            depends:
+              - muen::x86-kernel-metrics
+        buildScript: |
+          for d in ${!BOB_DEP_PATHS[@]}; do
+            dirname=$(echo $d | sed 's/::/-/g')
+            mkdir $dirname
+            cp ${BOB_DEP_PATHS[$d]}/gnatmetric.log $dirname/
+          done
+        packageScript: |
+          rsync -a --delete $1/ .

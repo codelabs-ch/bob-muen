@@ -696,6 +696,37 @@ multiPackage:
           mkdir .debug
           cp $1/install/usr/bin/kernel .debug/
 
+      metrics:
+        buildTools: [libadalang-tools]
+        buildScript: |
+          # gnatmetric ignores files from Externally_Built libs, an attribute
+          # which is set to True by gprinstall-created GPR files.
+          # Copy all relevant lib deps here and create simple GPR file.
+          for d in ${!BOB_DEP_PATHS[@]}; do
+            DIR=${BOB_DEP_PATHS[$d]}
+            if [ -e ${DIR}/usr/share/gpr/*.gpr ]; then
+              # remove dependency from project path first
+              GPR_PROJECT_PATH=$(echo "$GPR_PROJECT_PATH" | tr ':' '\n' | grep -v '$DIR' | paste -sd ':' -)
+
+              gpr_name=$(basename ${DIR}/usr/share/gpr/*.gpr)
+              include_name=$(basename ${DIR}/usr/include/*)
+              echo "dependency found in: ${DIR}"
+              mkdir -p deps
+              cp -r ${DIR}/usr/include/* deps
+          cat > deps/${gpr_name} << EOF
+          project ${include_name} is
+             for Source_Dirs use ("${include_name}");
+          end ${include_name};
+          EOF
+            fi
+          done
+
+          GPR_PROJECT_PATH=deps:$GPR_PROJECT_PATH \
+            OBJ_DIR="${PWD}/" \
+            gnatmetric -v --output-dir=. -P$1/kernel/kernel > gnatmetric.log 2>&1
+        packageScript: |
+          cp $1/gnatmetric.log .
+
       proof:
         inherit: [muen_proof]
         environment:

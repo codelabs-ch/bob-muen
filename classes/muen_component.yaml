@@ -37,7 +37,6 @@ buildScript: |
       --relocate-build-tree=build \
       --target=${GPR_TARGET} \
       --prefix="${PREFIX:-install/usr}" \
-      -m \
       -p \
       -f \
       ${@:2}

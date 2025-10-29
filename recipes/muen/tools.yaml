@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-devel-59e3fac208fc-bob}
-  commit: ${MUEN_TOOLS_COMMIT:-474af97957533c24124e2a5e940ef9e59450c7ff}
+  commit: ${MUEN_TOOLS_COMMIT:-20db77fc0981b96529556148d9bf1891cadef4dc}
 
 multiPackage:
   liballoc:
@@ -707,6 +707,14 @@ multiPackage:
       cp -r $1/scripts/mulog.py .
     packageScript: |
       rsync -a --delete $1/ .
+
+  solo5-muen-gencspec:
+    buildScript: |
+      cp -r $1/scripts/solo5-muen-gencspec.py solo5-muen-gencspec
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      solo5-muen-gencspec: "."
 
   tests:
     depends:

@@ -1,0 +1,27 @@
+inherit: [cpackage, make]
+
+checkoutSCM:
+  scm: git
+  url: https://github.com/Solo5/solo5.git
+  branch: main
+  commit: dabc69fd89b8119449ec4088c54b458d4ccc851b
+
+buildTools: [host-toolchain, target-toolchain]
+buildVars: [AUTOCONF_BUILD, CC]
+buildScript: |
+  rsync -a --delete $1/ .
+  sed -i 's/CONFIG_SPT_TENDER=1//' configure.sh
+  HOST_CC=${AUTOCONF_BUILD}-gcc TARGET_CC=${CC} ./configure.sh --prefix=.
+  makeParallel
+
+multiPackage:
+  elftool:
+    packageScript: |
+      cp $1/elftool/solo5-elftool .
+
+    provideTools:
+      solo5-elftool: "."
+
+  hello-muen:
+    packageScript: |
+      cp $1/tests/test_hello/test_hello.muen .

@@ -211,6 +211,15 @@ multiPackage:
       PLATFORM: "qemu-kvm-coreboot"
     multiPackage: *muen_build_mode
 
+  qemu-solo5-test:
+    environment:
+      SYSTEM: "mirage-solo5"
+      HARDWARE: "qemu-kvm"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "qemu-kvm"
+      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5-test"
+    multiPackage: *muen_build_mode
+
   nuc6cayh-efi-integ:
     environment:
       SYSTEM: "integration_tests"

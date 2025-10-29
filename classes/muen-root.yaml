@@ -24,6 +24,10 @@ depends:
     use: [tools]
     forward: True
 
+  - name: devel::solo5-elftool
+    use: [tools]
+    forward: True
+
   # with basement::rootrecipe we have a common set of tools and a host-
   # toolchain which is also set as target toolchain.
   # for muen we need a gnat toolchain first. Use alr to get one.

@@ -614,6 +614,21 @@ multiPackage:
     buildScript: createPolicySrc $1
     packageScript: packagePolicySrc $1
 
+  policy-src-mirage-solo5:
+    checkoutSCM:
+      scm: url
+      url: file://${UNIKERNEL_FILE:-Please specify UNIKERNEL_FILE!}
+      dir: uni
+    inherit: [muen_policy, solo5]
+    buildVars: [UNIKERNEL_FILE]
+    buildScript: |
+      composeSolo5Config $1 $1/uni/$(basename $UNIKERNEL_FILE) \
+          --channel-size 0x4000000
+      createPolicySrc $1
+    packageScript: |
+      packagePolicySrc $1
+      cp $1/unipi.muen .
+
   isr_entries:
     buildScript: |
       cp $1/kernel/src/asm/isrlist.S .

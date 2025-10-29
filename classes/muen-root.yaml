@@ -138,6 +138,10 @@ depends:
       - name: muen::tools-solo5-muen-gencspec
         use: [tools]
         forward: True
+      - name: muen::x86-kernel-solo5-policy-compose
+        use: [tools]
+        forward: True
+
       - name: muen::sbs-tools
         use: [tools]
         forward: True

@@ -629,6 +629,20 @@ multiPackage:
       packagePolicySrc $1
       cp $1/unipi.muen .
 
+  policy-src-solo5-test:
+    inherit: [muen_policy, solo5]
+    depends:
+      - devel::solo5-hello-muen
+    buildScript: |
+      composeSolo5Config $1 \
+        ${BOB_DEP_PATHS[devel::solo5-hello-muen]}/test_hello.muen \
+        --disable-reset \
+        --bootparams "Hi!"
+      createPolicySrc $1
+    packageScript: |
+      packagePolicySrc $1
+      cp $1/test_hello.muen .
+
   isr_entries:
     buildScript: |
       cp $1/kernel/src/asm/isrlist.S .

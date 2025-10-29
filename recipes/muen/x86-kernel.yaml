@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-devel-c5bc9f3df36f-bob}
-  commit: ${MUEN_X86_KNL_COMMIT:-707f9cc32b871e7e5f5472ccf65c08705d12c4bf}
+  commit: ${MUEN_X86_KNL_COMMIT:-e596be7078690731830a9b4d33e5b4de163f9d70}
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated
@@ -838,3 +838,11 @@ multiPackage:
     packageScript: |
       rsync -a --delete $1/ .
       echo "GPR_PROJECT_PATH=." >> .gpr_project
+
+  solo5-policy-compose:
+    buildScript: |
+      cp -r $1/policy/xml/mirageos/compose.py solo5-policy-compose
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      solo5-policy-compose: "."

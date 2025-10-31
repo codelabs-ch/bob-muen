@@ -13,7 +13,7 @@ layers:
   - name: basement-gnu-linux
     scm: git
     url: https://github.com/BobBuildTool/basement-gnu-linux.git
-    commit: 1f9be7ea25154bdc6539b439931e260f464ad345
+    commit: 8eab7cbc0b9991463f8da609e2302373598fc24a
     branch: master
 
   - name: ada

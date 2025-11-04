@@ -227,6 +227,7 @@ multiPackage:
       HARDWARE: "kontron-ktqm77"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "kontron-ktqm77"
+      MUEN_LINUX_KASAN: "1"
     multiPackage:
       <<: *muen_build_mode
       metrics:

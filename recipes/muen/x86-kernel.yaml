@@ -749,8 +749,15 @@ multiPackage:
       cp -r $1/* .
 
   linux-config:
+    buildVars: [MUEN_LINUX_KASAN]
     buildScript: |
       cp $1/components/linux/config/* .
+
+      if [[ ${MUEN_LINUX_KASAN:-UNSET} != UNSET ]]; then
+        for file in *; do
+          [ -f "$file" ] && echo 'CONFIG_KASAN=y' >> $file
+        done
+      fi
     packageScript: |
       cp $1/* .
       sed -i 's/CONFIG_LOCALVERSION="-muen"/# CONFIG_LOCALVERSION is not set/g' *

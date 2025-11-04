@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-devel-c5bc9f3df36f-bob}
-  commit: ${MUEN_X86_KNL_COMMIT:-f8dce8163e289bc096e0363973b8a4b57cb3a35a}
+  commit: ${MUEN_X86_KNL_COMMIT:-707f9cc32b871e7e5f5472ccf65c08705d12c4bf}
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated
@@ -749,8 +749,15 @@ multiPackage:
       cp -r $1/* .
 
   linux-config:
+    buildVars: [MUEN_LINUX_KASAN]
     buildScript: |
       cp $1/components/linux/config/* .
+
+      if [[ ${MUEN_LINUX_KASAN:-UNSET} != UNSET ]]; then
+        for file in *; do
+          [ -f "$file" ] && echo 'CONFIG_KASAN=y' >> $file
+        done
+      fi
     packageScript: |
       cp $1/* .
       sed -i 's/CONFIG_LOCALVERSION="-muen"/# CONFIG_LOCALVERSION is not set/g' *

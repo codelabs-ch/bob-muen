@@ -1,17 +1,21 @@
 checkoutSCM:
   scm: git
   url: git@git.codelabs.ch:rootfs-content.git
-  branch: main
-  commit: b9b01fea9027a627d0c47920cff3c8b52623783b
+  branch: unipi
+  commit: 96fd03a9781f9fed905854b53ce5347c6f5bcff6
 
 buildScript: |
   rsync -a --delete $1/* .
 
-packageVars: [ARCH]
+packageVars: [ARCH, UNIKERNEL_FILE]
 packageTools: [target-toolchain]
 packageScript: |
   if [[ ${ARCH} == *x86* ]]; then
     rsync -a --delete $1/common/* $1/x86/* .
   else
     rsync -a --delete $1/common/* $1/arm64/* .
+  fi
+
+  if [[ ${UNIKERNEL_FILE:-UNSET} != UNSET ]]; then
+    rsync -a $1/unipi/* .
   fi

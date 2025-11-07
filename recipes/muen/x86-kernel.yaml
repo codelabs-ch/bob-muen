@@ -765,6 +765,18 @@ multiPackage:
     packageScript: |
       cp $1/* .
 
+  linux-config-unipi:
+    inherit: [kconfig]
+    buildVars: [LINUX_CONFIG]
+    buildScript: |
+      cp $1/components/linux/config/${LINUX_CONFIG} .
+      kconfigDisable CONFIG_LOCALVERSION ${LINUX_CONFIG}
+
+      echo 'CONFIG_NETFILTER_XT_MATCH_U32=m' >> ${LINUX_CONFIG}
+      echo 'CONFIG_BRIDGE_NETFILTER=m' >> ${LINUX_CONFIG}
+    packageScript: |
+      cp $1/* .
+
   policy:
     inherit: [python3]
     depends:

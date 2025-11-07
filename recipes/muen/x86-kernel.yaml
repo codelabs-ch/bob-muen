@@ -753,18 +753,17 @@ multiPackage:
       cp -r $1/* .
 
   linux-config:
-    buildVars: [MUEN_LINUX_KASAN]
+    inherit: [kconfig]
+    buildVars: [LINUX_KASAN, LINUX_CONFIG]
     buildScript: |
-      cp $1/components/linux/config/* .
+      cp $1/components/linux/config/${LINUX_CONFIG} .
+      kconfigDisable CONFIG_LOCALVERSION ${LINUX_CONFIG}
 
-      if [[ ${MUEN_LINUX_KASAN:-UNSET} != UNSET ]]; then
-        for file in *; do
-          [ -f "$file" ] && echo 'CONFIG_KASAN=y' >> $file
-        done
+      if [[ ${LINUX_KASAN:-UNSET} != UNSET ]]; then
+        kconfigEnable CONFIG_KASAN ${LINUX_CONFIG}
       fi
     packageScript: |
       cp $1/* .
-      sed -i 's/CONFIG_LOCALVERSION="-muen"/# CONFIG_LOCALVERSION is not set/g' *
 
   policy:
     inherit: [python3]

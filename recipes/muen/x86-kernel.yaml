@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-devel-c5bc9f3df36f-bob}
-  commit: ${MUEN_X86_KNL_COMMIT:-707f9cc32b871e7e5f5472ccf65c08705d12c4bf}
+  commit: ${MUEN_X86_KNL_COMMIT:-e596be7078690731830a9b4d33e5b4de163f9d70}
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated
@@ -610,34 +610,38 @@ multiPackage:
               GNATPROVE_TIMEOUT: "0"
 
   policy-src:
-    buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM, MUEN_UCODE_DIR]
-    buildTools: [mucfgmerge]
+    inherit: [muen_policy]
+    buildScript: muenCreatePolicySrc $1
+    packageScript: muenPackagePolicySrc $1
+
+  policy-src-mirage-solo5:
+    checkoutSCM:
+      scm: url
+      url: file://${UNIKERNEL_FILE:-Please specify UNIKERNEL_FILE!}
+      dir: uni
+    inherit: [muen_policy, solo5]
+    buildVars: [UNIKERNEL_FILE]
     buildScript: |
-      cat > system_config.xml << EOF
-      <system>
-       <config>
-        <string name="system"              value="${SYSTEM}.xml"/>
-        <string name="hardware"            value="hardware/${HARDWARE}.xml"/>
-        <string name="additional_hardware" value="hardware/${ADDITIONAL_HW}.xml"/>
-        <string name="platform"            value="platform/${PLATFORM}.xml"/>
-       </config>
-      </system>
-      EOF
-
-      # scheduling plan
-      if [[ -e $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml ]]; then
-        cp $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml scheduling_plans.xml
-      elif [[ -e $1/policy/scheduling/static/${SYSTEM}.xml ]]; then
-        cp $1/policy/scheduling/static/${SYSTEM}.xml scheduling_plans.xml
-      else
-        echo "No scheduling configuration for ${SYSTEM} (platform: ${PLATFORM})"
-        false
-      fi
-
-      mucfgmerge system_config.xml ${SYSTEM}.xml -I $1/policy:$1/policy/xml:.
+      composeSolo5Config $1 $1/uni/$(basename $UNIKERNEL_FILE) \
+          --channel-size 0x4000000
+      muenCreatePolicySrc $1
     packageScript: |
-      cp $1/${SYSTEM}.xml .
-      ln -snf ${SYSTEM}.xml policy_src.xml
+      packagePolicySrc $1
+      cp $1/unipi.muen .
+
+  policy-src-solo5-test:
+    inherit: [muen_policy, solo5]
+    depends:
+      - devel::solo5-hello-muen
+    buildScript: |
+      composeSolo5Config $1 \
+        ${BOB_DEP_PATHS[devel::solo5-hello-muen]}/test_hello.muen \
+        --disable-reset \
+        --bootparams "Hi!"
+      muenCreatePolicySrc $1
+    packageScript: |
+      muenPackagePolicySrc $1
+      cp $1/test_hello.muen .
 
   isr_entries:
     buildScript: |
@@ -749,18 +753,29 @@ multiPackage:
       cp -r $1/* .
 
   linux-config:
-    buildVars: [MUEN_LINUX_KASAN]
+    inherit: [kconfig]
+    buildVars: [LINUX_KASAN, LINUX_CONFIG]
     buildScript: |
-      cp $1/components/linux/config/* .
+      cp $1/components/linux/config/${LINUX_CONFIG} .
+      kconfigDisable CONFIG_LOCALVERSION ${LINUX_CONFIG}
 
-      if [[ ${MUEN_LINUX_KASAN:-UNSET} != UNSET ]]; then
-        for file in *; do
-          [ -f "$file" ] && echo 'CONFIG_KASAN=y' >> $file
-        done
+      if [[ ${LINUX_KASAN:-UNSET} != UNSET ]]; then
+        kconfigEnable CONFIG_KASAN ${LINUX_CONFIG}
       fi
     packageScript: |
       cp $1/* .
-      sed -i 's/CONFIG_LOCALVERSION="-muen"/# CONFIG_LOCALVERSION is not set/g' *
+
+  linux-config-unipi:
+    inherit: [kconfig]
+    buildVars: [LINUX_CONFIG]
+    buildScript: |
+      cp $1/components/linux/config/${LINUX_CONFIG} .
+      kconfigDisable CONFIG_LOCALVERSION ${LINUX_CONFIG}
+
+      echo 'CONFIG_NETFILTER_XT_MATCH_U32=m' >> ${LINUX_CONFIG}
+      echo 'CONFIG_BRIDGE_NETFILTER=m' >> ${LINUX_CONFIG}
+    packageScript: |
+      cp $1/* .
 
   policy:
     inherit: [python3]
@@ -782,7 +797,7 @@ multiPackage:
       - muen::x86-kernel-components-time
       - muen::x86-kernel-components-vt
 
-      - muen::x86-kernel-policy-src
+      - ${MUEN_POLICY_SRC}
 
       - name: demo::rootfs
         environment:
@@ -811,14 +826,15 @@ multiPackage:
       - mugenmsrstore
       - mugenacpi
       - mucfgvalidate
-    buildVars: [SYSTEM, HARDWARE, PLATFORM]
+    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC, MUEN_UCODE_DIR]
+    # MUEN_UCODE_DIR is used by mucfgucode tool.
     buildScript: |
       # build the linux cspecs
       $1/components/linux/misc/linux-muen-gencspec.py \
         ${BOB_DEP_PATHS[muen::linux-image]}/boot/bzImage \
         $1/components/linux/spec/linux.xml \
         --out_spec linux.xml \
-        --src_policy ${BOB_DEP_PATHS[muen::x86-kernel-policy-src]}/${SYSTEM}.xml
+        --src_policy ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml
       # --initramfs ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz \
 
       CSPECS="$(pwd)/linux.xml"
@@ -830,7 +846,7 @@ multiPackage:
         fi
       done
       # Join
-      mucfgcjoin -i ${BOB_DEP_PATHS['muen::x86-kernel-policy-src']}/${SYSTEM}.xml \
+      mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
         -o ${SYSTEM}_with_comp.xml \
         -c ${CSPECS}
 
@@ -863,3 +879,11 @@ multiPackage:
     packageScript: |
       rsync -a --delete $1/ .
       echo "GPR_PROJECT_PATH=." >> .gpr_project
+
+  solo5-policy-compose:
+    buildScript: |
+      cp -r $1/policy/xml/mirageos/compose.py solo5-policy-compose
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      solo5-policy-compose: "."

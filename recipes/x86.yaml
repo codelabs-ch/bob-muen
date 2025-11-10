@@ -211,6 +211,35 @@ multiPackage:
       PLATFORM: "qemu-kvm-coreboot"
     multiPackage: *muen_build_mode
 
+  qemu-solo5-test:
+    environment:
+      SYSTEM: "mirage-solo5"
+      HARDWARE: "qemu-kvm"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "qemu-kvm"
+      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5-test"
+    multiPackage: *muen_build_mode
+
+  qemu-unipi:
+    environment:
+      SYSTEM: "mirage-solo5"
+      HARDWARE: "qemu-kvm"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "qemu-kvm"
+      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-mirage-solo5"
+      LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
+    multiPackage: *muen_build_mode
+
+  nuc5i5myhe-unipi:
+    environment:
+      SYSTEM: "mirage-solo5"
+      HARDWARE: "intel-nuc-5i5myhe"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "intel-nuc-5i5myhe"
+      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-mirage-solo5"
+      LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
+    multiPackage: *muen_build_mode
+
   nuc6cayh-efi-integ:
     environment:
       SYSTEM: "integration_tests"

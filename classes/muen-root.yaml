@@ -24,10 +24,6 @@ depends:
     use: [tools]
     forward: True
 
-  - name: devel::solo5-elftool
-    use: [tools]
-    forward: True
-
   # with basement::rootrecipe we have a common set of tools and a host-
   # toolchain which is also set as target toolchain.
   # for muen we need a gnat toolchain first. Use alr to get one.
@@ -132,13 +128,6 @@ depends:
         use: [tools]
         forward: True
       - name: muen::tools-mucfgucode
-        use: [tools]
-        forward: True
-
-      - name: muen::tools-solo5-muen-gencspec
-        use: [tools]
-        forward: True
-      - name: muen::x86-kernel-solo5-policy-compose
         use: [tools]
         forward: True
 

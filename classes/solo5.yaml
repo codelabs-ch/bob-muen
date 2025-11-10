@@ -1,9 +1,18 @@
 inherit: [python3]
 depends:
+  - name: muen::tools-solo5-muen-gencspec
+    use: [tools]
+  - name: muen::x86-kernel-solo5-policy-compose
+    use: [tools]
+
   - muen::tools-libmupy
+
   - tools:
       target-toolchain: host-compat-toolchain
     depends:
+      - name: devel::solo5-elftool
+        use: [tools]
+
       - python::lxml
       - devel::lief-python
 buildVars: [SYSTEM]

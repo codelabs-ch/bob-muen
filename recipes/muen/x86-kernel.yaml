@@ -611,8 +611,8 @@ multiPackage:
 
   policy-src:
     inherit: [muen_policy]
-    buildScript: createPolicySrc $1
-    packageScript: packagePolicySrc $1
+    buildScript: muenCreatePolicySrc $1
+    packageScript: muenPackagePolicySrc $1
 
   policy-src-mirage-solo5:
     checkoutSCM:
@@ -624,7 +624,7 @@ multiPackage:
     buildScript: |
       composeSolo5Config $1 $1/uni/$(basename $UNIKERNEL_FILE) \
           --channel-size 0x4000000
-      createPolicySrc $1
+      muenCreatePolicySrc $1
     packageScript: |
       packagePolicySrc $1
       cp $1/unipi.muen .
@@ -638,9 +638,9 @@ multiPackage:
         ${BOB_DEP_PATHS[devel::solo5-hello-muen]}/test_hello.muen \
         --disable-reset \
         --bootparams "Hi!"
-      createPolicySrc $1
+      muenCreatePolicySrc $1
     packageScript: |
-      packagePolicySrc $1
+      muenPackagePolicySrc $1
       cp $1/test_hello.muen .
 
   isr_entries:

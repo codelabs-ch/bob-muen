@@ -2,7 +2,7 @@ buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM]
 buildTools: [mucfgmerge]
 buildScript: |
   # $1 - source dir
-  createPolicySrc() {
+  muenCreatePolicySrc() {
     cat > system_config.xml << EOF
     <system>
      <config>
@@ -29,7 +29,7 @@ buildScript: |
 
 packageScript: |
   # $1 - build dir
-  packagePolicySrc() {
+  muenPackagePolicySrc() {
     cp $1/${SYSTEM}.xml .
     ln -snf ${SYSTEM}.xml policy_src.xml
   }

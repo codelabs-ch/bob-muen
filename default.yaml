@@ -17,3 +17,10 @@ scmOverrides:
 
 include:
   - user
+
+archiveAppend:
+  backend: http
+  name: "bob archive"
+  url: "https://bob-archive.codelabs.ch/"
+  sslVerify: true
+  flags: [download]

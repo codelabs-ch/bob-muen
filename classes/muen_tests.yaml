@@ -1,0 +1,18 @@
+buildVars: [BOB_PACKAGE_NAME]
+buildScript: |
+  mkdir -p gcov
+  for T in ${!BOB_DEP_PATHS[@]}; do
+    if [[ $T == ${BOB_PACKAGE_NAME} ]] ||
+       [[ $T != muen::*-test ]]; then
+      continue
+    fi
+    mkdir -p $T
+    cp ${BOB_DEP_PATHS[$T]}/gnattest.xml $T
+    gcov-tool merge -o gcov ${BOB_DEP_PATHS[$T]}/ gcov
+    cp ${BOB_DEP_PATHS[$T]}/*.gcno gcov
+  done
+  cd gcov
+  gcov *.gcda
+  rm *.gcda *.gcno
+packageScript: |
+  rsync -a --delete $1/ .

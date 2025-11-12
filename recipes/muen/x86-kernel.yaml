@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-devel-c5bc9f3df36f-bob}
-  commit: ${MUEN_X86_KNL_COMMIT:-e596be7078690731830a9b4d33e5b4de163f9d70}
+  commit: ${MUEN_X86_KNL_COMMIT:-9b393a749ed762f8c128100cea1df298690600c7}
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated
@@ -608,6 +608,19 @@ multiPackage:
             privateEnvironment:
               GNATPROVE_STEPS: "200000"
               GNATPROVE_TIMEOUT: "0"
+          test:
+            inherit: [muen_test]
+            buildScript: |
+              DATA_DIR=$1/components/libmutime \
+              TESTS_DIR=$1/components/libmutime/tests \
+              muenTest $1/components/libmutime/gnattest_libmutime
+            packageScript: |
+              muenPackageTest
+
+      tests:
+        inherit: [muen_tests]
+        depends:
+          - muen::x86-kernel-components-libmutime-test
 
   policy-src:
     inherit: [muen_policy]

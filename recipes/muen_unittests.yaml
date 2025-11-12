@@ -7,7 +7,9 @@ depends:
         use: [tools]
         forward: True
 
+      - muen::common-tests
       - muen::tools-tests
+      - muen::x86-kernel-components-tests
 
 buildScript: |
   for t in ${@:2}; do

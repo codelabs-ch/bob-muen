@@ -1,6 +1,6 @@
 [submodule "ci/nci"]
 	path = ci/nci
-	url = git@git.codelabs.ch:nci.git
+	url = https://git.codelabs.ch/nci.git
 [submodule "ci/nci-config"]
 	path = ci/nci-config
 	url = git@git.codelabs.ch:nci-config

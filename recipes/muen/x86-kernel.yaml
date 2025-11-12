@@ -608,6 +608,14 @@ multiPackage:
             privateEnvironment:
               GNATPROVE_STEPS: "200000"
               GNATPROVE_TIMEOUT: "0"
+          test:
+            inherit: [muen_test]
+            buildScript: |
+              DATA_DIR=$1/components/libmutime \
+              TESTS_DIR=$1/components/libmutime/tests \
+              muenTest $1/components/libmutime/gnattest_libmutime
+            packageScript: |
+              muenPackageTest
 
   policy-src:
     inherit: [muen_policy]

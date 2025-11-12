@@ -1,6 +1,6 @@
 checkoutSCM:
   scm: git
-  url: git@git.codelabs.ch:rootfs-content.git
+  url: https://git.codelabs.ch/rootfs-content.git
   branch: main
   commit: 96fd03a9781f9fed905854b53ce5347c6f5bcff6
 

@@ -2,7 +2,7 @@ inherit: [gpr]
 
 checkoutSCM:
   scm: git
-  url: git@git.codelabs.ch:muen/arm64/rts-aunit.git
+  url: https://git.codelabs.ch/muen/arm64/rts-aunit.git
   branch: main
   commit: b7f451eaeccbd0a4f555c09d1f1ace0d53dd627e
 

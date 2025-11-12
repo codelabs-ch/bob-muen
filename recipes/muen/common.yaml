@@ -118,3 +118,11 @@ multiPackage:
                 provideDeps: ['*-tgt']
                 packageScript: gprInstallPackageTgt
           proof: *common_proof
+          test:
+            inherit: [muen_test]
+            buildScript: |
+              DATA_DIR=$1/libmusinfo \
+              TESTS_DIR=$1/libmusinfo/tests \
+              muenTest $1/libmusinfo/gnattest_libmusinfo
+            packageScript: |
+              muenPackageTest

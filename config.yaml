@@ -24,6 +24,6 @@ layers:
 
   - name: codelabs
     scm: git
-    url: git@git.codelabs.ch:bob/codelabs.git
+    url: https://git.codelabs.ch/bob/codelabs.git
     branch: main
     commit: 0ac8e2a83222a5fa3e50af0fb33de7c674acc2a4

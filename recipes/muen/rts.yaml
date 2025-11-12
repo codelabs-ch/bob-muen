@@ -5,7 +5,7 @@ depends:
 
 checkoutSCM:
   scm: git
-  url: git@git.codelabs.ch:muen/rts
+  url: https://git.codelabs.ch/muen/rts
   branch: devel
   commit: afb7500438d952f8be9de3d267a98b9910908860
 

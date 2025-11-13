@@ -1,0 +1,9 @@
+{
+	"linters": {
+		"script": {
+			"type": "script-and-regex",
+				"script-and-regex.script": "./.arclint.sh",
+				"script-and-regex.regex": "/^(?P<message>.*)$/m"
+		}
+	}
+}

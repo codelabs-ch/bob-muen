@@ -1,0 +1,96 @@
+name: Build system images
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        recipe:
+          - arm64-qemu-zcu102-minimal-debug
+          - arm64-qemu-zcu102-minimal-release
+          - x86-qemu-release
+          - x86-ktqm77-integ-release
+          - x86-t430s-debug
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pipx
+        run: |
+          python3 -m pip install --user pipx
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install Bob build tool via pipx
+        run: |
+          pipx install BobBuildTool
+
+      - name: Build recipe
+        run: |
+          bob layers update
+          bob --version
+          echo "Building ${{ matrix.recipe }}"
+          bob dev -j$(nproc) ${{ matrix.recipe }}
+
+  build-debian:
+    runs-on: ubuntu-latest
+    container: debian:latest
+    strategy:
+      matrix:
+        recipe:
+          - x86-qemu-release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          apt-get update
+          apt-get install -y bc git python3 python3-pip python3-venv pipx rsync
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install Bob build tool via pipx
+        run: |
+          pipx install BobBuildTool
+
+      - name: Build recipe
+        run: |
+          bob layers update
+          bob --version
+          echo "Building ${{ matrix.recipe }}"
+          bob dev -j$(nproc)  --always-checkout muen::* ${{ matrix.recipe }}
+
+  build-mirage-static_website:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        recipe:
+          - x86-nuc5i5myhe-solo5-debug
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pipx
+        run: |
+          python3 -m pip install --user pipx
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install Bob build tool via pipx
+        run: |
+          pipx install BobBuildTool
+
+      - name: Fetch mirageos Docker image
+        run: |
+          docker create --name temp-container \
+            ghcr.io/codelabs-ch/muen-mirageos:devel-59e3fac208fc-bob
+
+      - name: Copy unikernel from container
+        run: docker cp temp-container:/home/opam/https.muen ./https.muen
+
+      - name: Build recipe
+        run: |
+          bob layers update
+          bob --version
+          echo "Building ${{ matrix.recipe }}"
+          bob dev -j$(nproc) ${{ matrix.recipe }} -DUNIKERNEL_FILE=${PWD}/https.muen

@@ -18,7 +18,7 @@ scmOverrides:
 include:
   - user
 
-archiveAppend:
+archivePrepend:
   backend: http
   name: "bob archive"
   url: "https://bob-archive.codelabs.ch/"

@@ -282,4 +282,5 @@ multiPackage:
       HARDWARE: "lenovo-t430s"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "lenovo-t430s"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
     multiPackage: *muen_build_mode

@@ -238,6 +238,7 @@ multiPackage:
       PLATFORM: "intel-nuc-5i5myhe"
       MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-mirage-solo5"
       LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
+      ROOTFS_OVERLAYS: "unipi/"
     multiPackage: *muen_build_mode
 
   nuc6cayh-efi-integ:

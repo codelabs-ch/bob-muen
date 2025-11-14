@@ -7,7 +7,10 @@ checkoutSCM:
 buildScript: |
   rsync -a --delete $1/* .
 
-packageVars: [ARCH, UNIKERNEL_FILE]
+# ROOTFS_OVERLAYS:
+#   ;-separated list of directories to sync
+#   over architecture base
+packageVars: [ARCH, ROOTFS_OVERLAYS]
 packageTools: [target-toolchain]
 packageScript: |
   if [[ ${ARCH} == *x86* ]]; then
@@ -16,6 +19,9 @@ packageScript: |
     rsync -a --delete $1/common/* $1/arm64/* .
   fi
 
-  if [[ ${UNIKERNEL_FILE:-UNSET} != UNSET ]]; then
-    rsync -a $1/unipi/* .
+  if [[ -n ${ROOTFS_OVERLAYS:-} ]]; then
+    IFS=';' read -r -a overlays <<< "$ROOTFS_OVERLAYS"
+    for overlay in "${overlays[@]}"; do
+      rsync -a $1/${overlay} .
+    done;
   fi

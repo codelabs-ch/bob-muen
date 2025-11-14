@@ -274,3 +274,11 @@ multiPackage:
           done
         packageScript: |
           rsync -a --delete $1/ .
+
+  t430s:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-t430s"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-t430s"
+    multiPackage: *muen_build_mode

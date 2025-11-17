@@ -12,7 +12,7 @@ metaEnvironment:
 
 checkoutSCM:
   scm: git
-  url: https://git.codelabs.ch/git/spark-crypto.git
+  url: https://git.codelabs.ch/spark-crypto.git
   branch: master
   commit: 7326a3b8333e6962536a0b868ffd605cbcfc055b
 

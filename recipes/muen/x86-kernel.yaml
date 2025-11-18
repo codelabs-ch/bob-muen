@@ -627,7 +627,7 @@ multiPackage:
     buildScript: muenCreatePolicySrc $1
     packageScript: muenPackagePolicySrc $1
 
-  policy-src-mirage-solo5:
+  policy-src-solo5:
     checkoutSCM:
       scm: url
       url: file://${UNIKERNEL_FILE:-Please specify UNIKERNEL_FILE!}

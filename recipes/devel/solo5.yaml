@@ -11,6 +11,7 @@ buildVars: [AUTOCONF_BUILD, CC]
 buildScript: |
   rsync -a --delete $1/ .
   sed -i 's/CONFIG_SPT_TENDER=1//' configure.sh
+  sed -i 's/--dirty//' scripts/gen_version_h.sh
   HOST_CC=${AUTOCONF_BUILD}-gcc TARGET_CC=${CC} ./configure.sh --prefix=.
   makeParallel
 

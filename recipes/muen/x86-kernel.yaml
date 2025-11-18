@@ -639,7 +639,7 @@ multiPackage:
           --channel-size 0x4000000
       muenCreatePolicySrc $1
     packageScript: |
-      packagePolicySrc $1
+      muenPackagePolicySrc $1
       cp $1/unipi.muen .
 
   policy-src-solo5-test:

@@ -220,7 +220,7 @@ multiPackage:
       MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5-test"
     multiPackage: *muen_build_mode
 
-  qemu-unipi:
+  qemu-solo5:
     environment:
       SYSTEM: "mirage-solo5"
       HARDWARE: "qemu-kvm"
@@ -230,7 +230,7 @@ multiPackage:
       LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
     multiPackage: *muen_build_mode
 
-  nuc5i5myhe-unipi:
+  nuc5i5myhe-solo5:
     environment:
       SYSTEM: "mirage-solo5"
       HARDWARE: "intel-nuc-5i5myhe"

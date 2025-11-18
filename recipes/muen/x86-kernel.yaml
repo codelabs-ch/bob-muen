@@ -635,7 +635,7 @@ multiPackage:
     inherit: [muen_policy, solo5]
     buildVars: [UNIKERNEL_FILE]
     buildScript: |
-      composeSolo5Config $1 $1/uni/$(basename $UNIKERNEL_FILE) \
+      solo5ComposeConfig $1 $1/uni/$(basename $UNIKERNEL_FILE) \
           --channel-size 0x4000000
       muenCreatePolicySrc $1
     packageScript: |
@@ -647,7 +647,7 @@ multiPackage:
     depends:
       - devel::solo5-hello-muen
     buildScript: |
-      composeSolo5Config $1 \
+      solo5ComposeConfig $1 \
         ${BOB_DEP_PATHS[devel::solo5-hello-muen]}/test_hello.muen \
         --disable-reset \
         --bootparams "Hi!"

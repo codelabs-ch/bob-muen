@@ -640,7 +640,8 @@ multiPackage:
       muenCreatePolicySrc $1
     packageScript: |
       muenPackagePolicySrc $1
-      cp $1/unipi.muen .
+      fname=$(basename $UNIKERNEL_FILE)
+      cp $1/$fname ./$fname
 
   policy-src-solo5-test:
     inherit: [muen_policy, solo5]

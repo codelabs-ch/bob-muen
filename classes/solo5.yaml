@@ -21,7 +21,7 @@ buildScript: |
   # $1   - source dir
   # $2   - unikernel artifact
   # $3.. - additional arguments to gencspec
-  composeSolo5Config() {
+  solo5ComposeConfig() {
     echo "=== Creating unikernel component spec"
     solo5-muen-gencspec \
       $2 \

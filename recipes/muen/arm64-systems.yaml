@@ -1,6 +1,6 @@
 checkoutSCM:
   scm: git
-  url: git@git.codelabs.ch:muen/arm64/systems.git
+  url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
   commit: 435ab0e6342d1ee02293651307fb0697a136e07b
 

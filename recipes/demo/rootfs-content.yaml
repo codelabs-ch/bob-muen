@@ -1,13 +1,16 @@
 checkoutSCM:
   scm: git
-  url: git@git.codelabs.ch:rootfs-content.git
+  url: https://git.codelabs.ch/rootfs-content.git
   branch: main
-  commit: 96fd03a9781f9fed905854b53ce5347c6f5bcff6
+  commit: dd705c687ac7ca494fdd05d73891bdd7ee82ad1c
 
 buildScript: |
   rsync -a --delete $1/* .
 
-packageVars: [ARCH, UNIKERNEL_FILE]
+# ROOTFS_OVERLAYS:
+#   ;-separated list of directories to sync
+#   over architecture base
+packageVars: [ARCH, ROOTFS_OVERLAYS]
 packageTools: [target-toolchain]
 packageScript: |
   if [[ ${ARCH} == *x86* ]]; then
@@ -16,6 +19,9 @@ packageScript: |
     rsync -a --delete $1/common/* $1/arm64/* .
   fi
 
-  if [[ ${UNIKERNEL_FILE:-UNSET} != UNSET ]]; then
-    rsync -a $1/unipi/* .
+  if [[ -n ${ROOTFS_OVERLAYS:-} ]]; then
+    IFS=';' read -r -a overlays <<< "$ROOTFS_OVERLAYS"
+    for overlay in "${overlays[@]}"; do
+      rsync -a $1/${overlay} .
+    done;
   fi

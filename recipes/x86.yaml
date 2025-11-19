@@ -220,24 +220,25 @@ multiPackage:
       MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5-test"
     multiPackage: *muen_build_mode
 
-  qemu-unipi:
+  qemu-solo5:
     environment:
       SYSTEM: "mirage-solo5"
       HARDWARE: "qemu-kvm"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
-      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-mirage-solo5"
+      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5"
       LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
     multiPackage: *muen_build_mode
 
-  nuc5i5myhe-unipi:
+  nuc5i5myhe-solo5:
     environment:
       SYSTEM: "mirage-solo5"
       HARDWARE: "intel-nuc-5i5myhe"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "intel-nuc-5i5myhe"
-      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-mirage-solo5"
+      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5"
       LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
+      ROOTFS_OVERLAYS: "unipi/"
     multiPackage: *muen_build_mode
 
   nuc6cayh-efi-integ:
@@ -274,3 +275,12 @@ multiPackage:
           done
         packageScript: |
           rsync -a --delete $1/ .
+
+  t430s:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-t430s"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-t430s"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
+    multiPackage: *muen_build_mode

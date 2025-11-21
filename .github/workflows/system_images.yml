@@ -83,7 +83,7 @@ jobs:
       - name: Fetch mirageos Docker image
         run: |
           docker create --name temp-container \
-            ghcr.io/codelabs-ch/muen-mirageos:devel-59e3fac208fc-bob
+            ghcr.io/codelabs-ch/muen-mirageos:devel
 
       - name: Copy unikernel from container
         run: docker cp temp-container:/home/opam/https.muen ./https.muen

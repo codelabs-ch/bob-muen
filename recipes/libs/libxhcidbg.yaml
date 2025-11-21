@@ -3,7 +3,7 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/libxhcidbg.git
-  branch: muen-6706f6181745-bob
+  branch: muen
   commit: fd213202d1dea095dfbd2b6a0704b6fa61482d7f
 
 depends:

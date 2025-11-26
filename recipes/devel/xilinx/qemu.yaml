@@ -1,5 +1,8 @@
 inherit: [autotools, meson, patch, python3-checkout]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-2.0-or-later AND LGPL-2.1-or-later"
+
 checkoutSCM:
   scm: git
   url: https://github.com/Xilinx/qemu.git

@@ -25,7 +25,7 @@ multiPackage:
     depends:
       - adacore::xmlada-dev
       - muen::tools-libmutools-dev
-    inherit: [muen_component_app]
+    inherit: [muen_component]
     buildScript: |
       muenBuild $1/tau0
 

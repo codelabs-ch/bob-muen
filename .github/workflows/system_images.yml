@@ -47,7 +47,7 @@ jobs:
       - name: Install packages
         run: |
           apt-get update
-          apt-get install -y bc git python3 python3-pip python3-venv pipx rsync unzip
+          apt-get install -y bc curl git python3 python3-pip python3-venv pipx rsync unzip
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install Bob build tool via pipx

@@ -19,8 +19,8 @@ layers:
   - name: ada
     scm: git
     url: https://git.codelabs.ch/bob/ada.git
-    branch: main
-    commit: 8a94da8ec1b0e263761e6efcd8a1602bcc911728
+    branch: gnat-no-alr
+    commit: f4faa8e6da6105d0f54b478dabe13472369de184
 
   - name: codelabs
     scm: git

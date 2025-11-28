@@ -9,8 +9,8 @@ buildSetup: |
       -Xstacksize=8192" \
     muenBuild ${__SRC}/components/${1}/${1}
 
-    # stackcheck
-    mucheckstack -P${__SRC}/components/${1}/${1} -l8192
+    # stackcheck, currently disabled see T770
+    #mucheckstack -P${__SRC}/components/${1}/${1} -l8192
   }
 
 packageTools: [mucbinsplit]

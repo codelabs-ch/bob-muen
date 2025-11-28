@@ -17,7 +17,7 @@ multiPackage:
     packageScript: |
       cp -r $1/data/gpg-homedir/* .
   tools:
-    buildTools: [target-toolchain]
+    buildTools: [target-toolchain, gprbuild]
     buildScript: |
       makeParallel
       make install DESTDIR=$(pwd)/install/usr

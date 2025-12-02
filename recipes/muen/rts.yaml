@@ -6,8 +6,8 @@ depends:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/rts
-  branch: devel
-  commit: afb7500438d952f8be9de3d267a98b9910908860
+  branch: devel-x86-memmove
+  commit: 9246c4b129c8c29902a9abe5ee84aef1df504ef2
 
 buildTools: [target-toolchain, gprbuild]
 buildVars: [ARCH, AUTOCONF_HOST]

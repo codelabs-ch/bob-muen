@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
   branch: main
-  commit: ce42fea6df46ebfd5fecce318c0ba5128659a4f8
+  commit: 94538b20030bdacc06363b558676ff51c271dd2c
 
 environment:
   MUEN_COMMON_VARIANT: "component"

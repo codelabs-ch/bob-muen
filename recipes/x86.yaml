@@ -198,7 +198,7 @@ multiPackage:
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')
-            mkdir $dirname
+            mkdir -p $dirname
             cp ${BOB_DEP_PATHS[$d]}/gnatprove.* $dirname/
           done
         packageScript: |

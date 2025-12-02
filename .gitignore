@@ -3,10 +3,10 @@ __pycache__/
 dev
 work
 *.swp
-serial*.out
 emulate.*
 layers/
 layers.attic/
 projects/
 user.yaml
 ci/.idea
+run

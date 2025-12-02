@@ -7,7 +7,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/rts
   branch: main
-  commit: 7d2148e2adf4031f8b96bc2035d11060ce81ce01
+  commit: 2703441440fb864434f897d711db8d3e2e8e1c4a
 
 buildTools: [target-toolchain, gprbuild]
 buildVars: [ARCH, AUTOCONF_HOST]

@@ -13,8 +13,8 @@ from lib.logger import log
 from lib.process import stop_disable
 from lib.hosts import Host
 from steps.vm_qemu import VmQemu
+from steps.vm_qemu_xilinx import VmQemuXilinx
 
-serial_name = "serial.out"
 netdev_extra_opts = os.getenv("QEMU_NETDEV_EXTRA_OPTS")
 
 pidfile: Path = Path("emulate.pid")
@@ -61,7 +61,24 @@ def terminate_existing(pidfile) -> None:
         log.error(f"Could not terminate {pid}: {e}")
 
 
-def run(image: Path):
+def run_arm64(workdir: Path):
+    h = Host(
+        name="arm64-qemu", plan="testplan", artifacts_dir=".", config={"steps": None}
+    )
+    vm = VmQemuXilinx(host_ref=h, id="run")
+    vm.start(
+        workdir=workdir,
+        image="sdcard.img",
+        serial1_path="serial1.out",
+        serial2_path="serial2.out",
+    )
+    log.info(f"Artifacts directory is {vm.artifacts_path}")
+    log.info("SSH root password is 'muen'")
+    with open(pidfile, "w") as pid:
+        pid.write(str(vm.process.proc.pid))
+
+
+def run_x86(image: Path):
     h = Host(
         name="x86-qemu", plan="testplan", artifacts_dir=".", config={"steps": None}
     )
@@ -69,7 +86,7 @@ def run(image: Path):
     vm.start(
         workdir=".",
         image=image,
-        serial_path=serial_name,
+        serial_path="serial.out",
         netdev_extra_options=netdev_extra_opts,
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
@@ -110,4 +127,25 @@ if len(lines) != 1:
 log.info(f"Using dist dir '{dist_dir}'")
 
 stop_disable()
-run(image=Path(dist_dir) / "muen.iso")
+if "x86" in args.query:
+    log.info("Assuming x86 architecture")
+    run_x86(image=Path(dist_dir) / "muen.iso")
+elif "arm64" in args.query:
+    log.info("Assuming arm64 architecture")
+
+    qemu_path: Path = Path(
+        exec(cmd="bob query-path --fail -f {dist} //devel::xilinx::qemu")
+    )
+    qemu_path = qemu_path / "usr/bin"
+    log.info(f"Using QEMU from {qemu_path}")
+
+    dtb_path: Path = Path(
+        exec(cmd="bob query-path --fail -f {dist} //devel::xilinx::qemu-devicetrees")
+    )
+    log.info(f"Using device tree from {dtb_path}")
+
+    os.environ["PATH"] = str(qemu_path.resolve()) + os.pathsep + os.environ["PATH"]
+    os.environ["DTB_PATH"] = str(dtb_path.resolve())
+    run_arm64(workdir=Path(dist_dir))
+else:
+    sys.exit("Unable to determine architecture")

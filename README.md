@@ -25,7 +25,7 @@ This will (depending on your build-machine) take some time and consume some
 
 Start the image in qemu using the runQemu script::
 
-    $ contrib/runQemu_arm64.sh arm64-qemu-zcu102-minimal-debug
+    $ contrib/runQemu.py -q arm64-qemu-zcu102-minimal-debug
 
 ## GNATStudio
 

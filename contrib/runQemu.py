@@ -87,6 +87,19 @@ def run_x86(image: Path):
     h = Host(
         name="x86-qemu", plan="testplan", artifacts_dir=".", config={"steps": None}
     )
+    disk_config = {
+            "size_mb": 356,
+            "partitions": [{
+                "name": "Testing",
+                "final_lba": 411647,
+                "setup_script": "ci/nci-config/x86/scripts/target/muenblock-ref",
+            },
+            {
+                "name": "ext",
+                "final_lba": 729054,
+            },
+        ],
+    }
     vm = VmQemu(host_ref=h, id="run")
     vm.start(
         workdir=".",
@@ -94,6 +107,7 @@ def run_x86(image: Path):
         serial_path="serial.out",
         use_pseudo_term=args.pseudo_term,
         netdev_extra_options=netdev_extra_opts,
+        disk_config=disk_config
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
     log.info("SSH root password is 'muen'")

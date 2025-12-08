@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
-  branch: master
-  commit: 3486363b1dcbd801297e47d941dcc93eb2287777
+  branch: devel-debug-serialization
+  commit: 804c05284804246761dd92f0f34540aa5ae2121a
 
 depends:
   - muen::common-muschedinfo-dev
@@ -33,7 +33,6 @@ multiPackage:
   debug:
     buildSetup: |
       export BUILD_MODE=debug
-      export DEBUG_LEVEL=Level_5
     buildScript: *common_build
     packageScript: *common_pkg
   test:

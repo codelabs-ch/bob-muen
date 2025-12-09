@@ -21,6 +21,6 @@ include:
 archivePrepend:
   backend: http
   name: "bob archive"
-  url: "https://bob-archive.codelabs.ch/"
+  url: "https://bob-archive.codelabs.ch"
   sslVerify: true
   flags: [download]

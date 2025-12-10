@@ -83,7 +83,7 @@ def run_x86(image: Path):
         name="x86-qemu", plan="testplan", artifacts_dir=".", config={"steps": None}
     )
     disk_config = {
-            "size_in_MB": 356,
+            "size_mb": 356,
             "partitions": [{
                 "name": "Testing",
                 "final_lba": 411647,

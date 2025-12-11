@@ -87,19 +87,22 @@ def run_x86(image: Path):
             "partitions": [{
                 "name": "Testing",
                 "final_lba": 411647,
-                "setup_script": "x86/scripts/target/muenblock-ref"
-            }, {
+                "test_script": "ci/nci-config/x86/scripts/target/muenblock-ref",
+            },
+            {
                 "name": "ext",
                 "final_lba": 729054,
-            }]
-        }
+            },
+        ],
+    }
+    os.makedirs(Path("./run").absolute(), exist_ok=True)
     vm = VmQemu(host_ref=h, id="run")
     vm.start(
-        workdir=".",
+        workdir=str(Path("./run").absolute()),
         image=image,
         serial_path="serial.out",
         netdev_extra_options=netdev_extra_opts,
-        disk_config=disk_config
+        disk_config=disk_config,
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
     log.info("SSH root password is 'muen'")
@@ -141,7 +144,7 @@ log.info(f"Using dist dir '{dist_dir}'")
 stop_disable()
 if "x86" in args.query:
     log.info("Assuming x86 architecture")
-    run_x86(image=Path(dist_dir) / "muen.iso")
+    run_x86(image=(Path(dist_dir) / "muen.iso").absolute())
 elif "arm64" in args.query:
     log.info("Assuming arm64 architecture")
 

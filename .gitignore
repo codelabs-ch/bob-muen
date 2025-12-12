@@ -7,6 +7,7 @@ serial*.out
 emulate.*
 layers/
 layers.attic/
+override_layers.yaml
 projects/
 user.yaml
 ci/.idea

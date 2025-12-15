@@ -40,6 +40,8 @@ buildScript: |
       -p \
       -f \
       ${@:2}
+    find build -name '*.ci' | \
+      rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/share/ci/
   }
 
   # $1 ELF file to use

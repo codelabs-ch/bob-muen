@@ -10,6 +10,7 @@ buildSetup: |
     muenBuild ${__SRC}/components/${1}/${1}
 
     # stackcheck
+    export OBJ_DIR=$(pwd)/build/obj/
     mucheckstack -P${__SRC}/components/${1}/${1} -l8192
   }
 

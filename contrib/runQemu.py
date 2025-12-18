@@ -17,7 +17,7 @@ from steps.vm_qemu_xilinx import VmQemuXilinx
 
 netdev_extra_opts = os.getenv("QEMU_NETDEV_EXTRA_OPTS")
 
-pidfile: Path = Path("emulate.pid")
+pidfile: Path = Path(f"/tmp/emulate-{os.getenv("USER")}.pid")
 
 
 def exec(cmd: str) -> str:

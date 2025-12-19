@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-devel-storage_drv}
-  commit: ${MUEN_X86_KNL_COMMIT:-afce1511dba29f24c8582f8a0eeb387bac2776f0}
+  commit: ${MUEN_X86_KNL_COMMIT:-f8e68f5d9515c8d1e7cd6014b0d4d4947a9a9081}
 
 multiPackage:
   # TODO: move to it's own recipe once the components part is separated

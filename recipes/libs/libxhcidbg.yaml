@@ -22,11 +22,11 @@ multiPackage:
   dev:
     provideDeps: ['*-dev']
     packageScript: |
-      gprInstallPackageDev
+      muenInstallPackageDev
   tgt:
     packageVars: [CSPECS_FILE]
     packageScript: |
-      gprInstallPackageTgt
+      muenInstallPackageTgt
       mkdir -p usr/share/
       cp -L $1/libxhcidbg.xml usr/share
       mkdir -p .bob

@@ -27,10 +27,10 @@ multiPackage:
         multiPackage: &common_dev_tgt_provides
           dev:
             provideDeps: ['*-dev']
-            packageScript: gprInstallPackageDev
+            packageScript: muenInstallPackageDev
           tgt:
             provideDeps: ['*-tgt']
-            packageScript: gprInstallPackageTgt
+            packageScript: muenInstallPackageTgt
       crash_audit:
         depends:
           - muen::common-common-dev
@@ -47,9 +47,9 @@ multiPackage:
               muenBuild $1/${GPR_PATH}
             multiPackage: &common_dev_tgt
               dev:
-                packageScript: gprInstallPackageDev
+                packageScript: muenInstallPackageDev
               tgt:
-                packageScript: gprInstallPackageTgt
+                packageScript: muenInstallPackageTgt
           proof: &common_proof
             inherit: [muen_proof]
             buildSetup: |

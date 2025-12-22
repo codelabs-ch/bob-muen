@@ -13,7 +13,7 @@ multiPackage:
     buildScript: |
       muenBuild $1/bsp/common/arm64_common
     packageScript: |
-      gprInstallPackageDev
+      muenInstallPackageDev
   subjects:
     multiPackage:
       event_logger:

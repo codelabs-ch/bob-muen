@@ -21,7 +21,7 @@ multiPackage:
     multiPackage:
       dev:
         provideDeps: ['*-dev']
-        packageScript: gprInstallPackageDev
+        packageScript: muenInstallPackageDev
       tgt:
         provideDeps: ['*-tgt']
-        packageScript: gprInstallPackageTgt
+        packageScript: muenInstallPackageTgt

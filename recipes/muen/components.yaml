@@ -115,7 +115,7 @@ multiPackage:
                   $1/dbgserver/misc/gpr.xsl \
                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       "":
         inherit: [python3]
         depends:
@@ -223,7 +223,7 @@ multiPackage:
                   $1/example/misc/gpr.xsl \
                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
 
       "":
         depends:
@@ -366,7 +366,7 @@ multiPackage:
                   $1/sm/misc/gpr.xsl \
                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       "":
         inherit: [python3]
         depends:

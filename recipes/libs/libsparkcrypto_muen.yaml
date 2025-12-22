@@ -27,4 +27,4 @@ buildScript: |
 multiPackage:
   dev:
     packageScript: |
-      gprInstallPackageDev
+      muenInstallPackageDev

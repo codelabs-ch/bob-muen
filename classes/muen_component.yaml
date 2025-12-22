@@ -90,4 +90,5 @@ packageScript: |
       mkdir -p .bob
       echo usr/share/$(basename ${CSPECS_FILE:-}) > .bob/cspecs
     fi
+
   }

@@ -49,21 +49,13 @@ multiPackage:
         multiPackage: &common_dev_tgt
           dev:
             packageScript: |
-              gprInstallPackageDev
+              muenInstallPackageDev
           tgt:
             packageVars: [CSPECS_FILE]
             packageScript: |
-              gprInstallPackageTgt
-              if [[ -e $1/${CSPECS_FILE:-} ]]; then
-                mkdir -p usr/share/
-                cp $1/${CSPECS_FILE} usr/share
-                mkdir -p .bob
-                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
-              fi
+              muenInstallPackageTgt
       proof: &common_proof_lib
         inherit: [muen_proof]
-        environment:
-          RTS: "muen::rts"
         buildSetup: |
           export GPR_FILE=$1/${GPR_PATH}
           export MUEN_BUILD_MODE=prove
@@ -97,17 +89,11 @@ multiPackage:
           dev:
             provideDeps: ['*-dev']
             packageScript: |
-              gprInstallPackageDev
+              muenInstallPackageDev
           tgt:
             packageVars: [CSPECS_FILE]
             packageScript: |
-              gprInstallPackageTgt
-              if [[ -e $1/${CSPECS_FILE:-} ]]; then
-                mkdir -p usr/share/
-                cp $1/${CSPECS_FILE} usr/share
-                mkdir -p .bob
-                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
-              fi
+              muenInstallPackageTgt
       proof: *common_proof_lib
 
   libmudebuglog:
@@ -294,10 +280,10 @@ multiPackage:
         multiPackage:
           dev:
             provideDeps: ['*-dev']
-            packageScript: gprInstallPackageDev
+            packageScript: muenInstallPackageDev
           tgt:
             provideDeps: ['*-tgt']
-            packageScript: gprInstallPackageTgt
+            packageScript: muenInstallPackageTgt
       proof:
         inherit: [muen_proof]
         buildSetup: |

@@ -16,7 +16,7 @@ buildScript: |
   muenBuild $1/mulog_analyzer
 
 packageScript: |
-  gprInstallPackageTgt
+  muenInstallPackageTgt
 
 provideTools:
   mulog-analyzer: "usr/bin"

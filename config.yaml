@@ -1,4 +1,4 @@
-bobMinimumVersion: "1.1.0rc1"
+bobMinimumVersion: "1.2.0rc1"
 
 # Keep ssh-agent working.
 layersWhitelist: ["SSH_AGENT_PID", "SSH_AUTH_SOCK"]

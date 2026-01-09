@@ -121,9 +121,9 @@ multiPackage:
       - muen::arm64-systems-policy-files
       - muen::linux-dt-bindings
     buildTools: [mugendts, dtc, target-toolchain]
-    buildVars: [CC]
+    buildVars: [CC, SYSTEM]
     buildScript: |
-      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
+      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
       for F in *.dts; do
         F=$(basename ${F%.dts})
         ${CC} -I ${BOB_DEP_PATHS[muen::linux-dt-bindings]} -E \
@@ -136,13 +136,28 @@ multiPackage:
     packageScript: |
       rsync -a --delete $1/ .
 
+  policy-src:
+    inherit: [muen_policy]
+    buildScript: muenCreatePolicySrc $1
+    packageScript: muenPackagePolicySrc $1
+
   policy-files:
     inherit: [python3]
     depends:
       - muen::linux-image
       - muen::tools-libmupy
-    buildTools: [mucfgcjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
-    buildVars: [SYSTEM]
+      - ${MUEN_POLICY_SRC}
+    buildTools:
+      - mucfgalloc
+      - mucfgcjoin
+      - mucfgexpand
+      - mucfgvresalloc
+      - muxmlfilter
+      - mugenpt
+      - mugenspec
+      - mugensinfo
+      - mucfgvalidate
+    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC]
     buildScript: |
       rm -rf bin && mkdir bin
 
@@ -172,19 +187,31 @@ multiPackage:
       </component>
       EOF
 
-      mucfgcjoin -i $1/policy/${SYSTEM}.xml \
+      mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
         -c $1/subjects/example/spec/example.xml,linux.xml \
-        -o policy_src.xml
+        -o ${SYSTEM}_with_comp.xml
 
-      mucfgexpand policy_src.xml policy_a.xml
+      # Allocate virtual memory
+      mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
 
-      mucfgalloc policy_a.xml policy_b.xml
+      # Filter to core schema
+      muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
+        ${SYSTEM}_with_va_filtered.xml
 
-      mucfgvalidate policy_b.xml
+      # Expand
+      mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
 
-      mugenpt -o bin policy_b.xml
+      # Allocate physical memory
+      mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
 
-      mugensinfo -o bin policy_b.xml
+      # Validate
+      mucfgvalidate ${SYSTEM}_b.xml
+
+      GENERATORS=(mugenpt mugensinfo)
+      for G in ${GENERATORS[@]}; do
+        $G -o bin ${SYSTEM}_b.xml
+      done
+
     packageScript: |
       cp -r $1/* .
 

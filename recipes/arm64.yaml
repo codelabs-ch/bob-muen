@@ -15,6 +15,7 @@ inherit: [muen-root]
 environment:
   MUENBLOCK_BRANCH: "arm64"
   MUENBLOCK_COMMIT: "967d6b52f318bd9a8a397085b65047dfd6096660"
+  MUEN_POLICY_SRC: "muen::arm64-systems-policy-src"
 
   LINUX_CUSTOM_CONFIG: "muen::arm64-systems-linux-config"
 
@@ -156,14 +157,14 @@ buildScript: |
       fi
 
       # (b) Validate the resulting kernel binary against the policy.
-      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml ./kernel.elf
+      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml ./kernel.elf
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp) by first calling
       # mugends to generate the respective commands and then using these
       # files and bash commands from the legacy build system to generate
       # the required results.
-      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
+      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
       if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-xsct-swboot-file]}/xswboot.tcl .
       fi
@@ -316,6 +317,7 @@ multiPackage:
               - devel::xilinx::qemu-devicetrees
         environment:
           HARDWARE: "qemu-zcu102"
+          PLATFORM: "qemu-zcu102"
         multiPackage: &target_config
           minimal:
             environment:
@@ -344,4 +346,5 @@ multiPackage:
       zcu104:
         environment:
           HARDWARE: "xilinx-zcu104"
+          PLATFORM: "xilinx-zcu104"
         multiPackage: *target_config

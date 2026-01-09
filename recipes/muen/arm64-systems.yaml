@@ -16,16 +16,16 @@ multiPackage:
     packageScript: |
       gprInstallPackageDev
   bsp:
-    buildVars: [CROSS_COMPILE, OBJCOPY, NAME, TARGET_CONFIG]
+    buildVars: [CROSS_COMPILE, OBJCOPY, NAME, SYSTEM]
     buildTools: [target-toolchain]
     buildScript: |
       ${CROSS_COMPILE}gnatprep -v $1/bsp/platform/src/board.adb \
         board.adb \
-        $1/bsp/config/${TARGET_CONFIG}/${NAME}/bsp.conf
+        $1/bsp/config/${SYSTEM}/${NAME}/bsp.conf
 
       ${CROSS_COMPILE}gnatprep -v $1/bsp/platform/src/board.ads \
         board.ads \
-        $1/bsp/config/${TARGET_CONFIG}/${NAME}/bsp.conf
+        $1/bsp/config/${SYSTEM}/${NAME}/bsp.conf
       cp $1/bsp/platform/src/driver/* .
     packageScript: |
       rsync -a --delete $1/ .
@@ -50,7 +50,7 @@ multiPackage:
             environment:
               NAME: "subject_one"
           - muen::common-libmusinfo-dev
-        buildVars: [OBJCOPY, NAME, TARGET_PLATFORM, TARGET_CONFIG]
+        buildVars: [OBJCOPY, NAME, SYSTEM, HARDWARE]
         buildTools: [mucgenspec, target-toolchain]
         buildSetup: |
           export GEN_DIR=$(pwd)/generated
@@ -64,9 +64,9 @@ multiPackage:
           cp $1/install/usr/bin/example.* .
 
   bootloader-binaries:
-    buildVars: [TARGET_PLATFORM]
+    buildVars: [HARDWARE]
     buildScript: |
-      cp $1/deployment/${TARGET_PLATFORM}/common/bootloader/* .
+      cp $1/deployment/${HARDWARE}/common/bootloader/* .
     packageScript: |
       cp $1/* .
 
@@ -77,36 +77,36 @@ multiPackage:
       cp $1/* .
 
   gdb-xsct-files:
-    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildVars: [HARDWARE, SYSTEM]
     buildScript: |
-      cp $1/deployment/${TARGET_PLATFORM}/common/gdb/gdbinit.gtp .
-      cp $1/deployment/${TARGET_PLATFORM}/common/gdb/gdbinit_test.config .
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp $1/deployment/${TARGET_PLATFORM}/common/gdb/xsct_test.tcl .
-        cp $1/deployment/${TARGET_PLATFORM}/${TARGET_CONFIG}/gdb/gdbinit.config .
+      cp $1/deployment/${HARDWARE}/common/gdb/gdbinit.gtp .
+      cp $1/deployment/${HARDWARE}/common/gdb/gdbinit_test.config .
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
+        cp $1/deployment/${HARDWARE}/common/gdb/xsct_test.tcl .
+        cp $1/deployment/${HARDWARE}/${SYSTEM}/gdb/gdbinit.config .
       fi
     packageScript: |
       cp $1/* .
 
   uboot-tftp-files:
-    buildVars: [TARGET_PLATFORM]
+    buildVars: [HARDWARE]
     buildScript: |
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp $1/deployment/${TARGET_PLATFORM}/common/uboot/bootscript_test.cmd .
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
+        cp $1/deployment/${HARDWARE}/common/uboot/bootscript_test.cmd .
       fi
     packageScript: |
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp $1/* .
       fi
 
   xsct-swboot-file:
-    buildVars: [TARGET_PLATFORM, TARGET_CONFIG]
+    buildVars: [HARDWARE]
     buildScript: |
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
-        cp $1/deployment/${TARGET_PLATFORM}/common/xsct/xswboot.tcl .
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
+        cp $1/deployment/${HARDWARE}/common/xsct/xswboot.tcl .
       fi
     packageScript: |
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp $1/* .
       fi
 
@@ -142,7 +142,7 @@ multiPackage:
       - muen::linux-image
       - muen::tools-libmupy
     buildTools: [mucfgcjoin, mucfgexpand, mucfgalloc, mucfgvalidate, mugenpt, mugensinfo]
-    buildVars: [TARGET_CONFIG]
+    buildVars: [SYSTEM]
     buildScript: |
       rm -rf bin && mkdir bin
 
@@ -172,7 +172,7 @@ multiPackage:
       </component>
       EOF
 
-      mucfgcjoin -i $1/policy/${TARGET_CONFIG}.xml \
+      mucfgcjoin -i $1/policy/${SYSTEM}.xml \
         -c $1/subjects/example/spec/example.xml,linux.xml \
         -o policy_src.xml
 
@@ -189,9 +189,9 @@ multiPackage:
       cp -r $1/* .
 
   test:
-    buildVars: [TARGET_PLATFORM]
+    buildVars: [HARDWARE]
     buildScript: |
       cp $1/rts-aunit-config/common/* .
-      cp $1/rts-aunit-config/${TARGET_PLATFORM}/* .
+      cp $1/rts-aunit-config/${HARDWARE}/* .
     packageScript: |
       cp -r $1/* .

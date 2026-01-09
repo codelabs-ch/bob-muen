@@ -1,11 +1,11 @@
 #
 # usage:
 #
-#   bob dev | build arm64-{TARGET_PLATFORM}-{TARGET_CONFIG}-{BUILD_MODE}
+#   bob dev | build arm64-{HARDWARE}-{SYSTEM}-{BUILD_MODE}
 #     [-D MUEN_GDB_SUPPORT=enabled|disabled] with
 #
-#   - TARGET_PLATFORM: xilinx-zcu104 or qemu-zcu102
-#   - TARGET_CONFIG: minimal or multicore
+#   - HARDWARE: xilinx-zcu104 or qemu-zcu102
+#   - SYSTEM: minimal or multicore
 #   - BUILD_MODE: release, debug, test or prove
 #   - MUEN_GDB_SUPPORT (optional): enabled or disabled (default), enabled
 #     means disable SMMU to be able to use Xilinx on-board debugger
@@ -15,6 +15,7 @@ inherit: [muen-root]
 environment:
   MUENBLOCK_BRANCH: "arm64"
   MUENBLOCK_COMMIT: "967d6b52f318bd9a8a397085b65047dfd6096660"
+  MUEN_POLICY_SRC: "muen::arm64-systems-policy-src"
 
   LINUX_CUSTOM_CONFIG: "muen::arm64-systems-linux-config"
 
@@ -124,7 +125,7 @@ depends:
       - muen::arm64-systems-uboot-tftp-files
 
 buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools]
-buildVars: [MUEN_BUILD_MODE, TARGET_CONFIG, TARGET_PLATFORM]
+buildVars: [MUEN_BUILD_MODE, SYSTEM, HARDWARE]
 buildScript: |
   case ${MUEN_BUILD_MODE} in
     release|debug)
@@ -142,35 +143,30 @@ buildScript: |
       cp ${BOB_DEP_PATHS[muen::arm64-systems-devicetree]}/*.dtb .
       cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin .
 
-      if [[ ${TARGET_CONFIG} == "minimal" ]] ; then
-        cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_linux.cpio.gz
-      else
-        cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx1.cpio.gz
-        cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz rootfs_lnx2.cpio.gz
-      fi
+      cp ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz .
 
-      if [[ ${TARGET_CONFIG} == minimal ]]; then
+      if [[ ${SYSTEM} == "minimal" ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-event_logger]}/event_logger.bin subject_one.bin
       else
         cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-example]}/example.bin subject_one.bin
       fi
 
       # (b) Validate the resulting kernel binary against the policy.
-      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml ./kernel.elf
+      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml ./kernel.elf
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp) by first calling
       # mugends to generate the respective commands and then using these
       # files and bash commands from the legacy build system to generate
       # the required results.
-      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-xsct-swboot-file]}/xswboot.tcl .
       fi
 
       # (c.i) gdb / xsct
       cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         # overwrite gdbinit.config for hardware xsct deployment
         cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit.config .
       fi
@@ -182,14 +178,14 @@ buildScript: |
 
       bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
 
-      if [[ ${TARGET_PLATFORM} == qemu_zcu102 ]]; then
+      if [[ ${HARDWARE} == qemu-zcu102 ]]; then
         dd if=/dev/zero of=sdcard.img bs=128M count=1
         mkfs.vfat -F 32 sdcard.img
         mcopy -i sdcard.img BOOT.bin ::/
       fi
 
       # (c.iii) u-boot tftp script
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript.cmd bootscript.scr
       fi
       ;;
@@ -203,7 +199,7 @@ buildScript: |
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp)
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-xsct-swboot-file]}/xswboot.tcl .
       fi
 
@@ -211,7 +207,7 @@ buildScript: |
       cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit.gtp ./gdbinit
       sed -i -e "/__GDB_MAIN__/{r ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/gdbinit_test.config" -e "d}" gdbinit
 
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-gdb-xsct-files]}/xsct_test.tcl ./xsct.tcl
       fi
 
@@ -221,14 +217,14 @@ buildScript: |
 
       bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
 
-      if [[ ${TARGET_PLATFORM} == qemu_zcu102 ]]; then
+      if [[ ${HARDWARE} == qemu-zcu102 ]]; then
         dd if=/dev/zero of=sdcard.img bs=128M count=1
         mkfs.vfat -F 32 sdcard.img
         mcopy -i sdcard.img BOOT.bin ::/
       fi
 
       # (c.iii) u-boot tftp script
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-uboot-tftp-files]}/* .
         mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "Boot Script" -d bootscript_test.cmd bootscript.scr
       fi
@@ -244,7 +240,7 @@ packageScript: |
     release|debug)
       # Build binaries
       cp $1/*.bit .
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp $1/*.hdf .
       fi
 
@@ -264,13 +260,13 @@ packageScript: |
       # Deployment scripts (gdb / xsct, sdcard, tftp)
       cp $1/gdbinit .
 
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp $1/xswboot.tcl .
         cp $1/xsct.tcl .
         cp $1/bootscript.scr .
       fi
 
-      if [[ ${TARGET_PLATFORM} == qemu_zcu102 ]]; then
+      if [[ ${HARDWARE} == qemu-zcu102 ]]; then
         cp $1/sdcard.img .
       fi
 
@@ -280,20 +276,20 @@ packageScript: |
       cp $1/*.bin .
       cp $1/*.elf .
       cp $1/*.bit .
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp $1/*.hdf .
       fi
 
       # Deployment scripts (gdb / xsct, sdcard, tftp)
       cp $1/gdbinit .
 
-      if [[ ${TARGET_PLATFORM} == xilinx_zcu104 ]]; then
+      if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp $1/xswboot.tcl .
         cp $1/xsct.tcl .
         cp $1/bootscript.scr .
       fi
 
-      if [[ ${TARGET_PLATFORM} == qemu_zcu102 ]]; then
+      if [[ ${HARDWARE} == qemu-zcu102 ]]; then
         cp $1/sdcard.img .
       fi
       ;;
@@ -315,11 +311,12 @@ multiPackage:
                 use: [tools]
               - devel::xilinx::qemu-devicetrees
         environment:
-          TARGET_PLATFORM: "qemu_zcu102"
+          HARDWARE: "qemu-zcu102"
+          PLATFORM: "qemu-zcu102"
         multiPackage: &target_config
           minimal:
             environment:
-              TARGET_CONFIG: "minimal"
+              SYSTEM: "minimal"
             multiPackage: &muen_build_mode
               release:
                 environment:
@@ -335,7 +332,7 @@ multiPackage:
                   MUEN_BUILD_MODE: "prove"
           multicore:
             environment:
-              TARGET_CONFIG: "multicore"
+              SYSTEM: "multicore"
             multiPackage: *muen_build_mode
         packageToolsWeak: [qemu]
 
@@ -343,5 +340,6 @@ multiPackage:
     multiPackage:
       zcu104:
         environment:
-          TARGET_PLATFORM: "xilinx_zcu104"
+          HARDWARE: "xilinx-zcu104"
+          PLATFORM: "xilinx-zcu104"
         multiPackage: *target_config

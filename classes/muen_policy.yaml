@@ -8,7 +8,15 @@ buildScript: |
      <config>
       <string name="system"              value="${SYSTEM}.xml"/>
       <string name="hardware"            value="hardware/${HARDWARE}.xml"/>
-      <string name="additional_hardware" value="hardware/${ADDITIONAL_HW}.xml"/>
+  EOF
+
+    if [[ ${ADDITIONAL_HW:-"0"} != "0" ]]; then
+      cat >> system_config.xml << EOF
+        <string name="additional_hardware" value="hardware/${ADDITIONAL_HW}.xml"/>
+  EOF
+    fi
+
+    cat >> system_config.xml << EOF
       <string name="platform"            value="platform/${PLATFORM}.xml"/>
      </config>
     </system>

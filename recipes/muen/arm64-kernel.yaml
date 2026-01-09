@@ -11,7 +11,7 @@ depends:
   - muen::arm64-systems-policy-files
 
 buildTools: [mugenspec]
-buildVars: [MUEN_GDB_SUPPORT, RTS]
+buildVars: [MUEN_GDB_SUPPORT, RTS, SYSTEM]
 buildSetup: |
   export GPR_RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts
   export SKP_DIR=$(pwd)/skp
@@ -19,7 +19,7 @@ buildSetup: |
   export BIN_POSTFIX=""
 buildScript: |
   rm -rf skp && mkdir -p skp
-  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/policy_b.xml
+  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
 
 multiPackage:
   release:

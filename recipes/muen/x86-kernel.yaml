@@ -881,13 +881,13 @@ multiPackage:
       # Allocate physical memory
       mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
 
+      # Validate
+      mucfgvalidate ${SYSTEM}_b.xml
+
       GENERATORS=(mugenspec mugensolo5 mugenzp mugenmsrstore mugenacpi)
       for G in ${GENERATORS[@]}; do
         $G -o  $(pwd) ${SYSTEM}_b.xml
       done
-
-      # validate
-      mucfgvalidate ${SYSTEM}_b.xml
 
     provideDeps: ['*']
     packageScript: |

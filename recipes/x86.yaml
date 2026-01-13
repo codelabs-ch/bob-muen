@@ -164,11 +164,8 @@ multiPackage:
         environment:
           MUEN_BUILD_MODE: "prove"
         depends:
-          - environment:
-              ISR_ENTRIES: "muen::x86-kernel-components-isr_entries"
-            depends:
-              - muen::common-common-proof
-              - muen::common-strings-proof
+          - muen::common-common-proof
+          - muen::common-strings-proof
           - muen::common-libmusinfo-proof
 
           - muen::x86-kernel-proof

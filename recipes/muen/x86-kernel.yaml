@@ -4,23 +4,15 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-devel}
-  commit: ${MUEN_X86_KNL_COMMIT:-f56539d06d16f1dbde601dd203d3262f3109270d}
+  commit: ${MUEN_X86_KNL_COMMIT:-e229fd572ae747d8c68ab09b8aa65ff20377cff9}
 
 multiPackage:
-  # TODO: move to it's own recipe once the components part is separated
-  # from the main repo
-  components-isr_entries:
-    buildScript: |
-      cp $1/components/src/isr_entries.S .
-    packageScript: cp $1/isr_entries.S .
-
   components:
+    environment:
+      MUEN_COMMON_VARIANT: "component"
     buildVars: [MUEN_BUILD_MODE]
     depends:
       - name: muen::common-common-dev
-
-    environment:
-      ISR_ENTRIES: "muen::x86-kernel-components-isr_entries"
 
     multiPackage:
       ahci_drv:
@@ -657,27 +649,21 @@ multiPackage:
       muenPackagePolicySrc $1
       cp $1/test_hello.muen .
 
-  isr_entries:
-    buildScript: |
-      cp $1/kernel/src/asm/isrlist.S .
-    packageScript: cp $1/* .
-
   #### Kernel ##############################################################
 
   "":
-    environment:
-      ISR_ENTRIES: "muen::x86-kernel-isr_entries"
     depends:
-      - muen::common-common-dev
-      - muen::common-crash_audit-dev
-      - if: "$(eq,${MUEN_BUILD_MODE:-},debug)"
-        name: muen::common-debug-dev
-        environment:
-          COMMON_DEBUG_WITHOUT_UART_STATE: "1"
-      - muen::common-muinterrupts-dev
-      - muen::common-muschedinfo-dev
-      - muen::common-mutimedevents-dev
-      - muen::common-strings-dev
+      - environment:
+          MUEN_COMMON_VARIANT: "kernel"
+        depends:
+          - muen::common-common-dev
+          - muen::common-crash_audit-dev
+          - if: "$(eq,${MUEN_BUILD_MODE:-},debug)"
+            name: muen::common-debug-dev
+          - muen::common-muinterrupts-dev
+          - muen::common-muschedinfo-dev
+          - muen::common-mutimedevents-dev
+          - muen::common-strings-dev
 
       - muen::x86-kernel-policy
       - muen::x86-kernel-components-tau0

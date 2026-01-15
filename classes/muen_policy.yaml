@@ -32,7 +32,7 @@ buildScript: |
       false
     fi
 
-    mucfgmerge system_config.xml ${SYSTEM}.xml -I $1/policy:$1/policy/xml
+    mucfgmerge system_config.xml ${SYSTEM}.xml -I $1/policy:$1/policy/system
   }
 
 packageScript: |

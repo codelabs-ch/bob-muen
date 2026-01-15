@@ -1,7 +1,7 @@
 inherit: [muen-root]
 
 environment:
-  MUEN_POLICY_SRC: "muen::x86-kernel-policy-src"
+  MUEN_POLICY_SRC: "muen::x86-systems-policy-src"
   LINUX_CUSTOM_CONFIG: "muen::x86-systems-linux-config"
   LINUX_CONFIG: "linux-6.1"
 
@@ -214,7 +214,7 @@ multiPackage:
       HARDWARE: "qemu-kvm"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
-      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5-test"
+      MUEN_POLICY_SRC: "muen::x86-systems-policy-src-solo5-test"
     multiPackage: *muen_build_mode
 
   qemu-solo5:
@@ -223,7 +223,7 @@ multiPackage:
       HARDWARE: "qemu-kvm"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
-      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5"
+      MUEN_POLICY_SRC: "muen::x86-systems-policy-src-solo5"
       LINUX_CUSTOM_CONFIG: "muen::x86-systems-linux-config-unipi"
     multiPackage: *muen_build_mode
 
@@ -233,7 +233,7 @@ multiPackage:
       HARDWARE: "intel-nuc-5i5myhe"
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "intel-nuc-5i5myhe"
-      MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5"
+      MUEN_POLICY_SRC: "muen::x86-systems-policy-src-solo5"
       LINUX_CUSTOM_CONFIG: "muen::x86-systems-linux-config-unipi"
       ROOTFS_OVERLAYS: "unipi/"
     multiPackage: *muen_build_mode

@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
   branch: master
-  commit: 3486363b1dcbd801297e47d941dcc93eb2287777
+  commit: 95ddd1f70fd305f22ff7c54616014debffccf777
 
 depends:
   - muen::common-muschedinfo-dev
@@ -33,7 +33,6 @@ multiPackage:
   debug:
     buildSetup: |
       export BUILD_MODE=debug
-      export DEBUG_LEVEL=Level_5
     buildScript: *common_build
     packageScript: *common_pkg
   test:

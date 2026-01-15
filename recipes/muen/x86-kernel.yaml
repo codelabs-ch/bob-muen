@@ -67,6 +67,7 @@ multiPackage:
         multiPackage:
           config-dev:
             depends:
+              - muen::build-cfg-scripts
               - ${MUEN_POLICY_SRC}
             buildVars: [MUEN_POLICY_SRC]
             buildTools: [libxslt-tools]
@@ -75,6 +76,7 @@ multiPackage:
               xsltproc -o install/usr/share/dbg_config.gpr \
                       --stringparam GPRNAME dbg_config \
                       --stringparam COMPONENTNAME dbgserver \
+                      --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
                       $1/components/dbgserver/misc/gpr.xsl \
                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
             packageScript: |
@@ -89,6 +91,7 @@ multiPackage:
               - muen::common-crash_audit-dev
               - muen::common-strings-dev
               - libs::libxhcidbg-dev
+              - muen::build-cfg-scripts
 
               - name: python::lxml
                 tools:
@@ -121,6 +124,7 @@ multiPackage:
               # generate config.xml
               xsltproc -o generated/config.xml \
                        --stringparam COMPONENTNAME dbgserver \
+                       --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
                        $1/components/dbgserver/misc/config.xsl \
                        ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
 
@@ -158,12 +162,14 @@ multiPackage:
           config-dev:
             depends:
               - ${MUEN_POLICY_SRC}
+              - muen::build-cfg-scripts
             buildVars: [MUEN_POLICY_SRC]
             buildTools: [libxslt-tools]
             buildScript: |
               mkdir -p install/usr/share
               xsltproc -o install/usr/share/example_config.gpr \
                       --stringparam GPRNAME example_config \
+                      --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
                       $1/components/example/misc/gpr.xsl \
                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
             packageScript: |
@@ -313,6 +319,7 @@ multiPackage:
         multiPackage:
           config-dev:
             depends:
+              - muen::build-cfg-scripts
               - ${MUEN_POLICY_SRC}
             buildVars: [MUEN_POLICY_SRC]
             buildTools: [libxslt-tools]
@@ -321,6 +328,7 @@ multiPackage:
               xsltproc -o install/usr/share/config.gpr \
                       --stringparam GPRNAME config \
                       --stringparam COMPONENTNAME config \
+                      --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
                       $1/components/sm/misc/gpr.xsl \
                       ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
             packageScript: |
@@ -334,6 +342,7 @@ multiPackage:
               - muen::x86-kernel-components-libmudm-dev
               - muen::x86-kernel-components-libmutime-dev
               - muen::x86-kernel-components-sm-config-dev
+              - muen::build-cfg-scripts
 
               - name: python::lxml
                 tools:
@@ -356,6 +365,7 @@ multiPackage:
               # generate config.xml
               xsltproc -o generated/config.xml \
                        --stringparam COMPONENTNAME sm \
+                       --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
                        $1/components/sm/misc/config.xsl \
                        ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
             multiPackage:
@@ -508,6 +518,7 @@ multiPackage:
         depends:
           - muen::common-libmusinfo-dev
           - muen::x86-kernel-components-libmuchannel-dev
+          - muen::build-cfg-scripts
           - ${MUEN_POLICY_SRC}
 
         privateEnvironment:
@@ -521,7 +532,9 @@ multiPackage:
         buildScript: |
           mkdir -p generated
 
-          xsltproc -o generated/config.xml $1/components/libmudebuglog/misc/config.xsl \
+          xsltproc -o generated/config.xml \
+            --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
+            $1/components/libmudebuglog/misc/config.xsl \
             ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
 
           mucfgcvresalloc $1/components/libmudebuglog/spec/libmudebuglog.xml \

@@ -59,7 +59,7 @@ multiPackage:
           - ${SBS_KEYS_PKG:-muen::sbs-keys}
 
           - bsp::grub2
-          - muen::x86-kernel-grub-cfg
+          - muen::x86-systems-bootloader-cfg
 
           - environment:
               RTS: "muen::rts"
@@ -139,20 +139,20 @@ multiPackage:
           rm -f ${GRUB_CFG}.sig
           gpg --batch --digest-algo SHA512 -b --homedir $keydir \
               -o ${GRUB_CFG}.sig \
-              ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG}
+              ${BOB_DEP_PATHS[muen::x86-systems-bootloader-cfg]}/${GRUB_CFG}
 
           rm -rf $keydir
           pkgdatadir=${BOB_DEP_PATHS['bsp::grub2']}/usr/share/grub/ \
           grub-mkrescue -d ${BOB_DEP_PATHS['bsp::grub2']}/${GRUB2_MODS_PATH} \
             --modules="gcry_rsa gcry_sha512 configfile csl pgp sbs normal part_msdos ext2 configfile normal" \
-            --pubkey ${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/keys/testkey.pub \
+            --pubkey ${BOB_DEP_PATHS[muen::x86-systems-bootloader-cfg]}/keys/testkey.pub \
             -o muen.iso \
             -v \
-            boot/grub/grub.cfg=${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/${GRUB_CFG} \
+            boot/grub/grub.cfg=${BOB_DEP_PATHS[muen::x86-systems-bootloader-cfg]}/${GRUB_CFG} \
             boot/grub/grub.cfg.sig=${GRUB_CFG}.sig \
             boot/kernel.csl=muen.img.cmds \
             boot/kernel.sbs=muen.sbs \
-            boot/filo/menu.lst=${BOB_DEP_PATHS[muen::x86-kernel-grub-cfg]}/menu.lst
+            boot/filo/menu.lst=${BOB_DEP_PATHS[muen::x86-systems-bootloader-cfg]}/menu.lst
 
         packageScript: |
           cp $1/muen.iso .

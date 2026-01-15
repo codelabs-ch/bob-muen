@@ -1,0 +1,22 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: git@git.codelabs.ch:muen/mulog-analyzer
+  branch: main
+  commit: f4fa3770c4151f1d849f4292ef3a0391e9972787
+
+depends:
+  - name: codelabs::libs::alog-dev
+
+buildVars: [MULOG_BUILD_MODE]
+buildSetup: |
+  export BUILD_MODE=${MULOG_BUILD_MODE:-release}
+buildScript: |
+  muenBuild $1/mulog_analyzer
+
+packageScript: |
+  gprInstallPackageTgt
+
+provideTools:
+  mulog: "usr/bin"

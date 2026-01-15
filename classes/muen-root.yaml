@@ -26,11 +26,7 @@ depends:
 
   # with basement::rootrecipe we have a common set of tools and a host-
   # toolchain which is also set as target toolchain.
-  # for muen we need a gnat toolchain first. Use alr to get one.
-  - name: adacore::alr
-    use: [tools]
-    forward: True
-
+  # for muen we need a gnat toolchain first.
   - name: adacore::gnat-x86_64-pc-linux-gnu
     use: [tools]
     forward: True

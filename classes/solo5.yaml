@@ -1,6 +1,6 @@
 inherit: [python3]
 depends:
-  - name: muen::tools-solo5-muen-gencspec
+  - name: muen::tools-solo5-gencspec
     use: [tools]
   - name: muen::tools-solo5-policy-compose
     use: [tools]
@@ -16,14 +16,14 @@ depends:
       - python::lxml
       - devel::lief-python
 buildVars: [SYSTEM]
-buildTools: [solo5-elftool, solo5-muen-gencspec, solo5-policy-compose]
+buildTools: [solo5-elftool, solo5-gencspec, solo5-policy-compose]
 buildScript: |
   # $1   - source dir
   # $2   - unikernel artifact
   # $3.. - additional arguments to gencspec
   solo5ComposeConfig() {
     echo "=== Creating unikernel component spec"
-    solo5-muen-gencspec \
+    solo5-gencspec \
       $2 \
       $1/policy/xml/mirageos/cspec_src.xml . \
       --out_spec ./component_unikernel.xml \

@@ -716,13 +716,13 @@ multiPackage:
     provideTools:
       linux-gencspec: "."
 
-  solo5-muen-gencspec:
+  solo5-gencspec:
     buildScript: |
-      cp -r $1/scripts/solo5-muen-gencspec.py solo5-muen-gencspec
+      cp -r $1/scripts/solo5-gencspec.py solo5-gencspec
     packageScript: |
       rsync -a --delete $1/ .
     provideTools:
-      solo5-muen-gencspec: "."
+      solo5-gencspec: "."
 
   solo5-policy-compose:
     buildScript: |

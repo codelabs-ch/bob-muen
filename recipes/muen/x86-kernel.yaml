@@ -627,41 +627,6 @@ multiPackage:
         depends:
           - muen::x86-kernel-components-libmutime-test
 
-  policy-src:
-    inherit: [muen_policy]
-    buildScript: muenCreatePolicySrc $1
-    packageScript: muenPackagePolicySrc $1
-
-  policy-src-solo5:
-    checkoutSCM:
-      scm: url
-      url: file://${UNIKERNEL_FILE:-Please specify UNIKERNEL_FILE!}
-      dir: uni
-    inherit: [muen_policy, solo5]
-    buildVars: [UNIKERNEL_FILE]
-    buildScript: |
-      solo5ComposeConfig $1 $1/uni/$(basename $UNIKERNEL_FILE) \
-          --channel-size 0x4000000
-      muenCreatePolicySrc $1
-    packageScript: |
-      muenPackagePolicySrc $1
-      fname=$(basename $UNIKERNEL_FILE)
-      cp $1/$fname ./$fname
-
-  policy-src-solo5-test:
-    inherit: [muen_policy, solo5]
-    depends:
-      - devel::solo5-hello-muen
-    buildScript: |
-      solo5ComposeConfig $1 \
-        ${BOB_DEP_PATHS[devel::solo5-hello-muen]}/test_hello.muen \
-        --disable-reset \
-        --bootparams "Hi!"
-      muenCreatePolicySrc $1
-    packageScript: |
-      muenPackagePolicySrc $1
-      cp $1/test_hello.muen .
-
   #### Kernel ##############################################################
 
   "":

@@ -814,6 +814,7 @@ multiPackage:
     buildTools:
       - acpica
       - iucode-tool
+      - linux-gencspec
       - mucfgalloc
       - mucfgcjoin
       - mucfgexpand
@@ -829,7 +830,7 @@ multiPackage:
     buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC]
     buildScript: |
       # build the linux cspecs
-      $1/components/linux/misc/linux-muen-gencspec.py \
+      linux-gencspec \
         ${BOB_DEP_PATHS[muen::linux-image]}/boot/bzImage \
         $1/components/linux/spec/linux.xml \
         --out_spec linux.xml \

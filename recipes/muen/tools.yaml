@@ -708,6 +708,14 @@ multiPackage:
     packageScript: |
       rsync -a --delete $1/ .
 
+  linux-gencspec:
+    buildScript: |
+      cp -r $1/scripts/linux-gencspec.py linux-gencspec
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      linux-gencspec: "."
+
   solo5-muen-gencspec:
     buildScript: |
       cp -r $1/scripts/solo5-muen-gencspec.py solo5-muen-gencspec

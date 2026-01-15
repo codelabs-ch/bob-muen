@@ -878,11 +878,3 @@ multiPackage:
     packageScript: |
       rsync -a --delete $1/ .
       echo "GPR_PROJECT_PATH=." >> .gpr_project
-
-  solo5-policy-compose:
-    buildScript: |
-      cp -r $1/policy/xml/mirageos/compose.py solo5-policy-compose
-    packageScript: |
-      rsync -a --delete $1/ .
-    provideTools:
-      solo5-policy-compose: "."

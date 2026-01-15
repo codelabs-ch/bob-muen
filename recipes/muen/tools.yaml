@@ -716,6 +716,14 @@ multiPackage:
     provideTools:
       solo5-muen-gencspec: "."
 
+  solo5-policy-compose:
+    buildScript: |
+      cp -r $1/scripts/solo5-policy-compose.py solo5-policy-compose
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      solo5-policy-compose: "."
+
   tests:
     inherit: [muen_tests]
     depends:

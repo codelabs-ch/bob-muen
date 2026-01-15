@@ -757,14 +757,6 @@ multiPackage:
 
   ##########################################################################
 
-  grub-cfg:
-    buildScript: |
-      cp $1/emulate/grub* .
-      cp -r $1/emulate/keys .
-      cp $1/emulate/menu.lst .
-    packageScript: |
-      cp -r $1/* .
-
 
   policy:
     inherit: [python3]

@@ -812,6 +812,8 @@ multiPackage:
 
       - ${MUEN_POLICY_SRC}
 
+      - muen::x86-systems-linux-component-spec
+
       - name: demo::rootfs
         environment:
           ROOTFS_ARCH: "x86_64"
@@ -845,7 +847,7 @@ multiPackage:
       # build the linux cspecs
       linux-gencspec \
         ${BOB_DEP_PATHS[muen::linux-image]}/boot/bzImage \
-        $1/components/linux/spec/linux.xml \
+        ${BOB_DEP_PATHS[muen::x86-systems-linux-component-spec]}/linux.xml \
         --out_spec linux.xml \
         --src_policy ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml
       # --initramfs ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz \

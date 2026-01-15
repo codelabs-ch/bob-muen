@@ -2,8 +2,8 @@ inherit: [muen-root]
 
 environment:
   MUEN_POLICY_SRC: "muen::x86-kernel-policy-src"
-  LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config"
-  LINUX_CONFIG: "linux64-6.1"
+  LINUX_CUSTOM_CONFIG: "muen::x86-systems-linux-config"
+  LINUX_CONFIG: "linux-6.1"
 
 depends:
   - name: libs::glib-tools
@@ -224,7 +224,7 @@ multiPackage:
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "qemu-kvm"
       MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5"
-      LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
+      LINUX_CUSTOM_CONFIG: "muen::x86-systems-linux-config-unipi"
     multiPackage: *muen_build_mode
 
   nuc5i5myhe-solo5:
@@ -234,7 +234,7 @@ multiPackage:
       ADDITIONAL_HW: "common_hardware"
       PLATFORM: "intel-nuc-5i5myhe"
       MUEN_POLICY_SRC: "muen::x86-kernel-policy-src-solo5"
-      LINUX_CUSTOM_CONFIG: "muen::x86-kernel-linux-config-unipi"
+      LINUX_CUSTOM_CONFIG: "muen::x86-systems-linux-config-unipi"
       ROOTFS_OVERLAYS: "unipi/"
     multiPackage: *muen_build_mode
 

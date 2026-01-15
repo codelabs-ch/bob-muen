@@ -46,6 +46,11 @@ depends:
     use: [tools]
     forward: True
 
+  - name: muen::mulog_analyzer
+    use: [tools]
+    tools:
+      target-toolchain: host-compat-gnat-toolchain
+
   # (2) Build an aarch64 linux gnu compiler with ada enabled, so that
   # the target toolchain for the following 'sub-depends' is aarch64-
   # linux-gnu- with ada support.
@@ -124,7 +129,7 @@ depends:
     depends:
       - muen::arm64-systems-uboot-tftp-files
 
-buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools]
+buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools, mulog]
 buildVars: [MUEN_BUILD_MODE, SYSTEM, HARDWARE]
 buildScript: |
   case ${MUEN_BUILD_MODE} in

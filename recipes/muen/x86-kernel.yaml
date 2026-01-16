@@ -17,6 +17,7 @@ multiPackage:
     multiPackage:
       ahci_drv:
         depends:
+          - muen::component-libmubase-dev
           - muen::x86-kernel-components-libmuchannel-dev
           - muen::x86-kernel-components-libmudebuglog-dev
           - muen::common-strings-dev
@@ -40,6 +41,7 @@ multiPackage:
 
       controller:
         depends:
+          - muen::component-libmubase-dev
           - muen::x86-kernel-components-libmucontroltypes-dev
           - muen::x86-kernel-components-libmudebuglog-dev
           - muen::common-muinterrupts-dev
@@ -84,6 +86,7 @@ multiPackage:
           "":
             inherit: [python3, muen_component_app]
             depends:
+              - muen::component-libmubase-dev
               - muen::x86-kernel-components-dbgserver-config-dev
               - muen::x86-kernel-components-libmutime-dev
               - muen::x86-kernel-components-libmudebuglog-dev
@@ -135,6 +138,7 @@ multiPackage:
 
       dm:
         depends:
+          - muen::component-libmubase-dev
           - muen::x86-kernel-components-libmudm-dev
           - muen::x86-kernel-components-libmudebuglog-dev
           - muen::common-strings-dev
@@ -184,6 +188,7 @@ multiPackage:
               - muen::common-debug-dev
               - muen::common-mutimedevents-dev
               - muen::common-strings-dev
+              - muen::component-libmubase-dev
               - use: []
                 depends:
                   - muen::x86-kernel-components-libmucontrol-tgt
@@ -204,6 +209,8 @@ multiPackage:
                   GPR_PATH: "components/example/example"
 
       idle:
+        depends:
+          - muen::component-libmubase-dev
         inherit: [muen_component_app]
         buildScript: |
           muenBuildApp idle
@@ -213,6 +220,7 @@ multiPackage:
       isolation_tests:
         inherit: [muen_component_app, python3]
         depends:
+          - muen::component-libmubase-dev
           - muen::common-strings-dev
           - muen::common-libmusinfo-dev
           - muen::x86-kernel-components-libmudebuglog-dev
@@ -236,6 +244,7 @@ multiPackage:
       isolation_tests_monitor:
         inherit: [muen_component_app]
         depends:
+          - muen::component-libmubase-dev
           - muen::common-strings-dev
           - muen::common-libmusinfo-dev
           - muen::x86-kernel-components-libmudebuglog-dev
@@ -283,6 +292,7 @@ multiPackage:
       ps2_drv:
         inherit: [muen_component_app]
         depends:
+          - muen::component-libmubase-dev
           - muen::common-strings-dev
           - muen::x86-kernel-components-libmudebuglog-dev
           - use: []
@@ -296,6 +306,7 @@ multiPackage:
 
       sl:
         depends:
+          - muen::component-libmubase-dev
           - muen::common-libmusinfo-dev
           - muen::x86-kernel-components-libmuinit-dev
           - use: []
@@ -337,6 +348,7 @@ multiPackage:
             inherit: [python3]
             depends:
               - muen::common-strings-dev
+              - muen::component-libmubase-dev
               - muen::x86-kernel-components-libmucontrol-dev
               - muen::x86-kernel-components-libmudebuglog-dev
               - muen::x86-kernel-components-libmudm-dev
@@ -387,6 +399,7 @@ multiPackage:
         inherit: [muen_component_app]
         depends:
           - muen::x86-kernel-policy
+          - muen::component-libmubase-dev
         buildSetup: |
           export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}
         buildScript: muenBuildApp tau0
@@ -400,6 +413,7 @@ multiPackage:
       time:
         inherit: [muen_component_app]
         depends:
+          - muen::component-libmubase-dev
           - muen::common-libmusinfo-dev
           - muen::common-strings-dev
           - muen::x86-kernel-components-libmudebuglog-dev
@@ -427,6 +441,7 @@ multiPackage:
       vt:
         inherit: [muen_component_app]
         depends:
+          - muen::component-libmubase-dev
           - muen::common-debug-dev
           - muen::common-libmusinfo-dev
           - muen::common-strings-dev

@@ -129,7 +129,7 @@ depends:
     depends:
       - muen::arm64-systems-uboot-tftp-files
 
-buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools, mulog]
+buildTools: [mucheckelf, mugends, bootgen, mtools, dosfstools, uboot-tools, mulog-analyzer]
 buildVars: [MUEN_BUILD_MODE, SYSTEM, HARDWARE]
 buildScript: |
   case ${MUEN_BUILD_MODE} in

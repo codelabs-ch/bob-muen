@@ -453,7 +453,7 @@ multiPackage:
           - muen::common-strings-dev
 
       - muen::x86-kernel-policy
-      - muen::x86-kernel-components-tau0
+      - muen::components-tau0
     buildVars: [MUEN_BUILD_MODE]
     buildSetup: |
       export linker_script=$1/kernel/kernel.ld
@@ -537,19 +537,19 @@ multiPackage:
       - bsp::intel::microcode
       - muen::linux-image
       - muen::component-libs-muinit
-      - muen::x86-kernel-components-ahci_drv
-      - muen::x86-kernel-components-controller
-      - muen::x86-kernel-components-dbgserver
-      - muen::x86-kernel-components-dm
-      - muen::x86-kernel-components-example
-      - muen::x86-kernel-components-idle
-      - muen::x86-kernel-components-isolation_tests
-      - muen::x86-kernel-components-isolation_tests_monitor
-      - muen::x86-kernel-components-ps2_drv
-      - muen::x86-kernel-components-sl
-      - muen::x86-kernel-components-sm
-      - muen::x86-kernel-components-time
-      - muen::x86-kernel-components-vt
+      - muen::components-ahci_drv
+      - muen::components-controller
+      - muen::components-dbgserver
+      - muen::components-dm
+      - muen::components-example
+      - muen::components-idle
+      - muen::components-isolation_tests
+      - muen::components-isolation_tests_monitor
+      - muen::components-ps2_drv
+      - muen::components-sl
+      - muen::components-sm
+      - muen::components-time
+      - muen::components-vt
 
       - ${MUEN_POLICY_SRC}
 

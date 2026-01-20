@@ -185,13 +185,13 @@ multiPackage:
           - muen::component-libs-libmutime-proof
           - muen::component-libs-muinit-proof
 
-          - muen::x86-kernel-components-ahci_drv-proof
-          - muen::x86-kernel-components-controller-proof
-          - muen::x86-kernel-components-dm-proof
-          - muen::x86-kernel-components-example-proof
-          - muen::x86-kernel-components-sl-proof
-          - muen::x86-kernel-components-sm-proof
-          - muen::x86-kernel-components-time-proof
+          - muen::components-ahci_drv-proof
+          - muen::components-controller-proof
+          - muen::components-dm-proof
+          - muen::components-example-proof
+          - muen::components-sl-proof
+          - muen::components-sm-proof
+          - muen::components-time-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

@@ -9,15 +9,7 @@ buildSetup: |
   export __SRC=$1
 
   muenCspecs() {
-    # FIXME remove handling if components are exported as well
-    if [ -d ${__SRC}/components/${1}/spec ]; then
-      DIR=${__SRC}/components/${1}/spec
-    elif [ -d ${__SRC}/${1}/spec ]; then
-      DIR=${__SRC}/${1}/spec
-    else
-      DIR=nonexistent
-    fi
-
+    DIR=${__SRC}/${1}/spec
     SPEC=$DIR/${1}.xml
     if [ -e $DIR/${1}.xsl ]; then
       xsltproc -o generated/${1}.xml \

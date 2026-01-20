@@ -9,7 +9,7 @@ depends:
 
       - muen::common-tests
       - muen::tools-tests
-      - muen::x86-kernel-components-tests
+      - muen::component-libs-tests
 
 buildScript: |
   for t in ${@:2}; do

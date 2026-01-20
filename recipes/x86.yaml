@@ -175,19 +175,19 @@ multiPackage:
             tools:
               target-toolchain: host-compat-gnat-toolchain
 
-          - muen::x86-kernel-components-libmuchannel-proof
-          - muen::x86-kernel-components-libmucontrol-proof
-          - muen::x86-kernel-components-libmudebuglog-proof
-          - muen::x86-kernel-components-libmudm-proof
+          - muen::component-libs-libmuchannel-proof
+          - muen::component-libs-libmucontrol-proof
+          - muen::component-libs-libmudebuglog-proof
+          - muen::component-libs-libmudm-proof
           # TODO: T767
-          # - muen::x86-kernel-components-libmuinit-proof
-          - muen::x86-kernel-components-libmutime-proof
+          # - muen::component-libs-libmuinit-proof
+          - muen::component-libs-libmutime-proof
+          - muen::component-libs-muinit-proof
 
           - muen::x86-kernel-components-ahci_drv-proof
           - muen::x86-kernel-components-controller-proof
           - muen::x86-kernel-components-dm-proof
           - muen::x86-kernel-components-example-proof
-          - muen::x86-kernel-components-muinit-proof
           - muen::x86-kernel-components-sl-proof
           - muen::x86-kernel-components-sm-proof
           - muen::x86-kernel-components-time-proof

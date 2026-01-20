@@ -20,6 +20,7 @@ multiPackage:
           - muen::component-libmubase-dev
           - muen::component-libs-libmuchannel-dev
           - muen::component-libs-libmudebuglog-dev
+          - muen::component-libs-libmublock-dev
           - muen::common-strings-dev
           - use: []
             depends:

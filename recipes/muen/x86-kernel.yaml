@@ -224,9 +224,9 @@ multiPackage:
       isolation_tests:
         inherit: [muen_component_app, python3]
         depends:
-          - muen::component-libmubase-dev
           - muen::common-strings-dev
-          - muen::common-libmusinfo-dev
+          - muen::component-libmubase-dev
+          - muen::component-libs-libmusinfo-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::tools-libmupy
           - use: []
@@ -248,9 +248,9 @@ multiPackage:
       isolation_tests_monitor:
         inherit: [muen_component_app]
         depends:
-          - muen::component-libmubase-dev
           - muen::common-strings-dev
-          - muen::common-libmusinfo-dev
+          - muen::component-libmubase-dev
+          - muen::component-libs-libmusinfo-dev
           - muen::component-libs-libmucoll-dev
           - muen::component-libs-libmudebuglog-dev
           - use: []
@@ -281,7 +281,7 @@ multiPackage:
       sl:
         depends:
           - muen::component-libmubase-dev
-          - muen::common-libmusinfo-dev
+          - muen::component-libs-libmusinfo-dev
           - muen::component-libs-libmuinit-dev
           - use: []
             depends:
@@ -389,8 +389,8 @@ multiPackage:
         inherit: [muen_component_app]
         depends:
           - muen::component-libmubase-dev
-          - muen::common-libmusinfo-dev
           - muen::common-strings-dev
+          - muen::component-libs-libmusinfo-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::component-libs-libmucontrol-dev
           - muen::component-libs-libmucoll-dev
@@ -419,8 +419,8 @@ multiPackage:
         depends:
           - muen::component-libmubase-dev
           - muen::common-debug-dev
-          - muen::common-libmusinfo-dev
           - muen::common-strings-dev
+          - muen::component-libs-libmusinfo-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::component-libs-libmutime-dev
           - muen::component-libs-libmucoll-dev

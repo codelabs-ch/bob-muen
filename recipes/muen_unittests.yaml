@@ -7,7 +7,6 @@ depends:
         use: [tools]
         forward: True
 
-      - muen::common-tests
       - muen::tools-tests
       - muen::component-libs-tests
 

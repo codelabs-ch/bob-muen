@@ -49,7 +49,7 @@ multiPackage:
           - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
-          - muen::common-libmusinfo-dev
+          - muen::component-libs-libmusinfo-dev
         buildVars: [OBJCOPY, NAME, SYSTEM, HARDWARE]
         buildTools: [mucgenspec, target-toolchain]
         buildSetup: |

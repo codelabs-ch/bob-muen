@@ -166,7 +166,8 @@ multiPackage:
         depends:
           - muen::common-common-proof
           - muen::common-strings-proof
-          - muen::common-libmusinfo-proof
+
+          - muen::component-libs-libmusinfo-proof
 
           - muen::x86-kernel-proof
 

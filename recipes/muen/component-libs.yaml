@@ -195,6 +195,14 @@ multiPackage:
       muenBuild $1/libmublock/libmublock
     multiPackage: *common_dev_tgt_provide
 
+  libmucoll:
+    depends:
+      - muen::component-libmubase-dev
+      - muen::component-libs-libmuchannel-dev
+    buildScript: |
+      muenBuild $1/libmucoll/libmucoll
+    multiPackage: *common_dev_tgt_provide
+
   libmutime:
     privateEnvironment:
       CSPECS_FILE: "generated/libmutime.xml"

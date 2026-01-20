@@ -418,6 +418,7 @@ multiPackage:
           - muen::common-strings-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::component-libs-libmutime-dev
+          - muen::component-libs-libmucoll-dev
           - muen::component-libs-libmucontrol-dev
           - use: []
             depends:

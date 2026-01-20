@@ -1,0 +1,222 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/component/libs.git
+  branch: main
+  commit: ea8a44f97415f8ac7d82952186bb27921e556c37
+
+multiPackage:
+  muinit:
+    depends:
+      - libs::libsparkcrypto-dev
+      - muen::common-libmusinfo-dev
+      - muen::component-libs-libmuinit-dev
+      - use: []
+        depends:
+          - muen::component-libs-libmuinit-tgt
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/muinit/muinit
+          cp $1/muinit/spec/muinit.xml .
+        provideDeps: ['*-tgt']
+        packageVars: [OBJCOPY]
+        packageScript: |
+          ${OBJCOPY} -O binary \
+            --set-section-flags .bss=alloc,load,contents \
+            --set-section-flags .stack=alloc,load,contents \
+            $1/install/usr/bin/muinit muinit
+          cp $1/muinit.xml .
+          mkdir -p .bob
+          echo "muinit.xml" > .bob/cspecs
+      proof:
+        inherit: [muen_proof_app]
+        environment:
+          RTS: "muen::rts"
+          COMPONENT_NAME: "muinit"
+          GPR_PATH: "muinit/muinit"
+          GNATPROVE_FILES: "muinit_main.adb"
+
+  libmuchannel:
+    privateEnvironment:
+      GPR_PATH: "libmuchannel/libmuchannel"
+    buildVars: [GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: &common_dev_tgt
+          dev:
+            packageScript: |
+              gprInstallPackageDev
+          tgt:
+            packageVars: [CSPECS_FILE]
+            packageScript: |
+              gprInstallPackageTgt
+              if [[ -e $1/${CSPECS_FILE:-} ]]; then
+                mkdir -p usr/share/
+                cp $1/${CSPECS_FILE} usr/share
+                mkdir .bob
+                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+              fi
+      proof: &common_proof_lib
+        inherit: [muen_proof]
+        environment:
+          RTS: "muen::rts"
+        buildSetup: |
+          export GPR_FILE=$1/${GPR_PATH}
+          export MUEN_BUILD_MODE=prove
+          export OBJ_DIR=$(pwd)/obj/
+          export LIB_DIR=$(pwd)/lib/
+        buildScript: |
+          muenProof
+
+  libmucontroltypes:
+    buildScript: |
+      muenBuild $1/libmucontroltypes/libmucontroltypes
+    multiPackage: *common_dev_tgt
+
+  libmucontrol:
+    inherit: [muen_component_cspecs]
+    depends:
+      - muen::component-libs-libmucontroltypes-dev
+    privateEnvironment:
+      CSPECS_FILE: "generated/libmucontrol.xml"
+      GPR_PATH: "libmucontrol/libmucontrol"
+    buildVars: [GPR_PATH]
+    buildScript: |
+      muenCspecs libmucontrol
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: &common_dev_tgt_provide
+          dev:
+            provideDeps: ['*-dev']
+            packageScript: |
+              gprInstallPackageDev
+          tgt:
+            packageVars: [CSPECS_FILE]
+            packageScript: |
+              gprInstallPackageTgt
+              if [[ -e $1/${CSPECS_FILE:-} ]]; then
+                mkdir -p usr/share/
+                cp $1/${CSPECS_FILE} usr/share
+                mkdir .bob
+                echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
+              fi
+      proof: *common_proof_lib
+
+  libmudebuglog:
+    depends:
+      - muen::common-libmusinfo-dev
+      - muen::component-libs-libmuchannel-dev
+      - muen::build-cfg-scripts
+      - ${MUEN_POLICY_SRC}
+
+    privateEnvironment:
+      CSPECS_FILE: "generated/libmudebuglog.xml"
+      GPR_PATH: "libmudebuglog/libmudebuglog"
+
+    buildTools: [mucgenspec, mucfgcvresalloc, muxmlfilter, libxslt-tools]
+    buildSetup: |
+      export LIBMUDEBUGLOG_GENERATED=$(pwd)/generated
+    buildVars: [MUEN_POLICY_SRC, GPR_PATH]
+    buildScript: |
+      mkdir -p generated
+
+      xsltproc -o generated/config.xml \
+        --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
+        $1/libmudebuglog/misc/config.xsl \
+        ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
+      mucfgcvresalloc $1/libmudebuglog/spec/libmudebuglog.xml \
+                      generated/libmudebuglog.xml \
+                      -I generated
+
+      muxmlfilter -isn Component_Ext -osn Component generated/libmudebuglog.xml \
+                  generated/libmudebuglog_filtered.xml
+      mucgenspec --input-spec generated/libmudebuglog_filtered.xml \
+                $(pwd)/generated
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
+
+  libmudm:
+    inherit: [muen_component_cspecs]
+    privateEnvironment:
+      CSPECS_FILE: "generated/libmudm.xml"
+      GPR_PATH: "libmudm/libmudm"
+    depends:
+      - muen::common-libmusinfo-dev
+    buildVars: [GPR_PATH]
+    buildScript: |
+      muenCspecs libmudm
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild  $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt
+      proof: *common_proof_lib
+
+  libmuinit:
+    inherit: [muen_component_cspecs]
+    depends:
+      - muen::common-libmusinfo-dev
+      - muen::component-libs-libmucontrol-dev
+      - libs::libsparkcrypto-dev
+      - use: []
+        depends:
+          - muen::component-libs-libmucontrol-tgt
+    privateEnvironment:
+      CSPECS_FILE: "generated/libmuinit.xml"
+      GPR_PATH: "libmuinit/libmuinit"
+    buildVars: [GPR_PATH]
+    buildScript: |
+      muenCspecs libmuinit
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild  $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
+
+  libmutime:
+    privateEnvironment:
+      CSPECS_FILE: "generated/libmutime.xml"
+      GPR_PATH: "libmutime/libmutime"
+    buildVars: [GPR_PATH]
+    buildSetup: |
+      export LIBMUTIME_GENERATED=$(pwd)/generated
+    buildTools: [mucgenspec]
+    buildScript: |
+      mkdir -p generated
+      cp $1/libmutime/spec/libmutime.xml generated
+      mucgenspec --input-spec $1/libmutime/spec/libmutime.xml \
+                $(pwd)/generated
+    multiPackage:
+      "":
+        buildScript: muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt
+      proof:
+        <<: *common_proof_lib
+        privateEnvironment:
+          GNATPROVE_STEPS: "200000"
+          GNATPROVE_TIMEOUT: "0"
+      test:
+        inherit: [muen_test]
+        buildScript: |
+          DATA_DIR=$1/libmutime \
+          TESTS_DIR=$1/libmutime/tests \
+          muenTest $1/libmutime/gnattest_libmutime
+        packageScript: |
+          muenPackageTest
+
+  tests:
+    inherit: [muen_tests]
+    depends:
+      - muen::component-libs-libmutime-test

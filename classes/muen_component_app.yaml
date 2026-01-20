@@ -1,11 +1,13 @@
 inherit: [muen_component, muen_component_cspecs]
 
+depends:
+  - muen::component-libmubase-ld
 buildTools: [mucheckstack]
 buildSetup: |
   muenBuildApp() {
     muenCspecs $1
     GPRBUILD_EXTRA_ARGS="
-      -Xlinker_script=${__SRC}/components/component.ld \
+      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
       -Xstacksize=8192" \
     muenBuild ${__SRC}/components/${1}/${1}
 

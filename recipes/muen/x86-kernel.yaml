@@ -6,94 +6,92 @@ checkoutSCM:
   branch: ${MUEN_X86_KNL_BRANCH:-devel}
   commit: ${MUEN_X86_KNL_COMMIT:-377335576569839b32fc53a228e71788e0deab43}
 
+depends:
+  - environment:
+      MUEN_COMMON_VARIANT: "kernel"
+    depends:
+      - muen::common-common-dev
+      - muen::common-crash_audit-dev
+      - if: "$(eq,${MUEN_BUILD_MODE:-},debug)"
+        name: muen::common-debug-dev
+      - muen::common-muinterrupts-dev
+      - muen::common-muschedinfo-dev
+      - muen::common-mutimedevents-dev
+      - muen::common-strings-dev
+
+  - muen::x86-systems-policy
+  - muen::components-tau0
+buildVars: [MUEN_BUILD_MODE]
+buildSetup: |
+  export linker_script=$1/kernel/kernel.ld
+  export POLICY_SRC_DIR=${BOB_DEP_PATHS[muen::x86-systems-policy]}
+  export VERSION_DIR=$(pwd)/_version
+  mkdir -p $(pwd)/_version
+  cat > _version/sk-version.ads << EOF
+  --D @Interface
+  --D Muen version information.
+  package SK.Version is
+     Version_String : constant String :=
+       "$(git -C $1 describe --always --dirty="-UNCLEAN")";
+  end SK.Version;
+  EOF
+
 multiPackage:
   "":
-    depends:
-      - environment:
-          MUEN_COMMON_VARIANT: "kernel"
-        depends:
-          - muen::common-common-dev
-          - muen::common-crash_audit-dev
-          - if: "$(eq,${MUEN_BUILD_MODE:-},debug)"
-            name: muen::common-debug-dev
-          - muen::common-muinterrupts-dev
-          - muen::common-muschedinfo-dev
-          - muen::common-mutimedevents-dev
-          - muen::common-strings-dev
+    buildScript: |
+      GPR_FILE=kernel
+      if [[ ${MUEN_BUILD_MODE} == debug ]]; then
+        GPR_FILE+=_debug
+      fi
+      muenBuild $1/kernel/$GPR_FILE
+    provideDeps: ['muen::x86-systems-policy', '*tau0']
+    packageVars: [OBJCOPY]
+    packageScript: |
+      ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
+        --set-section-flags .stack=alloc,load,contents \
+        $1/install/usr/bin/kernel \
+        kernel
+      mkdir .debug
+      cp $1/install/usr/bin/kernel .debug/
 
-      - muen::x86-systems-policy
-      - muen::components-tau0
-    buildVars: [MUEN_BUILD_MODE]
-    buildSetup: |
-      export linker_script=$1/kernel/kernel.ld
-      export POLICY_SRC_DIR=${BOB_DEP_PATHS[muen::x86-systems-policy]}
-      export VERSION_DIR=$(pwd)/_version
-      mkdir -p $(pwd)/_version
-      cat > _version/sk-version.ads << EOF
-      --D @Interface
-      --D Muen version information.
-      package SK.Version is
-         Version_String : constant String :=
-           "$(git -C $1 describe --always --dirty="-UNCLEAN")";
-      end SK.Version;
+  metrics:
+    buildTools: [libadalang-tools]
+    buildScript: |
+      # gnatmetric ignores files from Externally_Built libs, an attribute
+      # which is set to True by gprinstall-created GPR files.
+      # Copy all relevant lib deps here and create simple GPR file.
+      for d in ${!BOB_DEP_PATHS[@]}; do
+        DIR=${BOB_DEP_PATHS[$d]}
+        if [ -e ${DIR}/usr/share/gpr/*.gpr ]; then
+          # remove dependency from project path first
+          GPR_PROJECT_PATH=$(echo "$GPR_PROJECT_PATH" | tr ':' '\n' | grep -v '$DIR' | paste -sd ':' -)
+
+          gpr_name=$(basename ${DIR}/usr/share/gpr/*.gpr)
+          include_name=$(basename ${DIR}/usr/include/*)
+          echo "dependency found in: ${DIR}"
+          mkdir -p deps
+          cp -r ${DIR}/usr/include/* deps
+      cat > deps/${gpr_name} << EOF
+      project ${include_name} is
+         for Source_Dirs use ("${include_name}");
+      end ${include_name};
       EOF
+        fi
+      done
 
-    multiPackage:
-      "":
-        buildScript: |
-          GPR_FILE=kernel
-          if [[ ${MUEN_BUILD_MODE} == debug ]]; then
-            GPR_FILE+=_debug
-          fi
-          muenBuild $1/kernel/$GPR_FILE
-        provideDeps: ['muen::x86-systems-policy', '*tau0']
-        packageVars: [OBJCOPY]
-        packageScript: |
-          ${OBJCOPY} -O binary --set-section-flags .bss=alloc,load,contents \
-            --set-section-flags .stack=alloc,load,contents \
-            $1/install/usr/bin/kernel \
-            kernel
-          mkdir .debug
-          cp $1/install/usr/bin/kernel .debug/
+      GPR_PROJECT_PATH=deps:$GPR_PROJECT_PATH \
+        OBJ_DIR="${PWD}/" \
+        gnatmetric -v --output-dir=. -P$1/kernel/kernel > gnatmetric.log 2>&1
+    packageScript: |
+      cp $1/gnatmetric.log .
 
-      metrics:
-        buildTools: [libadalang-tools]
-        buildScript: |
-          # gnatmetric ignores files from Externally_Built libs, an attribute
-          # which is set to True by gprinstall-created GPR files.
-          # Copy all relevant lib deps here and create simple GPR file.
-          for d in ${!BOB_DEP_PATHS[@]}; do
-            DIR=${BOB_DEP_PATHS[$d]}
-            if [ -e ${DIR}/usr/share/gpr/*.gpr ]; then
-              # remove dependency from project path first
-              GPR_PROJECT_PATH=$(echo "$GPR_PROJECT_PATH" | tr ':' '\n' | grep -v '$DIR' | paste -sd ':' -)
-
-              gpr_name=$(basename ${DIR}/usr/share/gpr/*.gpr)
-              include_name=$(basename ${DIR}/usr/include/*)
-              echo "dependency found in: ${DIR}"
-              mkdir -p deps
-              cp -r ${DIR}/usr/include/* deps
-          cat > deps/${gpr_name} << EOF
-          project ${include_name} is
-             for Source_Dirs use ("${include_name}");
-          end ${include_name};
-          EOF
-            fi
-          done
-
-          GPR_PROJECT_PATH=deps:$GPR_PROJECT_PATH \
-            OBJ_DIR="${PWD}/" \
-            gnatmetric -v --output-dir=. -P$1/kernel/kernel > gnatmetric.log 2>&1
-        packageScript: |
-          cp $1/gnatmetric.log .
-
-      proof:
-        inherit: [muen_proof]
-        environment:
-          RTS: "muen::rts"
-        buildSetup: |
-          export GPR_FILE=$1/kernel/kernel.gpr
-          export MUEN_BUILD_MODE=prove
-          export OBJ_DIR=$(pwd)/
-        buildScript: |
-          muenProof
+  proof:
+    inherit: [muen_proof]
+    environment:
+      RTS: "muen::rts"
+    buildSetup: |
+      export GPR_FILE=$1/kernel/kernel.gpr
+      export MUEN_BUILD_MODE=prove
+      export OBJ_DIR=$(pwd)/
+    buildScript: |
+      muenProof

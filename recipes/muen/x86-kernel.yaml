@@ -89,6 +89,7 @@ multiPackage:
             depends:
               - muen::component-libmubase-dev
               - muen::x86-kernel-components-dbgserver-config-dev
+              - muen::component-libs-libmucoll-dev
               - muen::component-libs-libmutime-dev
               - muen::component-libs-libmudebuglog-dev
               - muen::common-debug-dev

@@ -373,10 +373,10 @@ multiPackage:
       tau0:
         inherit: [muen_component_app]
         depends:
-          - muen::x86-kernel-policy
+          - muen::x86-systems-policy
           - muen::component-libmubase-dev
         buildSetup: |
-          export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-kernel-policy]}
+          export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-systems-policy]}
         buildScript: muenBuildApp tau0
         packageVars: [OBJCOPY]
         packageScript: |

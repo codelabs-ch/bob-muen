@@ -101,11 +101,11 @@ multiPackage:
             fi
           done
 
-          mucheckelf ${BOB_DEP_PATHS[muen::x86-kernel-policy]}/${SYSTEM}_b.xml \
+          mucheckelf ${BOB_DEP_PATHS[muen::x86-systems-policy]}/${SYSTEM}_b.xml \
             ${BOB_DEP_PATHS[muen::x86-kernel]}/.debug/kernel
 
           mucfgmemhashes -i ${DEPS} \
-            ${BOB_DEP_PATHS[muen::x86-kernel-policy]}/${SYSTEM}_b.xml \
+            ${BOB_DEP_PATHS[muen::x86-systems-policy]}/${SYSTEM}_b.xml \
             ${SYSTEM}_b.xml
 
           mugensinfo -o $(pwd) \

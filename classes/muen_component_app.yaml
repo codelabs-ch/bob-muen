@@ -4,6 +4,7 @@ depends:
   - muen::component-libmubase-ld
 buildTools: [mucheckstack]
 buildSetup: |
+  __SRC=$1
   muenBuildApp() {
     muenCspecs $1
     GPRBUILD_EXTRA_ARGS="

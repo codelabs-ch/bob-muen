@@ -183,7 +183,7 @@ multiPackage:
           # TODO: T767
           # - muen::component-libs-libmuinit-proof
           - muen::component-libs-libmutime-proof
-          - muen::component-libs-muinit-proof
+          - muen::component-libs-muinitstub-proof
 
           - muen::components-ahci_drv-proof
           - muen::components-controller-proof

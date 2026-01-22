@@ -84,7 +84,7 @@ multiPackage:
     depends:
       - bsp::intel::microcode
       - muen::linux-image
-      - muen::component-libs-muinit
+      - muen::component-libs-muinitstub
       - muen::components-ahci_drv
       - muen::components-controller
       - muen::components-dbgserver

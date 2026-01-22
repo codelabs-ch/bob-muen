@@ -7,7 +7,7 @@ checkoutSCM:
   commit: ea8a44f97415f8ac7d82952186bb27921e556c37
 
 multiPackage:
-  muinit:
+  muinitstub:
     depends:
       - libs::libsparkcrypto-dev
       - muen::component-libs-libmusinfo-dev

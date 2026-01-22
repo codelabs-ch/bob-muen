@@ -826,8 +826,7 @@ multiPackage:
       - mugenmsrstore
       - mugenacpi
       - mucfgvalidate
-    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC, MUEN_UCODE_DIR]
-    # MUEN_UCODE_DIR is used by mucfgucode tool.
+    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC]
     buildScript: |
       # build the linux cspecs
       $1/components/linux/misc/linux-muen-gencspec.py \

@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-devel}
-  commit: ${MUEN_TOOLS_COMMIT:-17225152b49d4a511a3168a3c8d7f4cf1142c731}
+  commit: ${MUEN_TOOLS_COMMIT:-ddece096f1423af18491614522d8dc08c0f89699}
 
 multiPackage:
   liballoc:
@@ -708,13 +708,29 @@ multiPackage:
     packageScript: |
       rsync -a --delete $1/ .
 
-  solo5-muen-gencspec:
+  linux-gencspec:
     buildScript: |
-      cp -r $1/scripts/solo5-muen-gencspec.py solo5-muen-gencspec
+      cp -r $1/scripts/linux-gencspec.py linux-gencspec
     packageScript: |
       rsync -a --delete $1/ .
     provideTools:
-      solo5-muen-gencspec: "."
+      linux-gencspec: "."
+
+  solo5-gencspec:
+    buildScript: |
+      cp -r $1/scripts/solo5-gencspec.py solo5-gencspec
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      solo5-gencspec: "."
+
+  solo5-policy-compose:
+    buildScript: |
+      cp -r $1/scripts/solo5-policy-compose.py solo5-policy-compose
+    packageScript: |
+      rsync -a --delete $1/ .
+    provideTools:
+      solo5-policy-compose: "."
 
   tests:
     inherit: [muen_tests]

@@ -1,0 +1,27 @@
+inherit: [muen_component]
+
+checkoutSCM:
+  scm: git
+  url: https://git.codelabs.ch/muen/component/base.git
+  branch: main
+  commit: d1c3d596d06d1ab882d7ddb65933114582f4c8dc
+
+multiPackage:
+  ld:
+    buildScript: |
+      cp $1/component.ld .
+    packageScript: |
+      cp $1/component.ld .
+  "":
+    depends:
+      - muen::common-common-dev
+    buildVars: [ARCH, MUEN_BUILD_MODE]
+    buildScript: |
+      muenBuild $1/libmubase.gpr
+    multiPackage:
+      dev:
+        provideDeps: ['*-dev']
+        packageScript: gprInstallPackageDev
+      tgt:
+        provideDeps: ['*-tgt']
+        packageScript: gprInstallPackageTgt

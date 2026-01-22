@@ -9,10 +9,11 @@ buildSetup: |
   export __SRC=$1
 
   muenCspecs() {
-    SPEC=${__SRC}/components/${1}/spec/${1}.xml
-    if [ -e ${__SRC}/components/${1}/spec/${1}.xsl ]; then
+    DIR=${__SRC}/${1}/spec
+    SPEC=$DIR/${1}.xml
+    if [ -e $DIR/${1}.xsl ]; then
       xsltproc -o generated/${1}.xml \
-         ${__SRC}/components/${1}/spec/${1}.xsl \
+         $DIR/${1}.xsl \
          ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
       SPEC=generated/${1}.xml
     fi

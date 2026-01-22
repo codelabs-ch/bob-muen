@@ -1,8 +1,8 @@
 inherit: [python3]
 depends:
-  - name: muen::tools-solo5-muen-gencspec
+  - name: muen::tools-solo5-gencspec
     use: [tools]
-  - name: muen::x86-kernel-solo5-policy-compose
+  - name: muen::tools-solo5-policy-compose
     use: [tools]
 
   - muen::tools-libmupy
@@ -16,20 +16,20 @@ depends:
       - python::lxml
       - devel::lief-python
 buildVars: [SYSTEM]
-buildTools: [solo5-elftool, solo5-muen-gencspec, solo5-policy-compose]
+buildTools: [solo5-elftool, solo5-gencspec, solo5-policy-compose]
 buildScript: |
   # $1   - source dir
   # $2   - unikernel artifact
   # $3.. - additional arguments to gencspec
   solo5ComposeConfig() {
     echo "=== Creating unikernel component spec"
-    solo5-muen-gencspec \
+    solo5-gencspec \
       $2 \
-      $1/policy/xml/mirageos/cspec_src.xml . \
+      $1/policy/system/mirageos/cspec_src.xml . \
       --out_spec ./component_unikernel.xml \
       ${@:3}
     echo "=== Creating system policy"
-    solo5-policy-compose --template $1/policy/xml/mirageos/mirage-solo5.xml \
+    solo5-policy-compose --template $1/policy/system/mirageos/mirage-solo5.xml \
       --unikernel-spec ./component_unikernel.xml \
       ./${SYSTEM}.xml
   }

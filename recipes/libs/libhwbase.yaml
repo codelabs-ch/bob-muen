@@ -1,10 +1,10 @@
 inherit: [muen_component]
 
 depends:
-  - muen::common-libmusinfo-dev
+  - muen::component-libs-libmusinfo-dev
   - use: []
     depends:
-      - muen::common-libmusinfo-tgt
+      - muen::component-libs-libmusinfo-tgt
 
 checkoutSCM:
   scm: git

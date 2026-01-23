@@ -1,8 +1,6 @@
 inherit: [gpr]
 
 depends:
-  - if: $(ne,${RTS:-UNSET},UNSET)
-    name: ${RTS}
   - muen::common-gpr
   - muen::build-cfg-gpr
 
@@ -28,7 +26,7 @@ buildScript: |
       -gnatef -s -k \
       --create-map-file \
       --target=${GPR_TARGET} \
-      ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
+      $(gprGetGprbuildRtsArg) \
       ${GPRBUILD_EXTRA_ARGS:-} \
       -largs "${LARGS[@]}" \
       -cargs "${CARGS[@]}"

@@ -1,9 +1,10 @@
-inherit: [muen_component, muen_component_cspecs]
+inherit: [muen_component, muen_component_cspecs, install]
 
 depends:
   - muen::component-libmubase-ld
+
 buildVars: [ARCH]
-buildTools: [mucheckstack]
+buildTools: [mucheckstack, mucbinsplit]
 buildSetup: |
   __SRC=$1
 
@@ -25,18 +26,19 @@ buildSetup: |
     # stackcheck
     export OBJ_DIR=$(pwd)/build/obj/
     mucheckstack -P${__SRC}/${1}/${PRJ} -l8192
+
+    # binsplit
+    if [[ -e generated/$1.xml ]]; then
+      mucbinsplit -i generated/$1.xml \
+                  -b install/usr/bin/$1 \
+                  -o install/$1.xml install/
+    fi
   }
 
-packageTools: [mucbinsplit]
 packageSetup: |
   __SRC=$1
-  # $1 - Component name
-  # $2 - Component spec XML to use (optional)
   muenInstallApp() {
-    spec=${2:-${__SRC}/generated/$1.xml}
-    mucbinsplit -i ${spec} \
-                -b ${__SRC}/install/usr/bin/$1 \
-                -o $1.xml .
+    installPackageBin $__SRC/install/
     mkdir -p .bob
     echo "$1.xml" > .bob/cspecs
   }

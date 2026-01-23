@@ -101,7 +101,7 @@ multiPackage:
       muenPolicySrcPackage $1
       cp $1/test_hello.muen .
 
-  policy:
+  policy-demo:
     inherit: [python3, muen_policy]
     depends:
       - bsp::intel::microcode

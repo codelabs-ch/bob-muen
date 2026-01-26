@@ -9,7 +9,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muenfs.git
   commit: 3e26e69ec721f54f43eb113cd5c43c2cbeb2bc69
-  branch: master
+  branch: main
 
 depends:
   - name: muen::linux-modules_prepare

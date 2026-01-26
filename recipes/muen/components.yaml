@@ -331,6 +331,9 @@ multiPackage:
       - muen::component-libmubase-dev
       - muen::component-libs-libmusinfo-dev
       - muen::component-libs-libmuinit-dev
+      - name: python::lxml
+        tools:
+          target-toolchain: host-compat-toolchain
       - use: []
         depends:
           - muen::component-libs-libmuinit-tgt
@@ -339,6 +342,8 @@ multiPackage:
         inherit: [muen_component_app]
         buildScript: |
           muenBuildApp sl
+          mv install/sl.xml sl_split.xml
+          $1/sl/misc/adjust-xml-spec.py sl_split.xml install/sl.xml
         packageScript: |
           muenInstallApp sl
       proof:

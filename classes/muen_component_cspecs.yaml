@@ -1,8 +1,4 @@
-depends:
-  - ${MUEN_POLICY_SRC}
-
 buildTools: [mucfgcvresalloc, muxmlfilter, mucgenspec, libxslt-tools]
-buildVars: [MUEN_POLICY_SRC]
 buildSetup: |
   mkdir -p generated
   export GENERATED=$(pwd)/generated
@@ -10,7 +6,7 @@ buildSetup: |
 
   # $1 - SRC relative component directory
   # $2 - Component spec XML to use (optional)
-  muenCspecs() {
+  __muenCspecs() {
     PRJ="${1##*/}"
     SPEC_DIR="${__SRC}/$1/spec"
     SPEC_XML="${2:-${SPEC_DIR}/${PRJ}.xml}"
@@ -35,5 +31,13 @@ buildSetup: |
 
       # Generate cspecs
       mucgenspec -i generated/${PRJ}_filtered.xml generated
+    fi
+  }
+
+  muenCspecs() {
+    if [[ -z ${MUEN_EXTERNAL_CSPECS:-} ]]; then
+      __muenCspecs ${@}
+    else
+      cp -a ${BOB_DEP_PATHS[${MUEN_EXTERNAL_CSPECS}]}/* generated -r
     fi
   }

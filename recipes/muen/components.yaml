@@ -126,6 +126,7 @@ multiPackage:
           - muen::common-debug-dev
           - muen::common-crash_audit-dev
           - muen::common-strings-dev
+          - ${MUEN_POLICY_SRC}
           - muen::build-cfg-scripts
           - if: "$(eq,${ARCH:-},x86_64)"
             name: libs::libxhcidbg-dev
@@ -206,12 +207,13 @@ multiPackage:
           GPR_PATH: "dm/dm"
 
   example:
+    depends:
+      - ${MUEN_POLICY_SRC}
+    buildVars: [MUEN_POLICY_SRC]
     multiPackage:
       config-dev:
         depends:
-          - ${MUEN_POLICY_SRC}
           - muen::build-cfg-scripts
-        buildVars: [MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |
           mkdir -p install/usr/share
@@ -266,6 +268,7 @@ multiPackage:
   isolation_tests:
     inherit: [muen_component_app, python3]
     depends:
+      - ${MUEN_POLICY_SRC}
       - muen::common-strings-dev
       - muen::component-libmubase-dev
       - muen::component-libs-libmusinfo-dev
@@ -277,6 +280,7 @@ multiPackage:
       - name: python::lxml
         tools:
           target-toolchain: host-compat-toolchain
+    buildVars: [MUEN_POLICY_SRC]
     buildScript: |
       # Generate reference_values.ads
       $1/isolation_tests/misc/reference_values.py \
@@ -290,6 +294,7 @@ multiPackage:
   isolation_tests_monitor:
     inherit: [muen_component_app]
     depends:
+      - ${MUEN_POLICY_SRC}
       - muen::common-strings-dev
       - muen::component-libmubase-dev
       - muen::component-libs-libmusinfo-dev
@@ -298,6 +303,7 @@ multiPackage:
       - use: []
         depends:
           - muen::component-libs-libmudebuglog-tgt
+    buildVars: [MUEN_POLICY_SRC]
     buildScript: |
       muenBuildApp isolation_tests_monitor
     packageScript: |
@@ -343,11 +349,12 @@ multiPackage:
           GPR_PATH: "sl/sl"
 
   sm:
+    depends:
+      - ${MUEN_POLICY_SRC}
     multiPackage:
       config-dev:
         depends:
           - muen::build-cfg-scripts
-          - ${MUEN_POLICY_SRC}
         buildVars: [MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |

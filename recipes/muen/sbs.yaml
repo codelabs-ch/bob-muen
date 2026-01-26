@@ -6,7 +6,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/sbs-tools.git
-  branch: master
+  branch: main
   commit: a1f69d799d6f34b09823c011140f5a91ab9134c8
 
 buildScript: |

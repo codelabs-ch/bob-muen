@@ -9,7 +9,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muennet.git
   commit: ec239e14c219b273dd51982c2aaae90f344d369f
-  branch: "master"
+  branch: main
 
 buildTools: [target-toolchain]
 

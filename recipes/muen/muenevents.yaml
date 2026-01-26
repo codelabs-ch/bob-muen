@@ -11,7 +11,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muenevents.git
   commit: de7dbbecc22d82c69f55adb7f80aa7c660eb8c31
-  branch: master
+  branch: main
 
 depends:
   - name: muen::linux-modules_prepare

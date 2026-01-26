@@ -11,7 +11,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muenblock.git
-  branch: "${MUENBLOCK_BRANCH:-master}"
+  branch: "${MUENBLOCK_BRANCH:-main}"
   commit: "${MUENBLOCK_COMMIT:-8b5f4ce85fe7723615de1b4195dafac6eb14212d}"
 
 depends:

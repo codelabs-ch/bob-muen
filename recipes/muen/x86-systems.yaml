@@ -44,6 +44,28 @@ multiPackage:
     packageScript: |
       cp $1/* .
 
+  policy-files:
+    buildScript: |
+      ln -snf $1/policy .
+    packageScript: |
+      mkdir -p hardware
+      cp $1/policy/hardware/cirrus7-nimbus.xml hardware/Cirrus7_Asus_Q87T.mlph.xml
+      cp $1/policy/hardware/intel-nuc-5i5myhe.xml hardware/Intel_NUC_5i5MYHE.mlph.xml
+      cp $1/policy/hardware/intel-nuc-6cayh.xml hardware/Intel_NUC_6CAYH.mlph.xml
+      cp $1/policy/hardware/kontron-ktqm77.xml hardware/Client_III.mlph.xml
+      cp $1/policy/hardware/lenovo-t430s.xml hardware/Lenovo_T430s.mlph.xml
+      cp $1/policy/hardware/lenovo-t440s.xml hardware/Lenovo_T440s.mlph.xml
+      cp $1/policy/hardware/lenovo-x260.xml hardware/Lenovo_X260.mlph.xml
+      cp $1/policy/hardware/up-squared-e3950.xml hardware/UP_Squared_E3950.mlph.xml
+      cp $1/policy/hardware/up-squared-e3950-coreboot.xml hardware/UP_Squared_E3950_Coreboot.mlph.xml
+      cp $1/policy/hardware/qemu-kvm.xml hardware
+      cp $1/policy/hardware/common_hardware.xml hardware
+
+      mkdir platform
+      cp $1/policy/platform/qemu-kvm.xml platform
+
+      cp $1/policy/scheduling . -r
+
   policy-src:
     inherit: [muen_policy_src]
     buildScript: muenPolicySrcCreate $1

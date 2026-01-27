@@ -20,13 +20,13 @@ layers:
     scm: git
     url: https://git.codelabs.ch/bob/ada.git
     branch: main
-    commit: 11f6c306f6e03dfd019c8e8108a3283b01a4a7fd
+    commit: 43c040d91f2d5cb8d9ba6ed6284fdd062e020f09
 
   - name: codelabs
     scm: git
     url: https://git.codelabs.ch/bob/codelabs.git
     branch: main
-    commit: 0ac8e2a83222a5fa3e50af0fb33de7c674acc2a4
+    commit: cdc79ea7ba57cb9377f0b6e7473392886813fead
 
 layersInclude:
   - override_layers

@@ -2,8 +2,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/tau0.git
-  branch: devel
-  commit: ee1c1389f7041f3ef35b9ba3e34701bae3f8f257
+  branch: main
+  commit: 9d7ee912d472910ba0ae40db93dc811d037e67b6
 
 depends:
   - muen::build-cfg-scripts

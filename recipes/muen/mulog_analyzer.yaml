@@ -2,7 +2,7 @@ inherit: [muen_component]
 
 checkoutSCM:
   scm: git
-  url: https://git.codelabs.ch/muen/mulog-analyzer
+  url: https://git.codelabs.ch/muen/mulog-analyzer.git
   branch: main
   commit: 9dd90cdf9ab3582d013ca32b1ceb5945b6b4a890
 

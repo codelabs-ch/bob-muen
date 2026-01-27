@@ -25,8 +25,8 @@ layers:
   - name: codelabs
     scm: git
     url: https://git.codelabs.ch/bob/codelabs.git
-    branch: main
-    commit: cdc79ea7ba57cb9377f0b6e7473392886813fead
+    branch: misc-minor
+    commit: 5a4e89590d442bfd51fa7ab9c46c38421c52342d
 
 layersInclude:
   - override_layers

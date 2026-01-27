@@ -3,8 +3,8 @@ inherit: [gpr]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/build-cfg.git
-  branch: devel
-  commit: c4bcea283831eda489e647cca3b1a7b56de41b3a
+  branch: main
+  commit: 35739274e65b2fc894ecd9a4f8d69dd3bea3bbd8
 
 buildScript: |
   rsync -a --delete $1/ .

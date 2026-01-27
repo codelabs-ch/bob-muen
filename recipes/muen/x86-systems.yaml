@@ -80,7 +80,7 @@ multiPackage:
       cp $1/test_hello.muen .
 
   policy:
-    inherit: [python3]
+    inherit: [python3, muen_policy]
     depends:
       - bsp::intel::microcode
       - muen::linux-image
@@ -99,15 +99,12 @@ multiPackage:
       - muen::components-time
       - muen::components-vt
 
-      - ${MUEN_POLICY_SRC}
-
       - muen::x86-systems-linux-component-spec
 
       - name: demo::rootfs
         environment:
           ROOTFS_ARCH: "x86_64"
 
-      - muen::tools-libmupy
       - name: python::lxml
         tools:
           target-toolchain: host-compat-toolchain
@@ -119,19 +116,12 @@ multiPackage:
       - acpica
       - iucode-tool
       - linux-gencspec
-      - mucfgalloc
-      - mucfgcjoin
-      - mucfgexpand
       - mucfgucode
-      - mucfgvresalloc
-      - muxmlfilter
-      - mugenspec
       - mugensolo5
       - mugenzp
       - mugenmsrstore
       - mugenacpi
-      - mucfgvalidate
-    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC]
+    buildVars: [SYSTEM, HARDWARE, PLATFORM]
     buildScript: |
       # build the linux cspecs
       linux-gencspec \
@@ -139,9 +129,9 @@ multiPackage:
         ${BOB_DEP_PATHS[muen::x86-systems-linux-component-spec]}/linux.xml \
         --out_spec linux.xml \
         --src_policy ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml
-      # --initramfs ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz \
-
+      # --initramfs ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz
       CSPECS="$(pwd)/linux.xml"
+
       # collect dependencies cspecs
       for dep_name in ${!BOB_DEP_PATHS[@]}; do
         dep_dir=${BOB_DEP_PATHS[${dep_name}]}
@@ -149,37 +139,6 @@ multiPackage:
           CSPECS+=${CSPECS:+,}${dep_dir}/$(cat ${dep_dir}/.bob/cspecs)
         fi
       done
-      # Join
-      mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
-        -o ${SYSTEM}_with_comp.xml \
-        -c ${CSPECS}
 
-      # Allocate virtual memory
-      mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
-
-      # Filter to core schema
-      muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
-        ${SYSTEM}_with_va_filtered.xml
-
-      # MCU
-      mucfgucode -i ${SYSTEM}_with_va_filtered.xml \
-        -u ${BOB_DEP_PATHS['bsp::intel::microcode']} -o .
-
-      # Expand
-      mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
-
-      # Allocate physical memory
-      mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
-
-      # Validate
-      mucfgvalidate ${SYSTEM}_b.xml
-
-      GENERATORS=(mugenspec mugensolo5 mugenzp mugenmsrstore mugenacpi)
-      for G in ${GENERATORS[@]}; do
-        $G -o  $(pwd) ${SYSTEM}_b.xml
-      done
-
+      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${CSPECS}"
     provideDeps: ['*']
-    packageScript: |
-      rsync -a --delete $1/ .
-      echo "GPR_PROJECT_PATH=." >> .gpr_project

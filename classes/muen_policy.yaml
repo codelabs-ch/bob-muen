@@ -1,0 +1,61 @@
+depends:
+  - muen::tools-libmupy
+  - $MUEN_POLICY_SRC
+buildVars: [ARCH, MUEN_POLICY_SRC]
+buildTools:
+  - mucfgalloc
+  - mucfgcjoin
+  - mucfgexpand
+  - mucfgvresalloc
+  - muxmlfilter
+  - mugenspec
+  - mucfgvalidate
+buildSetup: |
+  muenPolicyRun() {
+    SYSTEM=$1
+    HARDWARE=$2
+    PLATFORM=$3
+    CSPECS=$4
+
+    # Join
+    mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
+      -o ${SYSTEM}_with_comp.xml \
+      -c ${CSPECS}
+
+    # Allocate virtual memory
+    mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
+
+    # Filter to core schema
+    muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
+      ${SYSTEM}_with_va_filtered.xml
+
+    if [[ ${ARCH} == *x86* ]]; then
+      # MCU
+      mucfgucode -i ${SYSTEM}_with_va_filtered.xml \
+        -u ${BOB_DEP_PATHS['bsp::intel::microcode']} -o .
+    fi
+
+    # Expand
+    mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
+
+    # Allocate physical memory
+    mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
+
+    # Validate
+    mucfgvalidate ${SYSTEM}_b.xml
+
+    if [[ ${ARCH} == *x86* ]]; then
+      GENERATORS=(mugenspec mugensolo5 mugenzp mugenmsrstore mugenacpi)
+    else
+      GENERATORS=(mugenpt mugensinfo)
+    fi
+
+    # Run arch-specific generators
+    for G in ${GENERATORS[@]}; do
+      $G -o $(pwd) ${SYSTEM}_b.xml
+    done
+  }
+
+packageScript: |
+  rsync -a --delete $1/ .
+  echo "GPR_PROJECT_PATH=." >> .gpr_project

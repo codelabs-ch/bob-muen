@@ -137,7 +137,7 @@ multiPackage:
       rsync -a --delete $1/ .
 
   policy-src:
-    inherit: [muen_policy]
+    inherit: [muen_policy_src]
     buildScript: muenCreatePolicySrc $1
     packageScript: muenPackagePolicySrc $1
 

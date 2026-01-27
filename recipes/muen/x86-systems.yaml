@@ -45,7 +45,7 @@ multiPackage:
       cp $1/* .
 
   policy-src:
-    inherit: [muen_policy]
+    inherit: [muen_policy_src]
     buildScript: muenCreatePolicySrc $1
     packageScript: muenPackagePolicySrc $1
 
@@ -54,7 +54,7 @@ multiPackage:
       scm: url
       url: file://${UNIKERNEL_FILE:-Please specify UNIKERNEL_FILE!}
       dir: uni
-    inherit: [muen_policy, solo5]
+    inherit: [muen_policy_src, solo5]
     buildVars: [UNIKERNEL_FILE]
     buildScript: |
       solo5ComposeConfig $1 $1/uni/$(basename $UNIKERNEL_FILE) \
@@ -66,7 +66,7 @@ multiPackage:
       cp $1/$fname ./$fname
 
   policy-src-solo5-test:
-    inherit: [muen_policy, solo5]
+    inherit: [muen_policy_src, solo5]
     depends:
       - devel::solo5-hello-muen
     buildScript: |

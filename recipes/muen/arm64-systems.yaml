@@ -58,10 +58,15 @@ multiPackage:
           mucgenspec -i $1/subjects/example/spec/example.xml \
               -p Example generated
 
+          ln -snf $1/subjects/example/spec/example.xml
           muenBuild $1/subjects/example/example.gpr
           muenBuildBin example.elf
         packageScript: |
           cp $1/install/usr/bin/example.* .
+          mkdir -p usr/share/
+          cp -L $1/example.xml usr/share
+          mkdir -p .bob
+          echo usr/share/example.xml > .bob/cspecs
 
   bootloader-binaries:
     buildVars: [HARDWARE]

@@ -118,12 +118,12 @@ multiPackage:
 
   devicetree:
     depends:
-      - muen::arm64-systems-policy-files
+      - muen::arm64-systems-policy
       - muen::linux-dt-bindings
     buildTools: [mugendts, dtc, target-toolchain]
     buildVars: [CC, SYSTEM]
     buildScript: |
-      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
+      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml
       for F in *.dts; do
         F=$(basename ${F%.dts})
         ${CC} -I ${BOB_DEP_PATHS[muen::linux-dt-bindings]} -E \
@@ -141,7 +141,7 @@ multiPackage:
     buildScript: muenCreatePolicySrc $1
     packageScript: muenPackagePolicySrc $1
 
-  policy-files:
+  policy:
     privateEnvironment:
       ARCH: arm64
     inherit: [python3, muen_policy]

@@ -142,25 +142,16 @@ multiPackage:
     packageScript: muenPackagePolicySrc $1
 
   policy-files:
-    inherit: [python3]
+    privateEnvironment:
+      ARCH: arm64
+    inherit: [python3, muen_policy]
     depends:
       - muen::linux-image
-      - muen::tools-libmupy
-      - ${MUEN_POLICY_SRC}
     buildTools:
-      - mucfgalloc
-      - mucfgcjoin
-      - mucfgexpand
-      - mucfgvresalloc
-      - muxmlfilter
       - mugenpt
-      - mugenspec
       - mugensinfo
-      - mucfgvalidate
-    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC]
+    buildVars: [SYSTEM, HARDWARE, PLATFORM]
     buildScript: |
-      rm -rf bin && mkdir bin
-
       # Determine effective Linux image size from header
       LINUX_SIZE=$(python3 - ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin << EOF
       import os
@@ -186,34 +177,9 @@ multiPackage:
         </provides>
       </component>
       EOF
+      CSPECS="$(pwd)/linux.xml,$1/subjects/example/spec/example.xml"
 
-      mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
-        -c $1/subjects/example/spec/example.xml,linux.xml \
-        -o ${SYSTEM}_with_comp.xml
-
-      # Allocate virtual memory
-      mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
-
-      # Filter to core schema
-      muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
-        ${SYSTEM}_with_va_filtered.xml
-
-      # Expand
-      mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
-
-      # Allocate physical memory
-      mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
-
-      # Validate
-      mucfgvalidate ${SYSTEM}_b.xml
-
-      GENERATORS=(mugenpt mugensinfo)
-      for G in ${GENERATORS[@]}; do
-        $G -o bin ${SYSTEM}_b.xml
-      done
-
-    packageScript: |
-      cp -r $1/* .
+      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${CSPECS}"
 
   test:
     buildVars: [HARDWARE]

@@ -152,6 +152,11 @@ multiPackage:
     inherit: [python3, muen_policy]
     depends:
       - muen::linux-image
+      - environment:
+          RTS: "muen::rts"
+        depends:
+          - muen::arm64-systems-subjects-example
+          - muen::arm64-systems-subjects-event_logger
     buildTools:
       - mugenpt
       - mugensinfo
@@ -182,9 +187,9 @@ multiPackage:
         </provides>
       </component>
       EOF
-      CSPECS="$(pwd)/linux.xml,$1/subjects/example/spec/example.xml"
+      ADDITIONAL_CSPECS="$(pwd)/linux.xml"
 
-      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${CSPECS}"
+      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${ADDITIONAL_CSPECS}"
 
   test:
     buildVars: [HARDWARE]

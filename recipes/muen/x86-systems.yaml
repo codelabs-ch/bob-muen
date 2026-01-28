@@ -130,15 +130,7 @@ multiPackage:
         --out_spec linux.xml \
         --src_policy ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml
       # --initramfs ${BOB_DEP_PATHS[demo::rootfs]}/boot/initramfs.cpio.gz
-      CSPECS="$(pwd)/linux.xml"
+      ADDITIONAL_CSPECS="$(pwd)/linux.xml"
 
-      # collect dependencies cspecs
-      for dep_name in ${!BOB_DEP_PATHS[@]}; do
-        dep_dir=${BOB_DEP_PATHS[${dep_name}]}
-        if [[ -e ${dep_dir}/.bob/cspecs ]]; then
-          CSPECS+=${CSPECS:+,}${dep_dir}/$(cat ${dep_dir}/.bob/cspecs)
-        fi
-      done
-
-      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${CSPECS}"
+      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${ADDITIONAL_CSPECS}"
     provideDeps: ['*']

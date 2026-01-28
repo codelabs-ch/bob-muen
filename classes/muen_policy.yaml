@@ -17,6 +17,14 @@ buildSetup: |
     PLATFORM=$3
     CSPECS=$4
 
+    # collect dependencies cspecs
+    for dep_name in ${!BOB_DEP_PATHS[@]}; do
+      dep_dir=${BOB_DEP_PATHS[${dep_name}]}
+      if [[ -e ${dep_dir}/.bob/cspecs ]]; then
+        CSPECS+=${CSPECS:+,}${dep_dir}/$(cat ${dep_dir}/.bob/cspecs)
+      fi
+    done
+
     # Join
     mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
       -o ${SYSTEM}_with_comp.xml \

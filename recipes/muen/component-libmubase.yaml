@@ -9,9 +9,9 @@ checkoutSCM:
 multiPackage:
   ld:
     buildScript: |
-      cp $1/component.ld .
+      cp $1/component.*.ld .
     packageScript: |
-      cp $1/component.ld .
+      cp $1/component.*.ld .
   "":
     depends:
       - muen::common-common-dev

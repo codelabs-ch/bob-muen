@@ -190,6 +190,7 @@ multiPackage:
       ADDITIONAL_CSPECS="$(pwd)/linux.xml"
 
       muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${ADDITIONAL_CSPECS}"
+    provideDeps: ['*']
 
   test:
     buildVars: [HARDWARE]

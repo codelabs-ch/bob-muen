@@ -143,8 +143,8 @@ multiPackage:
 
   policy-src:
     inherit: [muen_policy_src]
-    buildScript: muenCreatePolicySrc $1
-    packageScript: muenPackagePolicySrc $1
+    buildScript: muenPolicySrcCreate $1
+    packageScript: muenPolicySrcPackage $1
 
   policy:
     privateEnvironment:

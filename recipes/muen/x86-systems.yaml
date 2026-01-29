@@ -46,8 +46,8 @@ multiPackage:
 
   policy-src:
     inherit: [muen_policy_src]
-    buildScript: muenCreatePolicySrc $1
-    packageScript: muenPackagePolicySrc $1
+    buildScript: muenPolicySrcCreate $1
+    packageScript: muenPolicySrcPackage $1
 
   policy-src-solo5:
     checkoutSCM:
@@ -59,9 +59,9 @@ multiPackage:
     buildScript: |
       solo5ComposeConfig $1 $1/uni/$(basename $UNIKERNEL_FILE) \
           --channel-size 0x4000000
-      muenCreatePolicySrc $1
+      muenPolicySrcCreate $1
     packageScript: |
-      muenPackagePolicySrc $1
+      muenPolicySrcPackage $1
       fname=$(basename $UNIKERNEL_FILE)
       cp $1/$fname ./$fname
 
@@ -74,9 +74,9 @@ multiPackage:
         ${BOB_DEP_PATHS[devel::solo5-hello-muen]}/test_hello.muen \
         --disable-reset \
         --bootparams "Hi!"
-      muenCreatePolicySrc $1
+      muenPolicySrcCreate $1
     packageScript: |
-      muenPackagePolicySrc $1
+      muenPolicySrcPackage $1
       cp $1/test_hello.muen .
 
   policy:

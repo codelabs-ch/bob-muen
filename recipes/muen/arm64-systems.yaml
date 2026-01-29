@@ -155,8 +155,10 @@ multiPackage:
       - environment:
           RTS: "muen::rts"
         depends:
-          - muen::arm64-systems-subjects-example
           - muen::arm64-systems-subjects-event_logger
+          - if: "$(eq,${SYSTEM:-},multicore)"
+            depends:
+              - muen::arm64-systems-subjects-example
     buildTools:
       - mugenpt
       - mugensinfo

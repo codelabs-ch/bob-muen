@@ -1,43 +1,69 @@
-buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM]
-buildTools: [mucfgmerge]
-buildScript: |
-  # $1 - source dir
-  muenCreatePolicySrc() {
-    cat > system_config.xml << EOF
-    <system>
-     <config>
-      <string name="system"              value="${SYSTEM}.xml"/>
-      <string name="hardware"            value="hardware/${HARDWARE}.xml"/>
-  EOF
+depends:
+  - muen::tools-libmupy
+  - $MUEN_POLICY_SRC
+buildVars: [ARCH, MUEN_POLICY_SRC]
+buildTools:
+  - mucfgalloc
+  - mucfgcjoin
+  - mucfgexpand
+  - mucfgvresalloc
+  - muxmlfilter
+  - mugenspec
+  - mucfgvalidate
+buildSetup: |
+  muenPolicyRun() {
+    SYSTEM=$1
+    HARDWARE=$2
+    PLATFORM=$3
+    CSPECS=$4
 
-    if [[ ${ADDITIONAL_HW:-"0"} != "0" ]]; then
-      cat >> system_config.xml << EOF
-        <string name="additional_hardware" value="hardware/${ADDITIONAL_HW}.xml"/>
-  EOF
+    # collect dependencies cspecs
+    for dep_name in ${!BOB_DEP_PATHS[@]}; do
+      dep_dir=${BOB_DEP_PATHS[${dep_name}]}
+      if [[ -e ${dep_dir}/.bob/cspecs ]]; then
+        CSPECS+=${CSPECS:+,}${dep_dir}/$(cat ${dep_dir}/.bob/cspecs)
+      fi
+    done
+
+    # Join
+    mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
+      -o ${SYSTEM}_with_comp.xml \
+      -c ${CSPECS}
+
+    # Allocate virtual memory
+    mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
+
+    # Filter to core schema
+    muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
+      ${SYSTEM}_with_va_filtered.xml
+
+    if [[ ${ARCH} == *x86* ]]; then
+      # MCU
+      mucfgucode -i ${SYSTEM}_with_va_filtered.xml \
+        -u ${BOB_DEP_PATHS['bsp::intel::microcode']} -o .
     fi
 
-    cat >> system_config.xml << EOF
-      <string name="platform"            value="platform/${PLATFORM}.xml"/>
-     </config>
-    </system>
-  EOF
+    # Expand
+    mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
 
-    # scheduling plan
-    if [[ -e $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml ]]; then
-      cp $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml scheduling_plans.xml
-    elif [[ -e $1/policy/scheduling/static/${SYSTEM}.xml ]]; then
-      cp $1/policy/scheduling/static/${SYSTEM}.xml scheduling_plans.xml
+    # Allocate physical memory
+    mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
+
+    # Validate
+    mucfgvalidate ${SYSTEM}_b.xml
+
+    if [[ ${ARCH} == *x86* ]]; then
+      GENERATORS=(mugenspec mugensolo5 mugenzp mugenmsrstore mugenacpi)
     else
-      echo "No scheduling configuration for ${SYSTEM} (platform: ${PLATFORM})"
-      false
+      GENERATORS=(mugenpt mugensinfo)
     fi
 
-    mucfgmerge system_config.xml ${SYSTEM}.xml -I $1/policy:$1/policy/system
+    # Run arch-specific generators
+    for G in ${GENERATORS[@]}; do
+      $G -o $(pwd) ${SYSTEM}_b.xml
+    done
   }
 
 packageScript: |
-  # $1 - build dir
-  muenPackagePolicySrc() {
-    cp $1/${SYSTEM}.xml .
-    ln -snf ${SYSTEM}.xml policy_src.xml
-  }
+  rsync -a --delete $1/ .
+  echo "GPR_PROJECT_PATH=." >> .gpr_project

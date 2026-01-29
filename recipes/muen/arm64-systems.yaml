@@ -58,10 +58,15 @@ multiPackage:
           mucgenspec -i $1/subjects/example/spec/example.xml \
               -p Example generated
 
+          ln -snf $1/subjects/example/spec/example.xml
           muenBuild $1/subjects/example/example.gpr
           muenBuildBin example.elf
         packageScript: |
           cp $1/install/usr/bin/example.* .
+          mkdir -p usr/share/
+          cp -L $1/example.xml usr/share
+          mkdir -p .bob
+          echo usr/share/example.xml > .bob/cspecs
 
   bootloader-binaries:
     buildVars: [HARDWARE]
@@ -118,12 +123,12 @@ multiPackage:
 
   devicetree:
     depends:
-      - muen::arm64-systems-policy-files
+      - muen::arm64-systems-policy
       - muen::linux-dt-bindings
     buildTools: [mugendts, dtc, target-toolchain]
     buildVars: [CC, SYSTEM]
     buildScript: |
-      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
+      mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml
       for F in *.dts; do
         F=$(basename ${F%.dts})
         ${CC} -I ${BOB_DEP_PATHS[muen::linux-dt-bindings]} -E \
@@ -137,30 +142,26 @@ multiPackage:
       rsync -a --delete $1/ .
 
   policy-src:
-    inherit: [muen_policy]
-    buildScript: muenCreatePolicySrc $1
-    packageScript: muenPackagePolicySrc $1
+    inherit: [muen_policy_src]
+    buildScript: muenPolicySrcCreate $1
+    packageScript: muenPolicySrcPackage $1
 
-  policy-files:
-    inherit: [python3]
+  policy:
+    privateEnvironment:
+      ARCH: arm64
+    inherit: [python3, muen_policy]
     depends:
       - muen::linux-image
-      - muen::tools-libmupy
-      - ${MUEN_POLICY_SRC}
+      - environment:
+          RTS: "muen::rts"
+        depends:
+          - muen::arm64-systems-subjects-example
+          - muen::arm64-systems-subjects-event_logger
     buildTools:
-      - mucfgalloc
-      - mucfgcjoin
-      - mucfgexpand
-      - mucfgvresalloc
-      - muxmlfilter
       - mugenpt
-      - mugenspec
       - mugensinfo
-      - mucfgvalidate
-    buildVars: [SYSTEM, HARDWARE, PLATFORM, MUEN_POLICY_SRC]
+    buildVars: [SYSTEM, HARDWARE, PLATFORM]
     buildScript: |
-      rm -rf bin && mkdir bin
-
       # Determine effective Linux image size from header
       LINUX_SIZE=$(python3 - ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin << EOF
       import os
@@ -186,34 +187,10 @@ multiPackage:
         </provides>
       </component>
       EOF
+      ADDITIONAL_CSPECS="$(pwd)/linux.xml"
 
-      mucfgcjoin -i ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml \
-        -c $1/subjects/example/spec/example.xml,linux.xml \
-        -o ${SYSTEM}_with_comp.xml
-
-      # Allocate virtual memory
-      mucfgvresalloc ${SYSTEM}_with_comp.xml ${SYSTEM}_va.xml
-
-      # Filter to core schema
-      muxmlfilter -isn Format_Src_Ext -osn Format_Src ${SYSTEM}_va.xml \
-        ${SYSTEM}_with_va_filtered.xml
-
-      # Expand
-      mucfgexpand ${SYSTEM}_with_va_filtered.xml ${SYSTEM}_a.xml
-
-      # Allocate physical memory
-      mucfgalloc ${SYSTEM}_a.xml ${SYSTEM}_b.xml
-
-      # Validate
-      mucfgvalidate ${SYSTEM}_b.xml
-
-      GENERATORS=(mugenpt mugensinfo)
-      for G in ${GENERATORS[@]}; do
-        $G -o bin ${SYSTEM}_b.xml
-      done
-
-    packageScript: |
-      cp -r $1/* .
+      muenPolicyRun "${SYSTEM}" "${HARDWARE}" "${PLATFORM}" "${ADDITIONAL_CSPECS}"
+    provideDeps: ['*']
 
   test:
     buildVars: [HARDWARE]

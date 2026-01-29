@@ -29,5 +29,5 @@ multiPackage:
       gprInstallPackageTgt
       mkdir -p usr/share/
       cp -L $1/libxhcidbg.xml usr/share
-      mkdir .bob
+      mkdir -p .bob
       echo usr/share/libxhcidbg.xml > .bob/cspecs

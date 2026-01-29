@@ -8,7 +8,7 @@ checkoutSCM:
 
 depends:
   - muen::common-muschedinfo-dev
-  - muen::arm64-systems-policy-files
+  - muen::arm64-systems-policy
 
 buildTools: [mugenspec]
 buildVars: [MUEN_GDB_SUPPORT, RTS, SYSTEM]
@@ -19,7 +19,7 @@ buildSetup: |
   export BIN_POSTFIX=""
 buildScript: |
   rm -rf skp && mkdir -p skp
-  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
+  mugenspec -o $(pwd)/skp ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml
 
 multiPackage:
   release:

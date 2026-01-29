@@ -1,0 +1,43 @@
+buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM]
+buildTools: [mucfgmerge]
+buildSetup: |
+  # $1 - source dir
+  muenPolicySrcCreate() {
+    cat > system_config.xml << EOF
+    <system>
+     <config>
+      <string name="system"              value="${SYSTEM}.xml"/>
+      <string name="hardware"            value="hardware/${HARDWARE}.xml"/>
+  EOF
+
+    if [[ ${ADDITIONAL_HW:-"0"} != "0" ]]; then
+      cat >> system_config.xml << EOF
+        <string name="additional_hardware" value="hardware/${ADDITIONAL_HW}.xml"/>
+  EOF
+    fi
+
+    cat >> system_config.xml << EOF
+      <string name="platform"            value="platform/${PLATFORM}.xml"/>
+     </config>
+    </system>
+  EOF
+
+    # scheduling plan
+    if [[ -e $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml ]]; then
+      cp $1/policy/scheduling/static/${SYSTEM}-${PLATFORM}.xml scheduling_plans.xml
+    elif [[ -e $1/policy/scheduling/static/${SYSTEM}.xml ]]; then
+      cp $1/policy/scheduling/static/${SYSTEM}.xml scheduling_plans.xml
+    else
+      echo "No scheduling configuration for ${SYSTEM} (platform: ${PLATFORM})"
+      false
+    fi
+
+    mucfgmerge system_config.xml ${SYSTEM}.xml -I $1/policy:$1/policy/system
+  }
+
+packageScript: |
+  # $1 - build dir
+  muenPolicySrcPackage() {
+    cp $1/${SYSTEM}.xml .
+    ln -snf ${SYSTEM}.xml policy_src.xml
+  }

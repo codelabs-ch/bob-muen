@@ -70,21 +70,21 @@ depends:
           RTS: "muen::arm64-rts-aunit"
         depends:
           - muen::arm64-kernel-${MUEN_BUILD_MODE}
-          - muen::arm64-systems-policy-files
+          - muen::arm64-systems-policy
       - if: !expr |
           "${MUEN_BUILD_MODE}" == "prove"
         environment:
           RTS: "muen::rts"
         depends:
           - muen::arm64-kernel-proof
-          - muen::arm64-systems-policy-files
+          - muen::arm64-systems-policy
       - if: !expr |
           "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
         environment:
           RTS: "muen::rts"
         depends:
           - muen::arm64-kernel-${MUEN_BUILD_MODE}
-          - muen::arm64-systems-policy-files
+          - muen::arm64-systems-policy
 
   # (4) Build the bootloader binaries for exception level 3 (currently
   # prebuilt binaries depending on hardware from muenonarm repository).
@@ -105,18 +105,7 @@ depends:
         environment:
           ROOTFS_ARCH: "arm64"
 
-  # (6) Build the native subjects of the Muen SK system for the build
-  # modes release and debug only (not required for the test runner nor
-  # the proofs). Currently, the standard Muen rts is used as runtime.
-  - if: !expr |
-      "${MUEN_BUILD_MODE}" == "release" || "${MUEN_BUILD_MODE}" == "debug"
-    environment:
-      RTS: "muen::rts"
-    depends:
-      - muen::arm64-systems-subjects-example
-      - muen::arm64-systems-subjects-event_logger
-
-  # (7) Generate deployment scripts for all deploy modes.
+  # (6) Generate deployment scripts for all deploy modes.
   - if: !expr |
       "${MUEN_BUILD_MODE}" != "prove"
     depends:
@@ -143,7 +132,7 @@ buildScript: |
 
       cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel.elf .
       cp ${BOB_DEP_PATHS[muen::arm64-kernel-${MUEN_BUILD_MODE}]}/kernel .
-      cp ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/bin/* .
+      cp ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/* .
 
       cp ${BOB_DEP_PATHS[muen::arm64-systems-devicetree]}/*.dtb .
       cp ${BOB_DEP_PATHS[muen::linux-image]}/Image.bin .
@@ -157,14 +146,14 @@ buildScript: |
       fi
 
       # (b) Validate the resulting kernel binary against the policy.
-      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml ./kernel.elf
+      mucheckelf ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml ./kernel.elf
 
       # (c) Generate deployment scripts, binaries and images for all deploy
       # modes (i.e. gdb, xsct, sdcard and u-boot tftp) by first calling
       # mugends to generate the respective commands and then using these
       # files and bash commands from the legacy build system to generate
       # the required results.
-      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy-files]}/${SYSTEM}_b.xml
+      mugends -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml
       if [[ ${HARDWARE} == xilinx-zcu104 ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-xsct-swboot-file]}/xswboot.tcl .
       fi

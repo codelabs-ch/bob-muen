@@ -2,13 +2,14 @@ inherit: [muen_component, muen_component_cspecs]
 
 depends:
   - muen::component-libmubase-ld
+buildVars: [ARCH]
 buildTools: [mucheckstack]
 buildSetup: |
   __SRC=$1
   muenBuildApp() {
     muenCspecs $1
     GPRBUILD_EXTRA_ARGS="
-      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
+      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.${ARCH}.ld \
       -Xstacksize=8192" \
     muenBuild ${__SRC}/${1}/${1}
 

@@ -199,6 +199,7 @@ multiPackage:
     depends:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
+    buildVars: [ARCH]
     buildScript: |
       muenBuild $1/libmucoll/libmucoll
     multiPackage: *common_dev_tgt_provide

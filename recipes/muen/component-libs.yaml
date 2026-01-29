@@ -57,7 +57,7 @@ multiPackage:
               if [[ -e $1/${CSPECS_FILE:-} ]]; then
                 mkdir -p usr/share/
                 cp $1/${CSPECS_FILE} usr/share
-                mkdir .bob
+                mkdir -p .bob
                 echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
               fi
       proof: &common_proof_lib
@@ -103,7 +103,7 @@ multiPackage:
               if [[ -e $1/${CSPECS_FILE:-} ]]; then
                 mkdir -p usr/share/
                 cp $1/${CSPECS_FILE} usr/share
-                mkdir .bob
+                mkdir -p .bob
                 echo usr/share/$(basename ${CSPECS_FILE}) > .bob/cspecs
               fi
       proof: *common_proof_lib

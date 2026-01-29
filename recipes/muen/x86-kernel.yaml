@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
-  branch: ${MUEN_X86_KNL_BRANCH:-main}
-  commit: ${MUEN_X86_KNL_COMMIT:-94657cf35bc8f36611be306c825ffa3ace7a5b5a}
+  branch: ${MUEN_X86_KNL_BRANCH:-devel-misc-minor}
+  commit: ${MUEN_X86_KNL_COMMIT:-0bf21c4ebe60a59742b597bb2acac78e6559ad8e}
 
 depends:
   - environment:

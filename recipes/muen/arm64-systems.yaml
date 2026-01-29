@@ -147,7 +147,7 @@ multiPackage:
     packageScript: muenPolicySrcPackage $1
 
   policy:
-    privateEnvironment:
+    environment:
       ARCH: arm64
     inherit: [python3, muen_policy]
     depends:
@@ -159,6 +159,7 @@ multiPackage:
           - if: "$(eq,${SYSTEM:-},multicore)"
             depends:
               - muen::arm64-systems-subjects-example
+              - muen::components-dbgserver
     buildTools:
       - mugenpt
       - mugensinfo

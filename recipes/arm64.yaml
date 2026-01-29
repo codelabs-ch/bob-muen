@@ -143,6 +143,7 @@ buildScript: |
         cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-event_logger]}/event_logger.bin subject_one.bin
       else
         cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-example]}/example.bin subject_one.bin
+        cp ${BOB_DEP_PATHS[muen::components-dbgserver]}/dbgserver_* .
       fi
 
       # (b) Validate the resulting kernel binary against the policy.

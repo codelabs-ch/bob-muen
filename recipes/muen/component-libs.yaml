@@ -208,7 +208,7 @@ multiPackage:
     privateEnvironment:
       CSPECS_FILE: "generated/libmutime.xml"
       GPR_PATH: "libmutime/libmutime"
-    buildVars: [GPR_PATH]
+    buildVars: [ARCH, GPR_PATH]
     buildSetup: |
       export LIBMUTIME_GENERATED=$(pwd)/generated
     buildTools: [mucgenspec]

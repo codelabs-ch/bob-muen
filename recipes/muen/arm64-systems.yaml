@@ -159,6 +159,9 @@ multiPackage:
           - if: "$(eq,${SYSTEM:-},multicore)"
             depends:
               - muen::arm64-systems-subjects-example
+              - name: muen::components-dbgserver
+                environment:
+                  ARCH: arm64
     buildTools:
       - mugenpt
       - mugensinfo

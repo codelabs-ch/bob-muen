@@ -41,7 +41,7 @@ multiPackage:
   libmuchannel:
     privateEnvironment:
       GPR_PATH: "libmuchannel/libmuchannel"
-    buildVars: [GPR_PATH]
+    buildVars: [ARCH, GPR_PATH]
     multiPackage:
       "":
         buildScript: |

@@ -92,8 +92,9 @@ multiPackage:
           - muen::common-debug-dev
           - muen::common-crash_audit-dev
           - muen::common-strings-dev
-          - libs::libxhcidbg-dev
           - muen::build-cfg-scripts
+          - if: "$(eq,${ARCH:-},x86_64)"
+            name: libs::libxhcidbg-dev
 
           - name: python::lxml
             tools:
@@ -102,8 +103,9 @@ multiPackage:
             depends:
               - muen::component-libs-libmudebuglog-tgt
               - muen::component-libs-libmutime-tgt
-              - libs::libxhcidbg-tgt
-        buildVars: [MUEN_POLICY_SRC]
+              - if: "$(eq,${ARCH:-},x86_64)"
+                name: libs::libxhcidbg-tgt
+        buildVars: [ARCH, MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |
           # generate dbg-subject_list.ads

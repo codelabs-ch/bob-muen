@@ -11,11 +11,17 @@ buildSetup: |
     GPRBUILD_EXTRA_ARGS="
       -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.${ARCH}.ld \
       -Xstacksize=8192" \
-    muenBuild ${__SRC}/${1}/${1}
+
+    # check for arch-specific project file
+    PRJ=${1}
+    if [ -f "${__SRC}/${1}/${1}_${ARCH}.gpr" ]; then
+      PRJ=${1}_${ARCH}
+    fi
+    muenBuild ${__SRC}/${1}/${PRJ}
 
     # stackcheck
     export OBJ_DIR=$(pwd)/build/obj/
-    mucheckstack -P${__SRC}/${1}/${1} -l8192
+    mucheckstack -P${__SRC}/${1}/${PRJ} -l8192
   }
 
 packageTools: [mucbinsplit]

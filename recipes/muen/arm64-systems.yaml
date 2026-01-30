@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: 4b975f883a391754ffaebafdeb5f01584899686f
+  branch: dbgserver
+  commit: d5e545528542880165478991c91ad8d542c25fd9
 
 multiPackage:
   common:

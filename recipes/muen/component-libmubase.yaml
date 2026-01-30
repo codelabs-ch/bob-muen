@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/base.git
-  branch: main
-  commit: d1c3d596d06d1ab882d7ddb65933114582f4c8dc
+  branch: arm64-dbgserver
+  commit: 6a2eef605199e74504cc6900933d1ddee9344831
 
 multiPackage:
   ld:

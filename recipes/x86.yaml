@@ -105,6 +105,7 @@ multiPackage:
             ${BOB_DEP_PATHS[muen::x86-kernel]}/.debug/kernel
 
           mucfgmemhashes -i ${DEPS} \
+            -j${MAKE_JOBS:-$(nproc)} \
             ${BOB_DEP_PATHS[muen::x86-systems-policy]}/${SYSTEM}_b.xml \
             ${SYSTEM}_b.xml
 

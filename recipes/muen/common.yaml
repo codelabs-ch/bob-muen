@@ -6,11 +6,11 @@ checkoutSCM:
 
 multiPackage:
   gpr:
-    inherit: [gpr]
     buildScript: |
       rsync -a --delete $1/gpr .
     packageScript: |
-      gprInstallPackageDev $1/gpr
+      cp $1/gpr/* .
+      echo "GPR_PROJECT_PATH=." >> .gpr_project
 
   "":
     inherit: [muen_component]

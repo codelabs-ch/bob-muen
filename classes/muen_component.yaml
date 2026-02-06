@@ -20,6 +20,19 @@ buildSetup: |
   fi
 buildScript: |
   muenBuild() {
+    local INSTALL_CALL_INFO=1
+    # parse arguments
+    OPTIND=1
+    local opt
+    while getopts "n" opt ; do
+      case "$opt" in
+        n)
+          INSTALL_CALL_INFO="0"
+          ;;
+      esac
+    done
+    shift $(( OPTIND -1 ))
+
     gprbuild -P $1 \
       -j${MAKE_JOBS:-$(nproc)} \
       --relocate-build-tree=build \
@@ -36,10 +49,12 @@ buildScript: |
       --target=${GPR_TARGET} \
       --prefix="${PREFIX:-install/usr}" \
       -p \
-      -f \
-      ${@:2}
-    find build -name '*.ci' | \
-      rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/share/ci/
+      -f
+
+    if [[ ${INSTALL_CALL_INFO} == 1 ]]; then
+      find build -name '*.ci' | \
+        rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/share/ci/
+    fi
   }
 
   # $1 ELF file to use

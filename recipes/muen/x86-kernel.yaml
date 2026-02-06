@@ -19,7 +19,9 @@ depends:
       - muen::common-mutimedevents-dev
       - muen::common-strings-dev
 
-  - muen::x86-systems-policy
+  - name: muen::x86-systems-policy
+    environment:
+      MUEN_COMMON_VARIANT: "component"
   - muen::components-tau0
 buildVars: [MUEN_BUILD_MODE]
 buildSetup: |

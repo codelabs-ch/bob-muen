@@ -1,5 +1,3 @@
-inherit: [gpr]
-
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/rts-aunit.git

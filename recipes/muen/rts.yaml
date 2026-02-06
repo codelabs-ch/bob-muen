@@ -1,5 +1,3 @@
-inherit: [gpr]
-
 depends:
   - muen::build-cfg-gpr
 

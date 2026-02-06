@@ -21,7 +21,7 @@ buildSetup: |
     if [ -f "${__SRC}/${1}/${PRJ}_${ARCH}.gpr" ]; then
       PRJ=${PRJ}_${ARCH}
     fi
-    muenBuild ${__SRC}/${1}/${PRJ}
+    muenBuild -n ${__SRC}/${1}/${PRJ}
 
     # stackcheck
     export OBJ_DIR=$(pwd)/build/obj/

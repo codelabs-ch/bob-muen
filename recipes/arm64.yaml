@@ -85,6 +85,8 @@ depends:
         depends:
           - muen::arm64-kernel-${MUEN_BUILD_MODE}
           - muen::arm64-systems-policy
+    environment:
+      RTS_PLATFORM: "bare"
 
   # (4) Build the bootloader binaries for exception level 3 (currently
   # prebuilt binaries depending on hardware from muenonarm repository).

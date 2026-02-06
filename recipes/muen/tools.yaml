@@ -12,7 +12,7 @@ multiPackage:
     multiPackage:
       dev:
         buildScript: |
-          muenBuild $1/liballoc/liballoc
+          muenBuild -n $1/liballoc/liballoc
         provideDeps: ['*-dev']
         packageScript: |
           muenInstallPackageDev
@@ -37,7 +37,7 @@ multiPackage:
     multiPackage:
       dev:
         buildScript: |
-          muenBuild $1/libmucfgcheck/libmucfgcheck
+          muenBuild -n $1/libmucfgcheck/libmucfgcheck
         provideDeps: ['*-dev']
         packageScript: |
           muenInstallPackageDev
@@ -75,7 +75,7 @@ multiPackage:
     multiPackage:
       dev:
         buildScript: |
-          muenBuild $1/libmucfgvcpu/libmucfgvcpu
+          muenBuild -n $1/libmucfgvcpu/libmucfgvcpu
         provideDeps: ['*-dev']
         packageScript: |
           muenInstallPackageDev
@@ -89,7 +89,7 @@ multiPackage:
     depends:
       - codelabs::libs::alog-dev
     buildScript: |
-      muenBuild $1/libmulog/libmulog
+      muenBuild -n $1/libmulog/libmulog
     provideDeps: ['*-dev']
     packageScript: |
       muenInstallPackageDev
@@ -111,7 +111,7 @@ multiPackage:
     multiPackage:
       dev:
         buildScript: |
-          muenBuild $1/libmutools/libmutools
+          muenBuild -n $1/libmutools/libmutools
         provideDeps: ['*-dev']
         packageScript: |
           muenInstallPackageDev
@@ -171,7 +171,7 @@ multiPackage:
 
     multiPackage:
       dev:
-        buildScript: muenBuild $1/libmuxml/libmuxml
+        buildScript: muenBuild -n $1/libmuxml/libmuxml
         provideDeps: ['*-dev']
         packageScript: muenInstallPackageDev
       test:
@@ -186,7 +186,7 @@ multiPackage:
     multiPackage:
       dev:
         buildScript: |
-          muenBuild $1/libpaging/libpaging
+          muenBuild -n $1/libpaging/libpaging
         provideDeps: ['*-dev']
         packageScript: |
           muenInstallPackageDev
@@ -209,7 +209,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucbinsplit/mucbinsplit
+          muenBuild -n $1/mucbinsplit/mucbinsplit
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -240,7 +240,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgalloc/mucfgalloc
+          muenBuild -n $1/mucfgalloc/mucfgalloc
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -258,7 +258,7 @@ multiPackage:
       "":
         inherit: [muen_component]
         buildScript: |
-          muenBuild $1/mucfgcjoin/mucfgcjoin
+          muenBuild -n $1/mucfgcjoin/mucfgcjoin
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -277,7 +277,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgcvresalloc/mucfgcvresalloc
+          muenBuild -n $1/mucfgcvresalloc/mucfgcvresalloc
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -302,7 +302,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgexpand/mucfgexpand
+          muenBuild -n $1/mucfgexpand/mucfgexpand
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -319,7 +319,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgmemhashes/mucfgmemhashes
+          muenBuild -n $1/mucfgmemhashes/mucfgmemhashes
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -338,7 +338,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgmerge/mucfgmerge
+          muenBuild -n $1/mucfgmerge/mucfgmerge
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -358,7 +358,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgvalidate/mucfgvalidate
+          muenBuild -n $1/mucfgvalidate/mucfgvalidate
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -377,7 +377,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgvresalloc/mucfgvresalloc
+          muenBuild -n $1/mucfgvresalloc/mucfgvresalloc
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -400,7 +400,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucgenspec/mucgenspec \
+          muenBuild -n $1/mucgenspec/mucgenspec \
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -417,7 +417,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucheckelf/mucheckelf -XLINKING=static
+          muenBuild -n $1/mucheckelf/mucheckelf -XLINKING=static
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -435,7 +435,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucheckstack/mucheckstack
+          muenBuild -n $1/mucheckstack/mucheckstack
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -469,7 +469,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugenacpi/mugenacpi
+          muenBuild -n $1/mugenacpi/mugenacpi
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -494,7 +494,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugends/mugends
+          muenBuild -n $1/mugends/mugends
         packageScript: |
           muenInstallPackageTgt $1/install/
         provideTools:
@@ -518,7 +518,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugendts/mugendts
+          muenBuild -n $1/mugendts/mugendts
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -537,7 +537,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugenmsrstore/mugenmsrstore
+          muenBuild -n $1/mugenmsrstore/mugenmsrstore
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -557,7 +557,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugenpt/mugenpt
+          muenBuild -n $1/mugenpt/mugenpt
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -575,7 +575,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugensinfo/mugensinfo
+          muenBuild -n $1/mugensinfo/mugensinfo
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -592,7 +592,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugensolo5/mugensolo5
+          muenBuild -n $1/mugensolo5/mugensolo5
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -614,7 +614,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugenspec/mugenspec
+          muenBuild -n $1/mugenspec/mugenspec
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -645,7 +645,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugentau0cmds/mugentau0cmds
+          muenBuild -n $1/mugentau0cmds/mugentau0cmds
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -664,7 +664,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mugenzp/mugenzp
+          muenBuild -n $1/mugenzp/mugenzp
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -679,7 +679,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mupcspkrdbg/mupcspkrdbg
+          muenBuild -n $1/mupcspkrdbg/mupcspkrdbg
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -698,7 +698,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/muwalkpt/muwalkpt
+          muenBuild -n $1/muwalkpt/muwalkpt
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -717,7 +717,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/muxmlfilter/muxmlfilter
+          muenBuild -n $1/muxmlfilter/muxmlfilter
         packageScript: |
           muenInstallPackageTgt
         provideTools:
@@ -734,7 +734,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: |
-          muenBuild $1/mucfgucode/mucfgucode
+          muenBuild -n $1/mucfgucode/mucfgucode
         packageScript: |
           muenInstallPackageTgt
         provideTools:

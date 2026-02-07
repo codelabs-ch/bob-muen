@@ -19,7 +19,7 @@ depends:
 
 buildTools: [bison, flex, m4, host-toolchain, target-toolchain, perl]
 buildVars: [ARCH, LINUX_CONFIG, LINUX_CUSTOM_CONFIG]
-buildScript: |
+buildSetup: |
   # prevent timestamps in configuration
   export KCONFIG_NOTIMESTAMP=1
   export KBUILD_BUILD_TIMESTAMP='Mon Dec 28 22:49:40 CET 2015'
@@ -28,6 +28,7 @@ buildScript: |
   export HOSTCFLAGS="-I${BOB_DEP_PATHS['libs::ncurses-dev']}/usr/include"
   export HOSTLDFLAGS="-L${BOB_DEP_PATHS['libs::ncurses-dev']}/usr/lib"
 
+buildScript: |
   cp -u "${BOB_DEP_PATHS[${LINUX_CUSTOM_CONFIG}]}/${LINUX_CONFIG:-kernel.config}" .config
   make -C "$1" O=$PWD olddefconfig
 

@@ -283,3 +283,12 @@ multiPackage:
       PLATFORM: "lenovo-t430s"
       ROOTFS_OVERLAYS: "overlay/static_eth0/"
     multiPackage: *muen_build_mode
+
+  t440s:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-t440s"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-t440s"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
+    multiPackage: *muen_build_mode

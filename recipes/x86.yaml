@@ -310,3 +310,13 @@ multiPackage:
       PLATFORM: "lenovo-x260"
       ROOTFS_OVERLAYS: "overlay/static_eth0/"
     multiPackage: *muen_build_mode
+
+  upsquared-efi:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "up-squared-e3950"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "up-squared-e3950"
+      GRUB2_TARGET: "x86_64"
+      GRUB2_PLATFORM: "efi"
+    multiPackage: *muen_build_mode

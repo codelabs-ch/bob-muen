@@ -96,7 +96,12 @@ multiPackage:
         multiPackage: *common_dev_tgt
 
       mutimedevents:
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: |
-          muenBuild $1/mutimedevents/mutimedevents
-        multiPackage: *common_dev_tgt
+        privateEnvironment:
+          GPR_PATH: "mutimedevents/mutimedevents"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt
+          proof: *common_proof

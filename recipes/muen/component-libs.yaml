@@ -107,10 +107,22 @@ multiPackage:
       CSPECS_FILE: "generated/libmudebuglog.xml"
       GPR_PATH: "libmudebuglog/libmudebuglog"
 
+    Config:
+      LIBMUDEBUGLOG_DISABLED:
+        help: If set the library becomes a dummy.
+        type: bool
+        default: false
+
     buildTools: [mucgenspec, mucfgcvresalloc, muxmlfilter, libxslt-tools]
+    buildVars: [ARCH, MUEN_POLICY_SRC, GPR_PATH, LIBMUDEBUGLOG_DISABLED]
     buildSetup: |
+      BOOL=(false true)
       export LIBMUDEBUGLOG_GENERATED=$(pwd)/generated
-    buildVars: [ARCH, MUEN_POLICY_SRC, GPR_PATH]
+      INPUT_SPEC=$1/libmudebuglog/spec/libmudebuglog.xml
+      if [ ${LIBMUDEBUGLOG_DISABLED} -eq "1" ]; then
+        INPUT_SPEC=$1/libmudebuglog/spec/libmudebuglog_null.xml
+      fi
+      export LIBMUDEBUGLOG_DISABLED=${BOOL[$LIBMUDEBUGLOG_DISABLED]}
     buildScript: |
       mkdir -p generated
 
@@ -119,7 +131,7 @@ multiPackage:
         $1/libmudebuglog/misc/config.xsl \
         ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
 
-      mucfgcvresalloc $1/libmudebuglog/spec/libmudebuglog.xml \
+      mucfgcvresalloc $INPUT_SPEC \
                       generated/libmudebuglog.xml \
                       -I generated
 

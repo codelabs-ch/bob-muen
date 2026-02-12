@@ -34,9 +34,22 @@ multiPackage:
       crash_audit:
         depends:
           - muen::common-common-dev
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: muenBuild $1/crash_audit/crash_audit
-        multiPackage: *common_dev_tgt_provides
+        privateEnvironment:
+          GPR_PATH: "crash_audit/crash_audit"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt_provides
+          proof: &common_proof
+            inherit: [muen_proof]
+            buildSetup: |
+              export GPR_FILE=$1/${GPR_PATH}
+              export MUEN_BUILD_MODE=prove
+              export OBJ_DIR=$(pwd)/obj/
+              export LIB_DIR=$(pwd)/lib/
+            buildScript: |
+              muenProof
       common:
         privateEnvironment:
           GPR_PATH: "src/muen_common"
@@ -50,15 +63,7 @@ multiPackage:
                 packageScript: muenInstallPackageDev
               tgt:
                 packageScript: muenInstallPackageTgt
-          proof: &common_proof
-            inherit: [muen_proof]
-            buildSetup: |
-              export GPR_FILE=$1/${GPR_PATH}
-              export MUEN_BUILD_MODE=prove
-              export OBJ_DIR=$(pwd)/obj/
-              export LIB_DIR=$(pwd)/lib/
-            buildScript: |
-              muenProof
+          proof: *common_proof
       strings:
         depends:
           - muen::common-common-dev

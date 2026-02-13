@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git
-  branch: arm64-dbgserver
-  commit: a64a472f9ac0bdf5c110ef314a2ef9b6621568ab
+  branch: main
+  commit: ea8a44f97415f8ac7d82952186bb27921e556c37
 
 multiPackage:
   muinitstub:

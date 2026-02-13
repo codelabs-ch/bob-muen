@@ -87,7 +87,6 @@ multiPackage:
           - muen::component-libmubase-dev
           - muen::components-dbgserver-config-dev
           - muen::component-libs-libmucoll-dev
-          - muen::component-libs-libmutime-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::common-debug-dev
           - muen::common-crash_audit-dev
@@ -102,7 +101,6 @@ multiPackage:
           - use: []
             depends:
               - muen::component-libs-libmudebuglog-tgt
-              - muen::component-libs-libmutime-tgt
               - if: "$(eq,${ARCH:-},x86_64)"
                 name: libs::libxhcidbg-tgt
         buildVars: [ARCH, MUEN_POLICY_SRC]

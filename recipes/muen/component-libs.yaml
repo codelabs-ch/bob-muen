@@ -41,7 +41,7 @@ multiPackage:
   libmuchannel:
     privateEnvironment:
       GPR_PATH: "libmuchannel/libmuchannel"
-    buildVars: [GPR_PATH]
+    buildVars: [ARCH, GPR_PATH]
     multiPackage:
       "":
         buildScript: |
@@ -122,7 +122,7 @@ multiPackage:
     buildTools: [mucgenspec, mucfgcvresalloc, muxmlfilter, libxslt-tools]
     buildSetup: |
       export LIBMUDEBUGLOG_GENERATED=$(pwd)/generated
-    buildVars: [MUEN_POLICY_SRC, GPR_PATH]
+    buildVars: [ARCH, MUEN_POLICY_SRC, GPR_PATH]
     buildScript: |
       mkdir -p generated
 
@@ -199,6 +199,7 @@ multiPackage:
     depends:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
+    buildVars: [ARCH]
     buildScript: |
       muenBuild $1/libmucoll/libmucoll
     multiPackage: *common_dev_tgt_provide

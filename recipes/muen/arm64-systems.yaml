@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: 4b975f883a391754ffaebafdeb5f01584899686f
+  commit: 9235360d07b7ff23456b5288ace864e1340fe909
 
 multiPackage:
   common:
@@ -147,7 +147,7 @@ multiPackage:
     packageScript: muenPolicySrcPackage $1
 
   policy:
-    privateEnvironment:
+    environment:
       ARCH: arm64
     inherit: [python3, muen_policy]
     depends:
@@ -155,8 +155,11 @@ multiPackage:
       - environment:
           RTS: "muen::rts"
         depends:
-          - muen::arm64-systems-subjects-example
           - muen::arm64-systems-subjects-event_logger
+          - if: "$(eq,${SYSTEM:-},multicore)"
+            depends:
+              - muen::arm64-systems-subjects-example
+              - muen::components-dbgserver
     buildTools:
       - mugenpt
       - mugensinfo

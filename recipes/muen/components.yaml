@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
   branch: main
-  commit: e1366f680da4145eeec4d917e31f3a8c8964a8ff
+  commit: ce42fea6df46ebfd5fecce318c0ba5128659a4f8
 
 environment:
   MUEN_COMMON_VARIANT: "component"
@@ -87,13 +87,13 @@ multiPackage:
           - muen::component-libmubase-dev
           - muen::components-dbgserver-config-dev
           - muen::component-libs-libmucoll-dev
-          - muen::component-libs-libmutime-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::common-debug-dev
           - muen::common-crash_audit-dev
           - muen::common-strings-dev
-          - libs::libxhcidbg-dev
           - muen::build-cfg-scripts
+          - if: "$(eq,${ARCH:-},x86_64)"
+            name: libs::libxhcidbg-dev
 
           - name: python::lxml
             tools:
@@ -101,9 +101,9 @@ multiPackage:
           - use: []
             depends:
               - muen::component-libs-libmudebuglog-tgt
-              - muen::component-libs-libmutime-tgt
-              - libs::libxhcidbg-tgt
-        buildVars: [MUEN_POLICY_SRC]
+              - if: "$(eq,${ARCH:-},x86_64)"
+                name: libs::libxhcidbg-tgt
+        buildVars: [ARCH, MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |
           # generate dbg-subject_list.ads

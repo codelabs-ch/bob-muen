@@ -34,11 +34,14 @@ multiPackage:
       event_logger:
         inherit: [muen_component]
         depends:
+          - muen::component-libmubase-dev
+          - muen::component-libmubase-ld
           - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
         buildVars: [OBJCOPY]
         buildScript: |
+          GPRBUILD_EXTRA_ARGS="-Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.arm64.ld"
           muenBuild $1/subjects/event_logger/event_logger.gpr
           muenBuildBin event_logger.elf
         packageScript: |
@@ -46,6 +49,8 @@ multiPackage:
       example:
         inherit: [muen_component]
         depends:
+          - muen::component-libmubase-dev
+          - muen::component-libmubase-ld
           - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
@@ -59,6 +64,7 @@ multiPackage:
               -p Example generated
 
           ln -snf $1/subjects/example/spec/example.xml
+          GPRBUILD_EXTRA_ARGS="-Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.arm64.ld"
           muenBuild $1/subjects/example/example.gpr
           muenBuildBin example.elf
         packageScript: |
@@ -147,7 +153,7 @@ multiPackage:
     packageScript: muenPolicySrcPackage $1
 
   policy:
-    privateEnvironment:
+    environment:
       ARCH: arm64
     inherit: [python3, muen_policy]
     depends:
@@ -159,9 +165,7 @@ multiPackage:
           - if: "$(eq,${SYSTEM:-},multicore)"
             depends:
               - muen::arm64-systems-subjects-example
-              - name: muen::components-dbgserver
-                environment:
-                  ARCH: arm64
+              - muen::components-dbgserver
     buildTools:
       - mugenpt
       - mugensinfo

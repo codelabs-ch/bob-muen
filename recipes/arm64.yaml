@@ -105,6 +105,7 @@ depends:
       - muen::arm64-systems-devicetree
       - name: demo::rootfs
         environment:
+          RTS_PLATFORM: "linux"
           ROOTFS_ARCH: "arm64"
 
   # (6) Generate deployment scripts for all deploy modes.

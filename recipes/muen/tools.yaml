@@ -3,8 +3,8 @@ inherit: [muen_component, python3]
 checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
-  branch: ${MUEN_TOOLS_BRANCH:-main}
-  commit: ${MUEN_TOOLS_COMMIT:-7cdeb94c05d23c82085e5d144480b65fcb0fd2fe}
+  branch: ${MUEN_TOOLS_BRANCH:-devel-scheduler}
+  commit: ${MUEN_TOOLS_COMMIT:-1174b0ff3ec401c610441b2c8121fb9027bddfc9}
 
 multiPackage:
   liballoc:

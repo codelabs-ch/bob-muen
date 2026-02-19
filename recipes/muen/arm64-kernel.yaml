@@ -3,10 +3,11 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
-  branch: main
-  commit: a4406c48a285ba6ca8f8b7de15828bf3b802c02f
+  branch: common-xuartps
+  commit: 3f54524cff2df7faf30cbd05db435c695a13eec9
 
 depends:
+  - muen::common-debug-dev
   - muen::common-muschedinfo-dev
   - muen::arm64-systems-policy
 

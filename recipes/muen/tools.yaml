@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-main}
-  commit: ${MUEN_TOOLS_COMMIT:-a13131e2b7bc18329bb8bb50ffc03595c76f985f}
+  commit: ${MUEN_TOOLS_COMMIT:-2f587ec3a1906f41fb8adb65079aca71e6a7349f}
 
 multiPackage:
   liballoc:
@@ -699,6 +699,7 @@ multiPackage:
           mucfgucode: "usr/bin"
       test:
         <<: *simple_test
+        buildTools: [iucode-tool]
         privateEnvironment:
           TEST_NAME: "mucfgucode"
 
@@ -748,6 +749,7 @@ multiPackage:
       - muen::tools-mucfgexpand-test
       - muen::tools-mucfgmemhashes-test
       - muen::tools-mucfgmerge-test
+      - muen::tools-mucfgucode-test
       - muen::tools-mucfgvalidate-test
       - muen::tools-mucfgvresalloc-test
       - muen::tools-mucgenspec-test
@@ -765,3 +767,4 @@ multiPackage:
       - muen::tools-mugenzp-test
       - muen::tools-mupcspkrdbg-test
       - muen::tools-muwalkpt-test
+      - muen::tools-muxmlfilter-test

@@ -20,6 +20,10 @@ depends:
     use: [tools]
     forward: True
 
+  - name: utils::iucode-tool
+    use: [tools]
+    forward: True
+
   - name: adacore::ada-language-server
     use: [tools]
     forward: True

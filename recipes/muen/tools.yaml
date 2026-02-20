@@ -699,6 +699,7 @@ multiPackage:
           mucfgucode: "usr/bin"
       test:
         <<: *simple_test
+        buildTools: [iucode-tool]
         privateEnvironment:
           TEST_NAME: "mucfgucode"
 
@@ -748,6 +749,7 @@ multiPackage:
       - muen::tools-mucfgexpand-test
       - muen::tools-mucfgmemhashes-test
       - muen::tools-mucfgmerge-test
+      - muen::tools-mucfgucode-test
       - muen::tools-mucfgvalidate-test
       - muen::tools-mucfgvresalloc-test
       - muen::tools-mucgenspec-test
@@ -765,3 +767,4 @@ multiPackage:
       - muen::tools-mugenzp-test
       - muen::tools-mupcspkrdbg-test
       - muen::tools-muwalkpt-test
+      - muen::tools-muxmlfilter-test

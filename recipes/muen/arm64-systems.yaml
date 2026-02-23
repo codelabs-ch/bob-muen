@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: 1317214e9c11234c10ae4c542d23c995ad5203cd
+  commit: b16cd62bdb1139112876ed33abec399e56dbc991
 
 multiPackage:
   common:

@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/mulog-analyzer.git
-  branch: main
-  commit: 9dd90cdf9ab3582d013ca32b1ceb5945b6b4a890
+  branch: devel-crash-audit
+  commit: e1a0f9e1299170b296236a3ef1e08eac3b1ce498
 
 depends:
   - name: codelabs::libs::alog-dev

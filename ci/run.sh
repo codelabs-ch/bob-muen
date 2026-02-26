@@ -235,15 +235,14 @@ if search_prefix "arm64-" "${!runner[@]}"; then
 	export PATH=$qemu_path:$PATH
 	export DTB_PATH=$dtb_path
 fi
-if search_prefix "x86-" "${!runner[@]}"; then
-	# The mulog.py script is required to analyze dbgserver logs.
-	bob ${bob_color} dev \
-		${bob_args} \
-		${sandbox} \
-		/x86-qemu-debug/muen::tools-mulog 2>&1 | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log)
-	mulog_dir=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} /x86-qemu-debug/muen::tools-mulog)
-	nci_defines+=( "-DMULOG_DIR=${mulog_dir}" )
-fi
+
+# The mulog*.py scripts are required to analyze dbgserver logs.
+bob ${bob_color} dev \
+	${bob_args} \
+	${sandbox} \
+	/x86-qemu-debug/muen::tools-mulog 2>&1 | tee >(sed -E "s/$ansi_rgx//g" >> $artifacts_dir/bob.log)
+mulog_dir=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} /x86-qemu-debug/muen::tools-mulog)
+nci_defines+=( "-DMULOG_DIR=${mulog_dir}" )
 
 # Setup nci plans including environment variables.
 nci_plans=()

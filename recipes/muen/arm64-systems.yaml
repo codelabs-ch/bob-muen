@@ -128,12 +128,13 @@ multiPackage:
     buildTools: [mugendts, dtc, target-toolchain]
     buildVars: [CC, SYSTEM]
     buildScript: |
+      rm -f *.dts
       mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml
       for F in *.dts; do
         F=$(basename ${F%.dts})
         ${CC} -I ${BOB_DEP_PATHS[muen::linux-dt-bindings]} -E \
           -nostdinc -undef -D__DTS__ -x assembler-with-cpp \
-          -o  $(basename $F)-pre.dts $F.dts
+          -o $(basename $F)-pre.dts $F.dts
         ARCH=arm64 dtc -I dts -O dtb \
           $(basename $F)-pre.dts \
           -o $(basename $F).dtb

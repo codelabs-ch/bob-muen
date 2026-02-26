@@ -705,7 +705,7 @@ multiPackage:
 
   mulog:
     buildScript: |
-      cp -r $1/scripts/mulog.py .
+      cp -r $1/scripts/mulog*.py .
     packageScript: |
       rsync -a --delete $1/ .
 

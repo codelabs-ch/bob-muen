@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux.git
-  branch: $(if-then-else,$(eq,${ARCH},arm64),linux-6.1.82-muen-arm,linux-6.1.82-muen-hvc-earlycon)
-  commit: $(if-then-else,$(eq,${ARCH},arm64),5d7821ecd20faf648149460c349429346aafccc5,0de719466f4d0c8c8e2e77b18427dc76ca242b94)
+  branch: $(if-then-else,$(eq,${ARCH},arm64),linux-6.1.82-muen-arm-hvc-earlycon,linux-6.1.82-muen-hvc-earlycon)
+  commit: $(if-then-else,$(eq,${ARCH},arm64),4212952f98fea63d03c8d6d812591b23fab66e30,0de719466f4d0c8c8e2e77b18427dc76ca242b94)
   shallow: 50
 
 depends:

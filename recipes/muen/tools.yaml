@@ -211,7 +211,7 @@ multiPackage:
           mkdir -p build/test/obj
           SECTIONS=(data text rodata)
           for S in ${SECTIONS[@]}; do
-            ${OBJCOPY} -Obinary --only-section=.${S} $1/mucbinsplit/data/test_binary build/test/obj/${S}.ref
+            ${OBJCOPY} -Obinary --only-section=.${S} $1/mucbinsplit/data/test_binary_x86_64 build/test/obj/${S}.ref
           done
           DATA_DIR=$1/${TEST_NAME}/data \
           TESTS_DIR=$1/${TEST_NAME}/tests \

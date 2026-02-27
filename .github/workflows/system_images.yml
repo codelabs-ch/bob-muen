@@ -14,6 +14,7 @@ jobs:
           - x86-ktqm77-integ-release
           - x86-t430s-debug
           - x86-t480s-debug
+          - x86-upsquared-efi-debug
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

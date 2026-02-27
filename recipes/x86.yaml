@@ -301,3 +301,12 @@ multiPackage:
       PLATFORM: "lenovo-t480s"
       ROOTFS_OVERLAYS: "overlay/static_eth0/"
     multiPackage: *muen_build_mode
+
+  x260:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-x260"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-x260"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
+    multiPackage: *muen_build_mode

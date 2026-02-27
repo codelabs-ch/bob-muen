@@ -13,6 +13,7 @@ jobs:
           - x86-qemu-release
           - x86-ktqm77-integ-release
           - x86-t430s-debug
+          - x86-t480s-debug
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

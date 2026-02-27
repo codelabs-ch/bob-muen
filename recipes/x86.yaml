@@ -283,3 +283,30 @@ multiPackage:
       PLATFORM: "lenovo-t430s"
       ROOTFS_OVERLAYS: "overlay/static_eth0/"
     multiPackage: *muen_build_mode
+
+  t440s:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-t440s"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-t440s"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
+    multiPackage: *muen_build_mode
+
+  t480s:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-t480s"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-t480s"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
+    multiPackage: *muen_build_mode
+
+  x260:
+    environment:
+      SYSTEM: "demo_system_vtd"
+      HARDWARE: "lenovo-x260"
+      ADDITIONAL_HW: "common_hardware"
+      PLATFORM: "lenovo-x260"
+      ROOTFS_OVERLAYS: "overlay/static_eth0/"
+    multiPackage: *muen_build_mode

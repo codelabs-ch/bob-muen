@@ -56,6 +56,7 @@ multiPackage:
     depends:
       - muen::build-cfg-scripts
       - muen::tools-libmuxml-dev
+      - muen::tools-libmutools-dev
     buildTools: [tidy]
     buildSetup: |
       export MUCFGVCPU_GENERATED=$(pwd)/generated

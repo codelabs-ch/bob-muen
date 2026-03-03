@@ -227,7 +227,7 @@ if ! bob ${bob_color} dev ${bob_args} ${sandbox} "${!runner[@]}" 2>&1 | tee >(se
 fi
 
 # Arch specific queries
-if search_prefix "arm64-" "${!runner[@]}"; then
+if search_prefix "arm64-qemu" "${!runner[@]}"; then
 	# Add required QEMU tools and devicetrees to path.
 	qemu_path=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //devel::xilinx::qemu)/usr/bin
 	dtb_path=${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //devel::xilinx::qemu-devicetrees)

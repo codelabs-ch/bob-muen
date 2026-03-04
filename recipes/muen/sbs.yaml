@@ -7,7 +7,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/sbs-tools.git
   branch: main
-  commit: e8ad94e71a60897f9f439ee80252b724cf1c5f40
+  commit: 1617e94d858a12d6a68988b671ba24af5a40181d
 
 buildScript: |
   rsync -a --delete $1/ .

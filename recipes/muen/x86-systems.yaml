@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/x86/systems.git
-  branch: main
-  commit: d762b93affb57d9ae373e94b1f2d9d711f0d7c44
+  branch: policy-unification-vcpu
+  commit: 3bbbff862fb83a4616252fa53b8e9892c32439ff
 
 multiPackage:
   bootloader-cfg:

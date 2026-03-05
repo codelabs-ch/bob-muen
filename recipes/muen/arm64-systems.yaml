@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: 81075e028645ec2c2eea9ae527301d3ab7a68d37
+  branch: policy-unification-vcpu
+  commit: e5d4f3ba526f3237672ce387b9e3ac7ad24b5516
 
 multiPackage:
   common:

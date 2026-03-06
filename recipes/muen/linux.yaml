@@ -45,9 +45,9 @@ multiPackage:
         packageScript: |
           mkdir -p boot
 
-          cp "$1/$(make -s -C "$1" image_name)" "boot/vmlinux-$PKG_VERSION"
-          cp "$1/System.map" "boot/System.map-$PKG_VERSION"
-          cp "$1/.config" "boot/config-$PKG_VERSION"
+          cp "$1/$(make -s -C "$1" image_name)" "boot"
+          cp "$1/System.map" "boot/System.map"
+          cp "$1/.config" "boot/config"
 
           if [[ -d "$1/arch/arm64/boot/dts" ]] ; then
               make -C "$1" INSTALL_DTBS_PATH="$PWD/boot/dtbs/$PKG_VERSION" dtbs_install
@@ -55,7 +55,7 @@ multiPackage:
 
           if [[ ${BASEMENT_DEBUG:-0} != "0" ]] ; then
               mkdir -p boot/.debug
-              cp "$1/vmlinux" "boot/.debug/vmlinux-$PKG_VERSION"
+              cp "$1/vmlinux" "boot/.debug/vmlinux"
           fi
 
           if [[ ${ARCH} == arm64 ]]; then
@@ -63,7 +63,7 @@ multiPackage:
           fi
 
           if [[ ${ARCH} == x86_64 ]]; then
-            cp "$1/arch/x86/boot/vmlinux.bin" "boot/bzImage"
+            cp "$1/arch/x86/boot/vmlinux.bin" "boot/"
           fi
 
       modules:

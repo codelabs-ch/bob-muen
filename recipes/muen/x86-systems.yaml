@@ -125,7 +125,7 @@ multiPackage:
     buildScript: |
       # build the linux cspecs
       linux-gencspec \
-        ${BOB_DEP_PATHS[muen::linux-image]}/boot/bzImage \
+        ${BOB_DEP_PATHS[muen::linux-image]}/boot/vmlinux.bin \
         ${BOB_DEP_PATHS[muen::x86-systems-linux-component-spec]}/linux.xml \
         --out_spec linux.xml \
         --src_policy ${BOB_DEP_PATHS[$MUEN_POLICY_SRC]}/${SYSTEM}.xml

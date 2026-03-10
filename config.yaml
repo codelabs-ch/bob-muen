@@ -6,9 +6,9 @@ layersWhitelist: ["SSH_AGENT_PID", "SSH_AUTH_SOCK"]
 layers:
   - name: basement
     scm: git
-    url: https://github.com/BobBuildTool/basement.git
-    commit: b79927c309a08bfd6daed00385a88576bad5310d
-    branch: master
+    url: https://github.com/codelabs-ch/basement.git
+    commit: df866d182cf7b3856a099f22a94b3fd38cad87a1
+    branch: master-b79927c309a0+codelabs
 
   - name: basement-gnu-linux
     scm: git
@@ -20,7 +20,7 @@ layers:
     scm: git
     url: https://git.codelabs.ch/bob/ada.git
     branch: main
-    commit: 43c040d91f2d5cb8d9ba6ed6284fdd062e020f09
+    commit: 013de77a8ee2fab635ba136fc5a573288451ca28
 
   - name: codelabs
     scm: git

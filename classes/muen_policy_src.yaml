@@ -1,4 +1,4 @@
-buildVars: [SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM]
+buildVars: [ARCH, SYSTEM, HARDWARE, ADDITIONAL_HW, PLATFORM]
 buildTools: [mucfgmerge]
 buildSetup: |
   # $1 - source dir
@@ -6,6 +6,7 @@ buildSetup: |
     cat > system_config.xml << EOF
     <system>
      <config>
+      <string name="architecture"        value="${ARCH}"/>
       <string name="system"              value="${SYSTEM}.xml"/>
       <string name="hardware"            value="hardware/${HARDWARE}.xml"/>
   EOF

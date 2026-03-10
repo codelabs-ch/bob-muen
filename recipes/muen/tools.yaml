@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-policy-unification-vcpu}
-  commit: ${MUEN_TOOLS_COMMIT:-5846ebf659f74fde34ec35100b826e14945a5733}
+  commit: ${MUEN_TOOLS_COMMIT:-79c916d6908913c0783d47e40b2f42274e4bdc95}
 
 multiPackage:
   liballoc:

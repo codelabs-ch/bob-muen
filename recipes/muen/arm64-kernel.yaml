@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
-  branch: main
-  commit: b60adb17abdb706b5a4ecc458a45067c66a59fc8
+  branch: policy-unification-vcpu
+  commit: 09710c096031d799afffa3c41ea4b8c9b2ec4e96
 
 depends:
   - muen::common-debug-dev

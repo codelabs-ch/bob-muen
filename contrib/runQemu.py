@@ -71,11 +71,16 @@ def run_arm64(workdir: Path):
         image="sdcard.img",
         serial1_path="serial1.out",
         serial2_path="serial2.out",
+        use_pseudo_term=args.pseudo_term,
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
     log.info("SSH root password is 'muen'")
     with open(pidfile, "w") as pid:
         pid.write(str(vm.process.proc.pid))
+    if args.pseudo_term:
+        # pts path is visible here
+        with open(vm.process.stdout_path, "r") as f:
+            log.info(f.read().rstrip())
 
 
 def run_x86(image: Path):
@@ -87,14 +92,19 @@ def run_x86(image: Path):
         workdir=".",
         image=image,
         serial_path="serial.out",
+        use_pseudo_term=args.pseudo_term,
         netdev_extra_options=netdev_extra_opts,
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
     log.info("SSH root password is 'muen'")
     with open(pidfile, "w") as pid:
         pid.write(str(vm.process.proc.pid))
-    with open(vm.process.stderr_path, "r") as vnc_info:
-        log.info(vnc_info.read().rstrip())
+    with open(vm.process.stderr_path, "r") as f:
+        log.info(f.read().rstrip())
+    if args.pseudo_term:
+        # pts path is visible here
+        with open(vm.process.stdout_path, "r") as f:
+            log.info(f.read().rstrip())
 
 
 parser = argparse.ArgumentParser()
@@ -104,6 +114,12 @@ parser.add_argument(
     "-t",
     action="store_true",
     help="terminate existing QEMU if running and exit",
+)
+parser.add_argument(
+    "--pseudo-term",
+    "-p",
+    action="store_true",
+    help="whether to use pseudo-terminal instead of serial file",
 )
 args = parser.parse_args()
 

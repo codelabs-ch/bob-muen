@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/rootfs-content.git
   branch: main
-  commit: cd5b953f77c449b866336df424586c09bbda44e9
+  commit: aa596ce5bc1f30c1bde8a9f81094741c817fa5f9
 
 buildScript: |
   rsync -a --delete $1/* .

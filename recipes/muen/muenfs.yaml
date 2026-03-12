@@ -8,7 +8,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muenfs.git
-  commit: 3e26e69ec721f54f43eb113cd5c43c2cbeb2bc69
+  commit: c6544c7b0aed54903dec4118ea687a4debba6535
   branch: main
 
 depends:

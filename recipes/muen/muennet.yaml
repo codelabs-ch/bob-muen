@@ -8,7 +8,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muennet.git
-  commit: 1e182262250f5a2311f3b9375694c6a048de8e3c
+  commit: d5944ac55d3ba0cc59dfe2b1ea4b127ac8f0bb60
   branch: main
 
 buildTools: [target-toolchain]

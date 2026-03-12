@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: b16cd62bdb1139112876ed33abec399e56dbc991
+  commit: 81075e028645ec2c2eea9ae527301d3ab7a68d37
 
 multiPackage:
   common:
@@ -46,6 +46,7 @@ multiPackage:
       example:
         inherit: [muen_component]
         depends:
+          - muen::component-libs-libmudebuglog-dev
           - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
@@ -128,12 +129,13 @@ multiPackage:
     buildTools: [mugendts, dtc, target-toolchain]
     buildVars: [CC, SYSTEM]
     buildScript: |
+      rm -f *.dts
       mugendts -o . ${BOB_DEP_PATHS[muen::arm64-systems-policy]}/${SYSTEM}_b.xml
       for F in *.dts; do
         F=$(basename ${F%.dts})
         ${CC} -I ${BOB_DEP_PATHS[muen::linux-dt-bindings]} -E \
           -nostdinc -undef -D__DTS__ -x assembler-with-cpp \
-          -o  $(basename $F)-pre.dts $F.dts
+          -o $(basename $F)-pre.dts $F.dts
         ARCH=arm64 dtc -I dts -O dtb \
           $(basename $F)-pre.dts \
           -o $(basename $F).dtb

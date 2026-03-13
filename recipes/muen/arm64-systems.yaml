@@ -125,7 +125,7 @@ multiPackage:
     buildScript: muenPolicySrcCreate $1
     packageScript: muenPolicySrcPackage $1
 
-  policy:
+  policy-demo:
     environment:
       ARCH: arm64
     inherit: [python3, muen_policy]

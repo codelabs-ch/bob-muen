@@ -34,6 +34,7 @@ multiPackage:
       event_logger:
         inherit: [muen_component]
         depends:
+          - muen::component-libmubase-dev
           - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"

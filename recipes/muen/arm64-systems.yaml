@@ -47,6 +47,7 @@ multiPackage:
       example:
         inherit: [muen_component]
         depends:
+          - muen::component-libmubase-dev
           - muen::component-libs-libmudebuglog-dev
           - name: muen::arm64-systems-common
             environment:

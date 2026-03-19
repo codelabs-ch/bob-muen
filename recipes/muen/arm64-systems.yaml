@@ -18,6 +18,7 @@ multiPackage:
         depends:
           - muen::common-debug-dev
           - muen::component-libmubase-dev
+          - muen::common-mutimedevents-dev
           - muen::arm64-systems-common
         buildScript: |
           muenBuildApp subjects/event_logger

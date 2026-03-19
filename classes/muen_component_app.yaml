@@ -6,6 +6,8 @@ buildVars: [ARCH]
 buildTools: [mucheckstack]
 buildSetup: |
   __SRC=$1
+
+  # $1 - SRC relative component directory
   muenBuildApp() {
     muenCspecs $1
     GPRBUILD_EXTRA_ARGS="
@@ -13,9 +15,9 @@ buildSetup: |
       -Xstacksize=8192" \
 
     # check for arch-specific project file
-    PRJ=${1}
-    if [ -f "${__SRC}/${1}/${1}_${ARCH}.gpr" ]; then
-      PRJ=${1}_${ARCH}
+    PRJ="${1##*/}"
+    if [ -f "${__SRC}/${1}/${PRJ}_${ARCH}.gpr" ]; then
+      PRJ=${PRJ}_${ARCH}
     fi
     muenBuild ${__SRC}/${1}/${PRJ}
 

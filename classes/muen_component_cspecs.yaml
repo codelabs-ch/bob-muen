@@ -8,27 +8,31 @@ buildSetup: |
   export GENERATED=$(pwd)/generated
   export __SRC=$1
 
+  # $1 - SRC relative component directory
   muenCspecs() {
-    DIR=${__SRC}/${1}/spec
-    SPEC=$DIR/${1}.xml
-    if [ -e $DIR/${1}.xsl ]; then
-      xsltproc -o generated/${1}.xml \
-         $DIR/${1}.xsl \
+    PRJ="${1##*/}"
+    SPEC_DIR="${__SRC}/$1/spec"
+    SPEC_XML="${SPEC_DIR}/${PRJ}.xml"
+    SPEC_XSL="${SPEC_DIR}/${PRJ}.xsl"
+
+    if [ -e ${SPEC_XSL} ]; then
+      xsltproc -o generated/${PRJ}.xml \
+         $SPEC_XSL \
          ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
-      SPEC=generated/${1}.xml
+
+      SPEC_XML=generated/${PRJ}.xml
     fi
 
-    if [ -e ${SPEC} ]; then
+    if [ -e ${SPEC_XML} ]; then
       # cspecs
-      mucfgcvresalloc  ${SPEC} \
-        generated/${1}.xml -I generated
+      mucfgcvresalloc ${SPEC_XML} \
+        generated/${PRJ}.xml -I generated
 
       # Filter xml cspecs
       muxmlfilter -isn Component_Ext -osn Component \
-        generated/${1}.xml generated/${1}_filtered.xml
+        generated/${PRJ}.xml generated/${PRJ}_filtered.xml
 
       # Generate cspecs
-      mucgenspec -i generated/${1}_filtered.xml \
-                 generated
+      mucgenspec -i generated/${PRJ}_filtered.xml generated
     fi
   }

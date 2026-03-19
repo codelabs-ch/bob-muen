@@ -32,18 +32,17 @@ multiPackage:
   subjects:
     multiPackage:
       event_logger:
-        inherit: [muen_component]
+        inherit: [muen_component_app]
         depends:
+          - muen::common-debug-dev
           - muen::component-libmubase-dev
           - name: muen::arm64-systems-common
             environment:
               NAME: "subject_one"
-        buildVars: [OBJCOPY]
         buildScript: |
-          muenBuild $1/subjects/event_logger/event_logger.gpr
-          muenBuildBin event_logger.elf
+          muenBuildApp subjects/event_logger
         packageScript: |
-          cp $1/install/usr/bin/event_logger.* .
+          muenInstallApp event_logger
       example:
         inherit: [muen_component]
         depends:

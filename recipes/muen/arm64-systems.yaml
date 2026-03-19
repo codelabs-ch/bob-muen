@@ -18,9 +18,7 @@ multiPackage:
         depends:
           - muen::common-debug-dev
           - muen::component-libmubase-dev
-          - name: muen::arm64-systems-common
-            environment:
-              NAME: "subject_one"
+          - muen::arm64-systems-common
         buildScript: |
           muenBuildApp subjects/event_logger
         packageScript: |
@@ -30,9 +28,7 @@ multiPackage:
         depends:
           - muen::component-libmubase-dev
           - muen::component-libs-libmudebuglog-dev
-          - name: muen::arm64-systems-common
-            environment:
-              NAME: "subject_one"
+          - muen::arm64-systems-common
           - muen::component-libs-libmusinfo-dev
         buildVars: [OBJCOPY, NAME, SYSTEM, HARDWARE]
         buildTools: [mucgenspec, target-toolchain]

@@ -7,6 +7,9 @@ checkoutSCM:
 multiPackage:
   common:
     inherit: [muen_component]
+    depends:
+      - muen::common-common-dev
+    buildVars: [ARCH]
     buildScript: |
       muenBuild $1/bsp/common/arm64_common
     packageScript: |

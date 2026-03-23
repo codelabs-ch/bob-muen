@@ -28,30 +28,16 @@ multiPackage:
         packageScript: |
           muenInstallApp event_logger
       example:
-        inherit: [muen_component]
+        inherit: [muen_component_app]
         depends:
           - muen::component-libmubase-dev
           - muen::component-libs-libmudebuglog-dev
           - muen::arm64-systems-common
           - muen::component-libs-libmusinfo-dev
-        buildVars: [OBJCOPY, NAME, SYSTEM, HARDWARE]
-        buildTools: [mucgenspec, target-toolchain]
-        buildSetup: |
-          export GEN_DIR=$(pwd)/generated
         buildScript: |
-          mucgenspec -i $1/subjects/example/spec/example.xml \
-              -p Example generated
-
-          ln -snf $1/subjects/example/spec/example.xml
-          muenBuild $1/subjects/example/example.gpr
-          muenBuildBin example.elf
+          muenBuildApp subjects/example
         packageScript: |
-          cp $1/install/usr/bin/example.* .
-          mkdir -p usr/share/
-          cp -L $1/example.xml usr/share
-          mkdir -p .bob
-          echo usr/share/example.xml > .bob/cspecs
-
+          muenInstallApp example
   bootloader-binaries:
     buildVars: [HARDWARE]
     buildScript: |

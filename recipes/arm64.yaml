@@ -142,7 +142,7 @@ buildScript: |
       if [[ ${SYSTEM} == "minimal" ]]; then
         cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-event_logger]}/event_logger_* .
       else
-        cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-example]}/example.bin subject_one.bin
+        cp ${BOB_DEP_PATHS[muen::arm64-systems-subjects-example]}/example_* .
         cp ${BOB_DEP_PATHS[muen::components-dbgserver]}/dbgserver_* .
       fi
 

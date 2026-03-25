@@ -4,14 +4,14 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/base.git
   branch: main
-  commit: 26398ed095104fd7c60d9e8f3bf3b63f9b7a3d9a
+  commit: 84c26343fdc581b6eabd4afb14e5e5b1bdae6c19
 
 multiPackage:
   ld:
     buildScript: |
-      cp $1/component.*.ld .
+      cp $1/component.ld .
     packageScript: |
-      cp $1/component.*.ld .
+      cp $1/component.ld .
   "":
     depends:
       - muen::common-common-dev

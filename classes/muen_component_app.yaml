@@ -11,7 +11,7 @@ buildSetup: |
   muenBuildApp() {
     muenCspecs $1
     GPRBUILD_EXTRA_ARGS="
-      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.${ARCH}.ld \
+      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
       -Xstacksize=8192" \
 
     # check for arch-specific project file

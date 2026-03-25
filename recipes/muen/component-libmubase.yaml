@@ -3,15 +3,15 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/base.git
-  branch: arm64-systems-cleanup
-  commit: ad554830dbff84cf4e4956c371a3f37e0b618bde
+  branch: use-one-linkerscript
+  commit: a7ec0b234cfe601434e2c37429f49e9fd0d322b9
 
 multiPackage:
   ld:
     buildScript: |
-      cp $1/component.*.ld .
+      cp $1/component.ld .
     packageScript: |
-      cp $1/component.*.ld .
+      cp $1/component.ld .
   "":
     depends:
       - muen::common-common-dev

@@ -1,4 +1,5 @@
 buildVars: [BOB_PACKAGE_NAME]
+buildTools: [target-toolchain]
 buildScript: |
   mkdir -p gcov
   for T in ${!BOB_DEP_PATHS[@]}; do

@@ -40,7 +40,7 @@ buildScript: |
       --timeout=${GNATPROVE_TIMEOUT:-10} \
       --steps=${GNATPROVE_STEPS:-0} \
       --warnings=error \
-      ${GNATPROVE_EXTRA_ARGS:-} >gnatprove.log 2>&1
+      ${GNATPROVE_EXTRA_ARGS:-} 2>&1 | tee gnatprove.log
   }
 packageScript: |
   cp $(find $1 -name gnatprove.out) .

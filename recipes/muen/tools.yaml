@@ -1,5 +1,3 @@
-inherit: [muen_component, python3]
-
 checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
@@ -8,6 +6,7 @@ checkoutSCM:
 
 multiPackage:
   liballoc:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:
@@ -29,6 +28,7 @@ multiPackage:
           muenPackageTest
 
   libmucfgcheck:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmulog-dev
       - muen::tools-libmuxml-dev
@@ -53,6 +53,7 @@ multiPackage:
           muenPackageTest
 
   libmucfgvcpu:
+    inherit: [muen_component]
     depends:
       - muen::build-cfg-scripts
       - muen::tools-libmuxml-dev
@@ -82,6 +83,7 @@ multiPackage:
           TEST_NAME: "libmucfgvcpu"
 
   libmulog-dev:
+    inherit: [muen_component]
     depends:
       - codelabs::libs::alog-dev
     buildScript: |
@@ -91,6 +93,7 @@ multiPackage:
       gprInstallPackageDev
 
   libmupy:
+    inherit: [python3]
     buildScript: |
       mkdir -p $(pwd)/${PYTHON3_DESTLIB}/site-packages/
       cp -r $1/libmupy/* $(pwd)/${PYTHON3_DESTLIB}/site-packages/
@@ -98,6 +101,7 @@ multiPackage:
       rsync -a --delete $1/ .
 
   libmutools:
+    inherit: [muen_component]
     depends:
       - ada::ada-bfd-dev
       - muen::tools-libmulog-dev
@@ -115,7 +119,7 @@ multiPackage:
           TEST_NAME: "libmutools"
 
   libmuxml:
-    inherit: [python3]
+    inherit: [muen_component, python3]
     depends:
       - name: python::lxml
         tools:
@@ -171,6 +175,7 @@ multiPackage:
           TEST_NAME: "libmuxml"
 
   libpaging:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:
@@ -186,12 +191,14 @@ multiPackage:
           TEST_NAME: "libpaging"
 
   libtest-dev:
+    inherit: [muen_component]
     buildScript: |
       muenBuild $1/libtest/libtest
     packageScript: |
       gprInstallPackageDev
 
   mucbinsplit:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:
@@ -220,6 +227,7 @@ multiPackage:
           muenPackageTest
 
   mucfgalloc:
+    inherit: [muen_component]
     depends:
       - muen::tools-liballoc-dev
       - muen::tools-libmutools-dev
@@ -237,10 +245,12 @@ multiPackage:
           TEST_NAME: "mucfgalloc"
 
   mucfgcjoin:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:
       "":
+        inherit: [muen_component]
         buildScript: |
           muenBuild $1/mucfgcjoin/mucfgcjoin
         packageScript: |
@@ -253,6 +263,7 @@ multiPackage:
           TEST_NAME: "mucfgcjoin"
 
   mucfgcvresalloc:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmucfgcheck-dev
       - muen::tools-libmulog-dev
@@ -271,6 +282,7 @@ multiPackage:
           TEST_NAME: "mucfgcvresalloc"
 
   mucfgexpand:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -295,6 +307,7 @@ multiPackage:
           TEST_NAME: "mucfgexpand"
 
   mucfgmemhashes:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmucfgcheck-dev
     multiPackage:
@@ -311,6 +324,7 @@ multiPackage:
           TEST_NAME: "mucfgmemhashes"
 
   mucfgmerge:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmucfgcheck-dev
       - muen::tools-libmulog-dev
@@ -329,6 +343,7 @@ multiPackage:
           TEST_NAME: "mucfgmerge"
 
   mucfgvalidate:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmucfgcheck-dev
       - muen::tools-libmulog-dev
@@ -348,6 +363,7 @@ multiPackage:
           TEST_NAME: "mucfgvalidate"
 
   mucfgvresalloc:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmucfgcheck-dev
       - muen::tools-libmulog-dev
@@ -366,6 +382,7 @@ multiPackage:
           TEST_NAME: "mucfgvresalloc"
 
   mucgenspec:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmucfgcheck-dev
       - muen::tools-libmutools-dev
@@ -388,6 +405,7 @@ multiPackage:
           TEST_NAME: "mucgenspec"
 
   mucheckelf:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:
@@ -404,6 +422,7 @@ multiPackage:
           TEST_NAME: "mucheckelf"
 
   mucheckstack:
+    inherit: [muen_component]
     depends:
       - adacore::gnatcoll-dev
       - muen::tools-libmutools-dev
@@ -430,6 +449,7 @@ multiPackage:
           muenPackageTest
 
   mugenacpi:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -454,6 +474,7 @@ multiPackage:
           TEST_NAME: "mugenacpi"
 
   mugends:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -477,6 +498,7 @@ multiPackage:
           TEST_NAME: "mugends"
 
   mugendts:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -500,6 +522,7 @@ multiPackage:
           TEST_NAME: "mugendts"
 
   mugenmsrstore:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -518,6 +541,7 @@ multiPackage:
           TEST_NAME: "mugenmsrstore"
 
   mugenpt:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -537,6 +561,7 @@ multiPackage:
           TEST_NAME: "mugenpt"
 
   mugensinfo:
+    inherit: [muen_component]
     depends:
       - muen::common-musinfo-dev
       - muen::tools-libmutools-dev
@@ -554,6 +579,7 @@ multiPackage:
           TEST_NAME: "mugensinfo"
 
   mugensolo5:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:
@@ -570,6 +596,7 @@ multiPackage:
           TEST_NAME: "mugensolo5"
 
   mugenspec:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     buildSetup: |
@@ -600,6 +627,7 @@ multiPackage:
           muenPackageTest
 
   mugentau0cmds:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -620,6 +648,7 @@ multiPackage:
           TEST_NAME: "mugentau0cmds"
 
   mugenzp:
+    inherit: [muen_component]
     depends:
       - adacore::xmlada-dev
       - codelabs::libs::xia-dev
@@ -638,6 +667,7 @@ multiPackage:
           TEST_NAME: "mugenzp"
 
   mupcspkrdbg:
+    inherit: [muen_component]
     multiPackage:
       "":
         buildScript: |
@@ -654,6 +684,7 @@ multiPackage:
           TEST_NAME: "mupcspkrdbg"
 
   muwalkpt:
+    inherit: [muen_component]
     depends:
       - muen::tools-libpaging-dev
     multiPackage:
@@ -670,6 +701,7 @@ multiPackage:
           TEST_NAME: "muwalkpt"
 
   muxmlfilter:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmulog-dev
       - muen::tools-libmuxml-dev
@@ -688,6 +720,7 @@ multiPackage:
           TEST_NAME: "muxmlfilter"
 
   mucfgucode:
+    inherit: [muen_component]
     depends:
       - muen::tools-libmutools-dev
     multiPackage:

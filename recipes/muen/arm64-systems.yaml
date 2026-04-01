@@ -2,73 +2,42 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: 43e80e701766d0303fbdcfd7c88eccad8081241b
+  commit: 9334a9529267f323c6c0ddacbfd0d23a7374dcc6
 
 multiPackage:
   common:
     inherit: [muen_component]
     depends:
-      - muen::arm64-systems-bsp
-    buildSetup: |
-      export BSP_DIR=${BOB_DEP_PATHS[muen::arm64-systems-bsp]}
+      - muen::common-common-dev
+    buildVars: [ARCH]
     buildScript: |
       muenBuild $1/bsp/common/arm64_common
     packageScript: |
       gprInstallPackageDev
-  bsp:
-    buildVars: [CROSS_COMPILE, OBJCOPY, NAME, SYSTEM]
-    buildTools: [target-toolchain]
-    buildScript: |
-      ${CROSS_COMPILE}gnatprep -v $1/bsp/platform/src/board.adb \
-        board.adb \
-        $1/bsp/config/${SYSTEM}/${NAME}/bsp.conf
-
-      ${CROSS_COMPILE}gnatprep -v $1/bsp/platform/src/board.ads \
-        board.ads \
-        $1/bsp/config/${SYSTEM}/${NAME}/bsp.conf
-      cp $1/bsp/platform/src/driver/* .
-    packageScript: |
-      rsync -a --delete $1/ .
   subjects:
     multiPackage:
       event_logger:
-        inherit: [muen_component]
+        inherit: [muen_component_app]
         depends:
-          - name: muen::arm64-systems-common
-            environment:
-              NAME: "subject_one"
-        buildVars: [OBJCOPY]
+          - muen::common-debug-dev
+          - muen::component-libmubase-dev
+          - muen::common-mutimedevents-dev
+          - muen::arm64-systems-common
         buildScript: |
-          muenBuild $1/subjects/event_logger/event_logger.gpr
-          muenBuildBin event_logger.elf
+          muenBuildApp subjects/event_logger
         packageScript: |
-          cp $1/install/usr/bin/event_logger.* .
+          muenInstallApp event_logger
       example:
-        inherit: [muen_component]
+        inherit: [muen_component_app]
         depends:
+          - muen::component-libmubase-dev
           - muen::component-libs-libmudebuglog-dev
-          - name: muen::arm64-systems-common
-            environment:
-              NAME: "subject_one"
+          - muen::arm64-systems-common
           - muen::component-libs-libmusinfo-dev
-        buildVars: [OBJCOPY, NAME, SYSTEM, HARDWARE]
-        buildTools: [mucgenspec, target-toolchain]
-        buildSetup: |
-          export GEN_DIR=$(pwd)/generated
         buildScript: |
-          mucgenspec -i $1/subjects/example/spec/example.xml \
-              -p Example generated
-
-          ln -snf $1/subjects/example/spec/example.xml
-          muenBuild $1/subjects/example/example.gpr
-          muenBuildBin example.elf
+          muenBuildApp subjects/example
         packageScript: |
-          cp $1/install/usr/bin/example.* .
-          mkdir -p usr/share/
-          cp -L $1/example.xml usr/share
-          mkdir -p .bob
-          echo usr/share/example.xml > .bob/cspecs
-
+          muenInstallApp example
   bootloader-binaries:
     buildVars: [HARDWARE]
     buildScript: |

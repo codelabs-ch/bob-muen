@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: 9334a9529267f323c6c0ddacbfd0d23a7374dcc6
+  branch: devel-scheduling-conf
+  commit: 19697f095da0b70dd13882c424164e76029e010c
 
 multiPackage:
   common:

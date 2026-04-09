@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_COMMON_URL:-https://git.codelabs.ch/muen/common.git}
   branch: ${MUEN_COMMON_BRANCH:-main}
-  commit: ${MUEN_COMMON_COMMIT:-17ac27158f9968c50350b7279026e06cf150a93d}
+  commit: ${MUEN_COMMON_COMMIT:-05f10953c9ef2e8f3116ad7b9706ad253aa9a4d2}
 
 multiPackage:
   gpr:

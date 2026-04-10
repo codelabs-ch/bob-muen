@@ -123,7 +123,6 @@ multiPackage:
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
-
     buildTools: [libxslt-tools, tidy]
     buildSetup: |
       export LIBMUXML_GENERATED=$(pwd)/generated
@@ -145,6 +144,10 @@ multiPackage:
         ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_extended_schema \
           generated/${S}.xsd generated/muxml-${S}_extended_schema.ads
       done
+
+      # hardware config schema for mugenhwcfg
+      xsltproc ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/strip-annotations.xsl \
+        generated/hardware_config.xsd > generated/hardware_config_mugenhwcfg.xsd
 
       if [[ ${ARCH} == x86_64 ]]; then
         EXTENDED_SCHEMA_FILES=("system_a_extended" "system_b_extended" "system_src_extended"

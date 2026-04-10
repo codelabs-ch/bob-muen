@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-main}
-  commit: ${MUEN_TOOLS_COMMIT:-1fbeca55242e0c8ecfe603c2411e0bcbab3e1292}
+  commit: ${MUEN_TOOLS_COMMIT:-bb0149c25e382f0da937d3fcfee8d2db630f55f8}
 
 multiPackage:
   liballoc:
@@ -123,7 +123,6 @@ multiPackage:
       - codelabs::libs::xia-dev
       - muen::build-cfg-scripts
       - muen::tools-libtest-dev
-
     buildTools: [libxslt-tools, tidy]
     buildSetup: |
       export LIBMUXML_GENERATED=$(pwd)/generated
@@ -145,6 +144,10 @@ multiPackage:
         ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/xml2ada Muxml.${S}_extended_schema \
           generated/${S}.xsd generated/muxml-${S}_extended_schema.ads
       done
+
+      # hardware config schema for mugenhwcfg
+      xsltproc ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/strip-annotations.xsl \
+        generated/hardware_config.xsd > generated/hardware_config_mugenhwcfg.xsd
 
       if [[ ${ARCH} == x86_64 ]]; then
         EXTENDED_SCHEMA_FILES=("system_a_extended" "system_b_extended" "system_src_extended"

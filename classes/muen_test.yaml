@@ -1,4 +1,4 @@
-inherit: [gpr]
+inherit: [gnat]
 
 depends:
   - adacore::aunit-dev
@@ -20,23 +20,18 @@ buildScript: |
 
     export GCONV_PATH=${BOB_TOOL_PATHS['target-toolchain']}/${TOOLCHAIN_SYSROOT}/usr/lib/gconv
     gnattest -q --test-duration --omit-sloc --no-subprojects \
+        --target=${AUTOCONF_HOST} \
         -P$1
 
-    gprbuild -P $(pwd)/build/test/test_driver \
-      -j${MAKE_JOBS:-$(nproc)} \
-      -gnatef -s -k \
-      --target=${GPR_TARGET} \
-      -p \
-      ${@:2} \
-      -largs "${LARGS[@]}" -lgcov \
-      -cargs "${CARGS[@]}"
+    gnatBuild -P $(pwd)/build/test/test_driver \
+      -o "-largs -lgcov"
 
     pushd build/test
     if [[ ${GNATTEST_DATA_DIR:-UNSET} != UNSET ]]; then
       cp ${GNATTEST_DATA_DIR} . -r
     fi
     mkdir -p obj
-    ./test_runner --exit-status=on --passed-tests=show
+    ../test_runner --exit-status=on --passed-tests=show
     popd
   }
 packageScript: |

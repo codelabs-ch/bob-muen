@@ -1,4 +1,4 @@
-inherit: [gpr]
+inherit: [gnat]
 
 depends:
   - muen::common-gpr
@@ -33,23 +33,14 @@ buildScript: |
     done
     shift $(( OPTIND -1 ))
 
-    gprbuild -P $1 \
-      -j${MAKE_JOBS:-$(nproc)} \
-      --relocate-build-tree=build \
-      -gnatef -s -k \
-      --create-map-file \
-      --target=${GPR_TARGET} \
-      $(gprGetGprbuildRtsArg) \
-      ${GPRBUILD_EXTRA_ARGS:-} \
-      -largs "${LARGS[@]}" \
-      -cargs "${CARGS[@]}"
-    rm -rf install
-    gprinstall -P $1 \
-      --relocate-build-tree=build \
-      --target=${GPR_TARGET} \
-      --prefix="${PREFIX:-install/usr}" \
-      -p \
-      -f
+    local GPR_FILE=$1
+    shift
+    local GPRBUILD_OPTIONS=()
+    local arg
+    for arg in "$@"; do
+      GPRBUILD_OPTIONS+=(-o "$arg")
+    done
+    gnatBuild -P "$GPR_FILE" "${GPRBUILD_OPTIONS[@]}"
 
     if [[ ${INSTALL_CALL_INFO} == 1 ]]; then
       find build -name '*.ci' | \
@@ -90,12 +81,12 @@ buildScript: |
 
 packageScript: |
   muenInstallPackageDev () {
-    gprInstallPackageDev "${@}"
+    gnatPackageDev "${@}"
   }
 
   __BUILD_DIR=$1
   muenInstallPackageTgt () {
-    gprInstallPackageTgt "${@}"
+    gnatPackageTgt "${@}"
 
     if [[ -f ${__BUILD_DIR}/${CSPECS_FILE:-} ]]; then
       mkdir -p usr/share/

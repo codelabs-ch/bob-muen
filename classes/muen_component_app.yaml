@@ -12,16 +12,15 @@ buildSetup: |
   # $2 - Component spec XML to use (optional)
   muenBuildApp() {
     muenCspecs $1 ${2:-}
-    GPRBUILD_EXTRA_ARGS="
-      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
-      -Xstacksize=8192" \
 
     # check for arch-specific project file
     PRJ="${1##*/}"
     if [ -f "${__SRC}/${1}/${PRJ}_${ARCH}.gpr" ]; then
       PRJ=${PRJ}_${ARCH}
     fi
-    muenBuild -n ${__SRC}/${1}/${PRJ}
+    muenBuild -n ${__SRC}/${1}/${PRJ} \
+      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
+      -Xstacksize=8192
 
     # stackcheck
     export OBJ_DIR=$(pwd)/build/obj/

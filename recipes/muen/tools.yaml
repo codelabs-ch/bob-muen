@@ -21,10 +21,11 @@ multiPackage:
         inherit: [muen_test]
         depends:
           - muen::tools-libtest-dev
+        buildSetup: |
+          export GNATTEST_TESTS_DIR=$1/liballoc/tests
         buildScript: |
-          DATA_DIR=$1/liballoc/data \
-          TESTS_DIR=$1/liballoc/tests \
-          muenTest $1/liballoc/gnattest_liballoc
+          GNATTEST_DATA_DIR=$1/liballoc/data \
+            muenTest $1/liballoc/gnattest_liballoc
         packageScript: |
           muenPackageTest
 
@@ -45,10 +46,11 @@ multiPackage:
         privateEnvironment:
           TEST_NAME: "libmucfgcheck"
         buildVars: [TEST_NAME]
+        buildSetup: |
+          export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
         buildScript: |
-          DATA_DIR=$1/${TEST_NAME}/data \
-          TESTS_DIR=$1/${TEST_NAME}/tests \
-          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+          GNATTEST_DATA_DIR=$1/${TEST_NAME}/data \
+            muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
 
@@ -210,15 +212,15 @@ multiPackage:
         privateEnvironment:
           TEST_NAME: "mucbinsplit"
         buildVars: [TEST_NAME, OBJCOPY]
+        buildSetup: export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
         buildScript: |
           mkdir -p build/test/obj
           SECTIONS=(data text rodata)
           for S in ${SECTIONS[@]}; do
             ${OBJCOPY} -Obinary --only-section=.${S} $1/mucbinsplit/data/test_binary_x86_64 build/test/obj/${S}.ref
           done
-          DATA_DIR=$1/${TEST_NAME}/data \
-          TESTS_DIR=$1/${TEST_NAME}/tests \
-          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+          GNATTEST_DATA_DIR=$1/${TEST_NAME}/data \
+            muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
 
@@ -423,12 +425,12 @@ multiPackage:
         privateEnvironment:
           TEST_NAME: "mucheckstack"
         buildVars: [TEST_NAME]
+        buildSetup: export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
         buildScript: |
           gprbuild -q -p -P$1/${TEST_NAME}/data/testci --relocate-build-tree=$(pwd)/build/test/test_ci
           gprbuild -q -p -P$1/${TEST_NAME}/data/testci_main --relocate-build-tree=$(pwd)/build/test/test_ci_main
-          DATA_DIR=$1/${TEST_NAME}/data \
-          TESTS_DIR=$1/${TEST_NAME}/tests \
-          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+          GNATTEST_DATA_DIR=$1/${TEST_NAME}/data \
+            muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
 
@@ -593,12 +595,12 @@ multiPackage:
         privateEnvironment:
           TEST_NAME: "mugenspec"
         buildVars: [TEST_NAME]
+        buildSetup: export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
         buildScript: |
           mkdir -p build/test
           rsync -a $1/${TEST_NAME}/templates build/test
-          DATA_DIR=$1/${TEST_NAME}/data \
-          TESTS_DIR=$1/${TEST_NAME}/tests \
-          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+          GNATTEST_DATA_DIR=$1/${TEST_NAME}/data \
+            muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
 

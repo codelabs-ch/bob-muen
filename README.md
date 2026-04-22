@@ -46,18 +46,18 @@ Start `gnatstudio` (needs to be in PATH):
 ### Kernel (x86)
 
 #### Debug
-    $ bob dev /x86-qemu-debug/muen::x86-kernel
-    $ bob project -n gnatstudio /x86-qemu-debug/muen::x86-kernel \
+    $ bob dev x86-qemu-debug/muen::x86-kernel
+    $ bob project -n gnatstudio x86-qemu-debug/muen::x86-kernel \
           --name x86-kernel-debug --gpr kernel_debug.gpr
 
 #### Release
-    $ bob dev /x86-qemu-release/muen::x86-kernel
-    $ bob project -n gnatstudio /x86-qemu-release/muen::x86-kernel \
+    $ bob dev x86-qemu-release/muen::x86-kernel
+    $ bob project -n gnatstudio x86-qemu-release/muen::x86-kernel \
           --name x86-kernel-release --gpr kernel.gpr
 
 #### Proof
-    $ bob dev /x86-qemu-proof/muen::x86-kernel-proof
-    $ bob project -n gnatstudio /x86-qemu-proof/muen::x86-kernel-proof \
+    $ bob dev x86-qemu-proof/muen::x86-kernel-proof
+    $ bob project -n gnatstudio x86-qemu-proof/muen::x86-kernel-proof \
           --name x86-kernel-proof --gpr kernel.gpr
 
 ### Mugends
@@ -75,7 +75,7 @@ Start `gnatstudio` (needs to be in PATH):
           //muen::tools-mucfgexpand
     $ bob project -n gnatstudio //muen::tools-mucfgexpand \
           --name mucfgexpand --gpr mucfgexpand.gpr \
-          -S .*libmu.* -S .*libmutools.* -S .*libmucfgvcpu.*
+          -S .*muen::tools-libmu.*
 
     $ bob dev muen_unittests//muen::tools-mucfgexpand-test
     $ bob project -n gnatstudio muen_unittests//muen::tools-mucfgexpand-test \

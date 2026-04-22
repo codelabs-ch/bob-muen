@@ -226,12 +226,16 @@ multiPackage:
         privateEnvironment:
           GNATPROVE_STEPS: "200000"
           GNATPROVE_TIMEOUT: "0"
-      test:
+      test: &simple_test
         inherit: [muen_test]
+        privateEnvironment:
+          TEST_NAME: "libmutime"
+        buildVars: [TEST_NAME]
+        buildSetup: |
+          export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
         buildScript: |
-          DATA_DIR=$1/libmutime \
-          TESTS_DIR=$1/libmutime/tests \
-          muenTest $1/libmutime/gnattest_libmutime
+          GNATTEST_DATA_DIR=$1/${TEST_NAME}
+          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
 
@@ -267,13 +271,9 @@ multiPackage:
         buildScript: |
           muenProof
       test:
-        inherit: [muen_test]
-        buildScript: |
-          DATA_DIR=$1/libmusinfo \
-          TESTS_DIR=$1/libmusinfo/tests \
-          muenTest $1/libmusinfo/gnattest_libmusinfo
-        packageScript: |
-          muenPackageTest
+        <<: *simple_test
+        privateEnvironment:
+          TEST_NAME: "libmusinfo"
 
   tests:
     inherit: [muen_tests]

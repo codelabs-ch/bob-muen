@@ -19,8 +19,8 @@ layers:
   - name: ada
     scm: git
     url: https://git.codelabs.ch/bob/ada.git
-    branch: main
-    commit: 013de77a8ee2fab635ba136fc5a573288451ca28
+    branch: ada-bfd-update
+    commit: 35a2266cf7b29630c2e5d2dcd048c47d9598168b
 
   - name: codelabs
     scm: git

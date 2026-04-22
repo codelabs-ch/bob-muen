@@ -76,3 +76,11 @@ Start `gnatstudio` (needs to be in PATH):
     $ bob project -n gnatstudio //muen::tools-mucfgexpand \
           --name mucfgexpand --gpr mucfgexpand.gpr \
           -S .*libmu.* -S .*libmutools.* -S .*libmucfgvcpu.*
+
+    $ bob dev muen_unittests//muen::tools-mucfgexpand-test
+    $ bob project -n gnatstudio muen_unittests//muen::tools-mucfgexpand-test \
+          --name mucfgexpand-test \
+          --gpr gnattest_mucfgexpand.gpr \
+          -S .*muen::tools-libmuxml.* \
+          -S .*muen::tools-libmucfgvcpu.* \
+          -S .*muen::tools-libmutools.*

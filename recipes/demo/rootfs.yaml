@@ -25,6 +25,10 @@ depends:
       - utils::cryptsetup
       - utils::ttysnoop
 
+  - if: "$(eq,${ROOTFS_ARCH:-},arm64)"
+    depends:
+      - libs::libgpiod
+
   - name: muen::linux-modules
     use: [environment, result]
   - muen::muenblock

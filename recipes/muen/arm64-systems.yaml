@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: f0e07d7a97cec264dd3d59687689bd9c40e2e446
+  branch: devel-i2c-gpio-support
+  commit: 6c3cd5737e141af9c1bb3bf0d4e8b18dd4f0398a
 
 multiPackage:
   common:

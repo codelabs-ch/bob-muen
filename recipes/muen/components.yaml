@@ -427,7 +427,8 @@ multiPackage:
   tau0:
     inherit: [muen_component_app]
     depends:
-      - muen::x86-systems-policy
+      - name: muen::x86-systems-policy
+        use: [result]
       - muen::component-libmubase-dev
     buildSetup: |
       export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-systems-policy]}

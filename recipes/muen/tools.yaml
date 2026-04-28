@@ -430,7 +430,7 @@ multiPackage:
   mucheckstack:
     inherit: [muen_component]
     depends:
-      - adacore::gnatcoll-dev
+      - adacore::gnatcoll-projects-dev
       - muen::tools-libmutools-dev
     multiPackage:
       "":

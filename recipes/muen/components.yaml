@@ -154,6 +154,12 @@ multiPackage:
                    $1/dbgserver/misc/logchannels.xsl \
                    ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
 
+          # generate logreaderstates.xml
+          xsltproc -o generated/logreaderstates.xml \
+                   --stringparam COMPONENTNAME dbgserver \
+                   $1/dbgserver/misc/logreaderstates.xsl \
+                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
           # generate subject_consoles.xml
           xsltproc -o generated/subject_consoles.xml \
                    --stringparam COMPONENTNAME dbgserver \

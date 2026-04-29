@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/libxhcidbg.git
-  branch: muen
-  commit: fd213202d1dea095dfbd2b6a0704b6fa61482d7f
+  branch: muen-fix-timeout
+  commit: e5718ef1335e6b89e62265f5c3e32a620e314e1f
 
 depends:
   - libs::libhwbase-dev

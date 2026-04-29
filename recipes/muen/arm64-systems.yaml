@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: a0dab67a5f38c6adb86010a8171d6643add15b65
+  commit: 15e1ffda77cfe41ef54d37786917c2599eb55080
 
 multiPackage:
   common:
@@ -21,6 +21,7 @@ multiPackage:
         depends:
           - muen::common-debug-dev
           - muen::component-libmubase-dev
+          - muen::component-libs-libmusinfo-dev
           - muen::common-mutimedevents-dev
           - muen::arm64-systems-common
         buildScript: |

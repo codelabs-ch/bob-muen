@@ -27,9 +27,8 @@ multiPackage:
             --set-section-flags .bss=alloc,load,contents \
             --set-section-flags .stack=alloc,load,contents \
             $1/install/usr/bin/muinit muinit
-          cp $1/muinit.xml .
-          mkdir -p .bob
-          echo "muinit.xml" > .bob/cspecs
+          mkdir -p .bob/cspecs/
+          cp $1/muinit.xml .bob/cspecs
       proof:
         inherit: [muen_proof_app]
         environment:

@@ -24,10 +24,7 @@ multiPackage:
     packageScript: |
       muenInstallPackageDev
   tgt:
-    packageVars: [CSPECS_FILE]
     packageScript: |
       muenInstallPackageTgt
-      mkdir -p usr/share/
-      cp -L $1/libxhcidbg.xml usr/share
-      mkdir -p .bob
-      echo usr/share/libxhcidbg.xml > .bob/cspecs
+      mkdir -p .bob/cspecs/
+      cp -L $1/libxhcidbg.xml .bob/cspecs

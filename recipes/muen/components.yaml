@@ -339,13 +339,14 @@ multiPackage:
           - muen::component-libs-libmuinit-tgt
     multiPackage:
       "":
-        inherit: [muen_component_app]
+        inherit: [muen_component_app, python3]
         buildScript: |
           muenBuildApp sl
-          mv install/sl.xml sl_split.xml
-          $1/sl/misc/adjust-xml-spec.py sl_split.xml install/sl.xml
+          mv install/.bob/cspecs/sl.xml sl_split.xml
+          $1/sl/misc/adjust-xml-spec.py sl_split.xml \
+            install/.bob/cspecs/sl.xml
         packageScript: |
-          muenInstallApp sl
+          muenInstallApp
       proof:
         inherit: [muen_proof_app]
         environment:

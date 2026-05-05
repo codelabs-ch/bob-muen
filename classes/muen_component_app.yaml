@@ -28,16 +28,15 @@ buildSetup: |
 
     # binsplit
     if [[ -e generated/$1.xml ]]; then
+      mkdir -p install/.bob/cspecs/
       mucbinsplit -i generated/$1.xml \
                   -b install/usr/bin/$1 \
-                  -o install/$1.xml install/
+                  -o install/.bob/cspecs/$1.xml install/
     fi
   }
 
 packageSetup: |
   __SRC=$1
   muenInstallApp() {
-    installPackageBin $__SRC/install/
-    mkdir -p .bob
-    echo "$1.xml" > .bob/cspecs
+    installPackageBin $__SRC/install/ ".bob" ".bob/***"
   }

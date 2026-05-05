@@ -89,10 +89,8 @@ packageScript: |
     gnatPackageTgt "${@}"
 
     if [[ -f ${__BUILD_DIR}/${CSPECS_FILE:-} ]]; then
-      mkdir -p usr/share/
-      cp ${__BUILD_DIR}/${CSPECS_FILE:-} usr/share
-      mkdir -p .bob
-      echo usr/share/$(basename ${CSPECS_FILE:-}) > .bob/cspecs
+      mkdir -p .bob/cspecs
+      cp ${__BUILD_DIR}/${CSPECS_FILE:-} .bob/cspecs
     fi
 
   }

@@ -38,6 +38,6 @@ buildSetup: |
     if [[ -z ${MUEN_EXTERNAL_CSPECS:-} ]]; then
       __muenCspecs ${@}
     else
-      cp -a ${BOB_DEP_PATHS[${MUEN_EXTERNAL_CSPECS}]}/* generated -r
+      rsync -aHk ${BOB_DEP_PATHS[${MUEN_EXTERNAL_CSPECS}]}/ generated/
     fi
   }

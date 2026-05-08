@@ -160,7 +160,9 @@ log.info(f"Using dist dir '{dist_dir}'")
 stop_disable()
 if "x86" in args.query:
     log.info("Assuming x86 architecture")
-    run_x86(image=(Path(dist_dir) / "muen.iso").absolute())
+    env_image = os.environ.get("MUEN_X86_QEMU_DISK")
+    image = (Path(dist_dir) / "muen.iso").absolute() if not env_image else Path(env_image)
+    run_x86(image=image)
 elif "arm64" in args.query:
     log.info("Assuming arm64 architecture")
 

@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/x86/systems.git
   branch: main
-  commit: 63fe92e88990783915fa96f9529813640dcb2172
+  commit: 1e7e094eb4b85fa913b3937adf28a9465db90578
 
 multiPackage:
   bootloader-cfg:

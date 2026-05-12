@@ -85,7 +85,8 @@ multiPackage:
       - bsp::intel::microcode
       - muen::linux-image
       - muen::component-libs-muinitstub
-      - muen::components-ahci_drv
+      - muen::components-storage_drv-ahci
+      - muen::components-storage_drv-nvme
       - muen::components-controller
       - muen::components-dbgserver
       - muen::components-dm

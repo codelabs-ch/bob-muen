@@ -8,8 +8,9 @@ buildSetup: |
   __SRC=$1
 
   # $1 - SRC relative component directory
+  # $2 - Component spec XML to use (optional)
   muenBuildApp() {
-    muenCspecs $1
+    muenCspecs $1 ${2:-}
     GPRBUILD_EXTRA_ARGS="
       -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
       -Xstacksize=8192" \
@@ -29,8 +30,11 @@ buildSetup: |
 packageTools: [mucbinsplit]
 packageSetup: |
   __SRC=$1
+  # $1 - Component name
+  # $2 - Component spec XML to use (optional)
   muenInstallApp() {
-    mucbinsplit -i ${__SRC}/generated/$1.xml \
+    spec=${2:-${__SRC}/generated/$1.xml}
+    mucbinsplit -i ${spec} \
                 -b ${__SRC}/install/usr/bin/$1 \
                 -o $1.xml .
     mkdir -p .bob

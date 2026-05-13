@@ -253,7 +253,7 @@ for r in "${!runner[@]}"; do
 	arch="${r%%-*}"
 	scenario="${r#${arch}-}"
 	varname=$(echo ${scenario} | tr '[:lower:]' '[:upper:]' | tr '-' '_')_IMAGE_DIR
-	varvalue="${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} //${r})"
+	varvalue="${RECIPES}/$(bob query-path --fail -f '{dist}' ${sandbox} /${r})"
 	nci_defines+=( "-D${varname}=${varvalue}" )
 done
 

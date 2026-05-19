@@ -9,10 +9,11 @@ buildSetup: |
   export __SRC=$1
 
   # $1 - SRC relative component directory
+  # $2 - Component spec XML to use (optional)
   muenCspecs() {
     PRJ="${1##*/}"
     SPEC_DIR="${__SRC}/$1/spec"
-    SPEC_XML="${SPEC_DIR}/${PRJ}.xml"
+    SPEC_XML="${2:-${SPEC_DIR}/${PRJ}.xml}"
     SPEC_XSL="${SPEC_DIR}/${PRJ}.xsl"
 
     if [ -e ${SPEC_XSL} ]; then

@@ -17,7 +17,7 @@ jobs:
           - x86-upsquared-efi-debug
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install pipx
         run: |
@@ -44,7 +44,7 @@ jobs:
           - x86-qemu-release
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install packages
         run: |
@@ -72,7 +72,7 @@ jobs:
           - x86-nuc5i5myhe-solo5-debug
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install pipx
         run: |

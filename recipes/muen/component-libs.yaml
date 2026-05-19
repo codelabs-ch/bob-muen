@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git
   branch: main
-  commit: a23a37698ac69bc2da578a9a973218da2b01829b
+  commit: de02c1d6da462498e6f9e64f21c57ff149e7b483
 
 multiPackage:
   muinitstub:

@@ -186,7 +186,8 @@ multiPackage:
           - muen::component-libs-libmutime-proof
           - muen::component-libs-muinitstub-proof
 
-          - muen::components-ahci_drv-proof
+          - muen::components-storage_drv-ahci-proof
+          - muen::components-storage_drv-nvme-proof
           - muen::components-controller-proof
           - muen::components-dm-proof
           - muen::components-example-proof

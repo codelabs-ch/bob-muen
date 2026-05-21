@@ -206,10 +206,15 @@ multiPackage:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
       - muen::component-libs-libmusinfo-dev
-    buildVars: [ARCH]
-    buildScript: |
-      muenBuild $1/libmucoll/libmucoll
-    multiPackage: *common_dev_tgt_provide
+    privateEnvironment:
+      GPR_PATH: "libmucoll/libmucoll"
+    buildVars: [ARCH, GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
 
   libmupci:
     depends:

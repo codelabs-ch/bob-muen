@@ -199,6 +199,7 @@ multiPackage:
     depends:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
+      - muen::component-libs-libmusinfo-dev
     buildVars: [ARCH]
     buildScript: |
       muenBuild $1/libmucoll/libmucoll

@@ -191,9 +191,15 @@ multiPackage:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
       - muen::component-libs-libmudebuglog-dev
-    buildScript: |
-      muenBuild $1/libmublock/libmublock
-    multiPackage: *common_dev_tgt_provide
+    privateEnvironment:
+      GPR_PATH: "libmublock/libmublock"
+    buildVars: [GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
 
   libmucoll:
     depends:

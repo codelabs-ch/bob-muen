@@ -220,6 +220,7 @@ multiPackage:
     depends:
       - muen::common-strings-dev
       - muen::component-libmubase-dev
+      - muen::component-libs-libmucoll-dev
       - muen::component-libs-libmudebuglog-dev
     privateEnvironment:
       GPR_PATH: "libmupci/libmupci"
@@ -227,7 +228,7 @@ multiPackage:
     multiPackage:
       "":
         buildScript: muenBuild $1/${GPR_PATH}
-        multiPackage: *common_dev_tgt
+        multiPackage: *common_dev_tgt_provide
       proof: *common_proof_lib
 
   libmutime:

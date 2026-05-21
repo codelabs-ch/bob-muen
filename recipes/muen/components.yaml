@@ -16,9 +16,8 @@ multiPackage:
     inherit: [muen_component_app]
     depends:
       - muen::component-libs-libmublock-dev
-      - muen::component-libs-libmuchannel-dev
       - muen::component-libs-libmudebuglog-dev
-      - muen::component-libs-libmutime-dev
+      - muen::component-libs-libmucoll-dev
       - muen::common-strings-dev
       - use: []
         depends:

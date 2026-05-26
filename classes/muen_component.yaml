@@ -44,7 +44,7 @@ buildScript: |
 
     if [[ ${INSTALL_CALL_INFO} == 1 ]]; then
       find build -name '*.ci' | \
-        rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/share/ci/
+        rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/lib
     fi
   }
 

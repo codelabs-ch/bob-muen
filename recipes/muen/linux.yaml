@@ -7,7 +7,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux.git
   branch: linux-6.1.82-muen-unified
-  commit: a0d6188d7fc4ade5a2a2896da99a88a27a2049ba
+  commit: 85a3397220d7e1b6bc75fae39e358251441dd1fb
   shallow: 50
 
 depends:

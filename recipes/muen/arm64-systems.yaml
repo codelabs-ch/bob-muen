@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: 15e1ffda77cfe41ef54d37786917c2599eb55080
+  commit: a2913423dd880ec11db43331f0bdaf75fb91b0b6
 
 multiPackage:
   common:
@@ -87,8 +87,14 @@ multiPackage:
       fi
 
   linux-config:
+    inherit: [kconfig]
+    buildVars: [USE_ARCH_TIMER]
     buildScript: |
       cp $1/linux/kernel.config .
+
+      if [[ ${USE_ARCH_TIMER:-UNSET} != UNSET ]]; then
+        kconfigDisable CONFIG_MUEN_CLKSRC kernel.config
+      fi
     packageScript: |
       cp $1/* .
 

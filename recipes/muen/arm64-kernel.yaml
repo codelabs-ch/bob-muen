@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
   branch: main
-  commit: 1783a9d9f02e9ac9a495d2bf8ecae7defe4327a1
+  commit: bb48b4c5ec7d33aba58edc2fc89d4d2996ca568f
 
 depends:
   - muen::common-debug-dev

@@ -168,6 +168,7 @@ multiPackage:
     depends:
       - muen::component-libs-libmusinfo-dev
       - muen::component-libs-libmucontrol-dev
+      - muen::component-libs-libmupci-dev
       - libs::libsparkcrypto-dev
       - use: []
         depends:

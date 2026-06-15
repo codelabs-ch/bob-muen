@@ -204,6 +204,20 @@ multiPackage:
       muenBuild $1/libmucoll/libmucoll
     multiPackage: *common_dev_tgt_provide
 
+  libmupci:
+    depends:
+      - muen::common-strings-dev
+      - muen::component-libmubase-dev
+      - muen::component-libs-libmudebuglog-dev
+    privateEnvironment:
+      GPR_PATH: "libmupci/libmupci"
+    buildVars: [GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt
+      proof: *common_proof_lib
+
   libmutime:
     privateEnvironment:
       CSPECS_FILE: "generated/libmutime.xml"

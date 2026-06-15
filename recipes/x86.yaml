@@ -182,6 +182,7 @@ multiPackage:
           - muen::component-libs-libmudebuglog-proof
           - muen::component-libs-libmudm-proof
           - muen::component-libs-libmuinit-proof
+          - muen::component-libs-libmupci-proof
           - muen::component-libs-libmutime-proof
           - muen::component-libs-muinitstub-proof
 

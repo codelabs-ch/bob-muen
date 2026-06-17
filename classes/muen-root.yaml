@@ -38,6 +38,8 @@ depends:
 
   - tools:
       target-toolchain: host-compat-gnat-toolchain
+    environment:
+      MUEN_BUILD_MODE: "release"
     depends:
 
       - name: adacore::gprbuild-bootstrap

@@ -83,7 +83,7 @@ def run_arm64(workdir: Path):
             log.info(f.read().rstrip())
 
 
-def run_x86(image: Path):
+def run_x86(image: Path, extra_options: str = ""):
     h = Host(
         name="x86-qemu", plan="testplan", artifacts_dir=".", config={"steps": None}
     )
@@ -109,6 +109,7 @@ def run_x86(image: Path):
         use_pseudo_term=args.pseudo_term,
         netdev_extra_options=netdev_extra_opts,
         disk_config=disk_config,
+        extra_options=extra_options,
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
     log.info("SSH root password is 'muen'")
@@ -162,7 +163,8 @@ if "x86" in args.query:
     log.info("Assuming x86 architecture")
     env_image = os.environ.get("MUEN_X86_QEMU_DISK")
     image = (Path(dist_dir) / "muen.iso").absolute() if not env_image else Path(env_image)
-    run_x86(image=image)
+    env_xtraopts = os.environ.get("MUEN_X86_EXTRA_OPTS")
+    run_x86(image=image, extra_options=env_xtraopts if env_xtraopts else "")
 elif "arm64" in args.query:
     log.info("Assuming arm64 architecture")
 

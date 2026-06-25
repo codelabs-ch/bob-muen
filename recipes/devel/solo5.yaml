@@ -2,15 +2,16 @@ inherit: [cpackage, make]
 
 checkoutSCM:
   scm: git
-  url: https://github.com/Solo5/solo5.git
-  branch: main
-  commit: dabc69fd89b8119449ec4088c54b458d4ccc851b
+  url: https://github.com/codelabs-ch/solo5.git
+  branch: main-8b4a38cf8b03+codelabs
+  commit: 1443b0608061b6dbcf5e91e974e1bf1bf088ff8a
 
 buildTools: [host-toolchain, target-toolchain]
 buildVars: [AUTOCONF_BUILD, CC]
 buildScript: |
   rsync -a --delete $1/ .
   sed -i 's/CONFIG_SPT_TENDER=1//' configure.sh
+  sed -i 's/CONFIG_HVT_TENDER=1//' configure.sh
   sed -i 's/--dirty//' scripts/gen_version_h.sh
   HOST_CC=${AUTOCONF_BUILD}-gcc TARGET_CC=${CC} ./configure.sh --prefix=.
   makeParallel

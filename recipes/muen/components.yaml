@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
-  branch: main
-  commit: 3ea99fa88dfab3e34c0fcd6efe20ddd6f37de8d7
+  branch: nvme-improvements
+  commit: aec1b5ecf55fe0a4412fe4df8484200f544f53ca
 
 environment:
   MUEN_COMMON_VARIANT: "component"

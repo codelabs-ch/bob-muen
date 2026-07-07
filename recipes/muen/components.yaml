@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
-  branch: main
-  commit: bed37123b0636454c34f246115736878a960b0db
+  branch: devel-muen-time
+  commit: b40e49be08bc5710b9345dc733a291be894fe6f3
 
 environment:
   MUEN_COMMON_VARIANT: "component"

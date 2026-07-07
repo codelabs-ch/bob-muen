@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: a2913423dd880ec11db43331f0bdaf75fb91b0b6
+  branch: devel-muen-time
+  commit: fb523c4878629eb1efc24829f2cfaa8e51e43746
 
 multiPackage:
   common:
@@ -133,11 +133,13 @@ multiPackage:
       - environment:
           RTS: "muen::rts"
         depends:
-          - muen::arm64-systems-subjects-event_logger
+          - muen::components-dbgserver
+          - if: "$(eq,${SYSTEM:-},minimal)"
+            depends:
+              - muen::arm64-systems-subjects-event_logger
           - if: "$(eq,${SYSTEM:-},multicore)"
             depends:
               - muen::arm64-systems-subjects-example
-              - muen::components-dbgserver
     buildTools:
       - mugenpt
       - mugensinfo

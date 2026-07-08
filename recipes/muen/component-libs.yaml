@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git
   branch: main
-  commit: da589b98fba52a5d92c8dc290c5a0e33ed188df8
+  commit: 818214f880d6ff296f6399c38c01351e180c4c9a
 
 multiPackage:
   muinitstub:
@@ -168,6 +168,7 @@ multiPackage:
     depends:
       - muen::component-libs-libmusinfo-dev
       - muen::component-libs-libmucontrol-dev
+      - muen::component-libs-libmupci-dev
       - libs::libsparkcrypto-dev
       - use: []
         depends:
@@ -191,18 +192,45 @@ multiPackage:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
       - muen::component-libs-libmudebuglog-dev
-    buildScript: |
-      muenBuild $1/libmublock/libmublock
-    multiPackage: *common_dev_tgt_provide
+    privateEnvironment:
+      GPR_PATH: "libmublock/libmublock"
+    buildVars: [GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
 
   libmucoll:
     depends:
       - muen::component-libmubase-dev
       - muen::component-libs-libmuchannel-dev
-    buildVars: [ARCH]
-    buildScript: |
-      muenBuild $1/libmucoll/libmucoll
-    multiPackage: *common_dev_tgt_provide
+      - muen::component-libs-libmusinfo-dev
+    privateEnvironment:
+      GPR_PATH: "libmucoll/libmucoll"
+    buildVars: [ARCH, GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: |
+          muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
+
+  libmupci:
+    depends:
+      - muen::common-strings-dev
+      - muen::component-libmubase-dev
+      - muen::component-libs-libmucoll-dev
+      - muen::component-libs-libmudebuglog-dev
+    privateEnvironment:
+      GPR_PATH: "libmupci/libmupci"
+    buildVars: [GPR_PATH]
+    multiPackage:
+      "":
+        buildScript: muenBuild $1/${GPR_PATH}
+        multiPackage: *common_dev_tgt_provide
+      proof: *common_proof_lib
 
   libmutime:
     privateEnvironment:

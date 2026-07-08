@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
   branch: main
-  commit: 3ea99fa88dfab3e34c0fcd6efe20ddd6f37de8d7
+  commit: bed37123b0636454c34f246115736878a960b0db
 
 environment:
   MUEN_COMMON_VARIANT: "component"
@@ -16,9 +16,9 @@ multiPackage:
     inherit: [muen_component_app]
     depends:
       - muen::component-libs-libmublock-dev
-      - muen::component-libs-libmuchannel-dev
       - muen::component-libs-libmudebuglog-dev
-      - muen::component-libs-libmutime-dev
+      - muen::component-libs-libmucoll-dev
+      - muen::component-libs-libmupci-dev
       - muen::common-strings-dev
       - use: []
         depends:

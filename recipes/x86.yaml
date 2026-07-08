@@ -177,11 +177,14 @@ multiPackage:
             tools:
               target-toolchain: host-compat-gnat-toolchain
 
+          - muen::component-libs-libmublock-proof
           - muen::component-libs-libmuchannel-proof
+          - muen::component-libs-libmucoll-proof
           - muen::component-libs-libmucontrol-proof
           - muen::component-libs-libmudebuglog-proof
           - muen::component-libs-libmudm-proof
           - muen::component-libs-libmuinit-proof
+          - muen::component-libs-libmupci-proof
           - muen::component-libs-libmutime-proof
           - muen::component-libs-muinitstub-proof
 

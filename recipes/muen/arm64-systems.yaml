@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
   branch: main
-  commit: a2913423dd880ec11db43331f0bdaf75fb91b0b6
+  commit: 99f9e6264ef11af6ba7db66abedaa1b058683f33
 
 multiPackage:
   common:
@@ -22,6 +22,7 @@ multiPackage:
           - muen::common-debug-dev
           - muen::component-libmubase-dev
           - muen::component-libs-libmusinfo-dev
+          - muen::component-libs-libmutime-dev
           - muen::common-mutimedevents-dev
           - muen::arm64-systems-common
         buildScript: |
@@ -133,11 +134,14 @@ multiPackage:
       - environment:
           RTS: "muen::rts"
         depends:
-          - muen::arm64-systems-subjects-event_logger
+          - muen::components-dbgserver
+          - muen::components-time
+          - if: "$(eq,${SYSTEM:-},minimal)"
+            depends:
+              - muen::arm64-systems-subjects-event_logger
           - if: "$(eq,${SYSTEM:-},multicore)"
             depends:
               - muen::arm64-systems-subjects-example
-              - muen::components-dbgserver
     buildTools:
       - mugenpt
       - mugensinfo

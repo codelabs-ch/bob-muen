@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
   branch: main
-  commit: bed37123b0636454c34f246115736878a960b0db
+  commit: c9679cf229fb160577a205cd14a19153eceac061
 
 environment:
   MUEN_COMMON_VARIANT: "component"
@@ -434,10 +434,14 @@ multiPackage:
           - muen::component-libs-libmutime-tgt
     multiPackage:
       "":
+        buildVars: [ARCH]
+        buildSetup: |
+          sed -e "s/%%%ARCH%%%/${ARCH}/g" \
+              $1/time/spec/time.xml > time.xml
         buildScript: |
-          muenBuildApp time
+          muenBuildApp time time.xml
         packageScript: |
-          muenInstallApp time
+          muenInstallApp time $1/generated/time.xml
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]

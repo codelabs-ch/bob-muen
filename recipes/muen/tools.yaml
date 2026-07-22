@@ -1,8 +1,8 @@
 checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
-  branch: ${MUEN_TOOLS_BRANCH:-main}
-  commit: ${MUEN_TOOLS_COMMIT:-871a56ca37a44a22852205b2a140c1051f3c78a7}
+  branch: ${MUEN_TOOLS_BRANCH:-devel-muen-time}
+  commit: ${MUEN_TOOLS_COMMIT:-9af7a7ce1689ccc0049f0a528c5f51bd6b721b68}
 
 multiPackage:
   liballoc:

@@ -3,8 +3,8 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git
-  branch: main
-  commit: 818214f880d6ff296f6399c38c01351e180c4c9a
+  branch: devel-muen-time
+  commit: c87da54367c11530342de043f3bcbc1bfdbeea39
 
 multiPackage:
   muinitstub:
@@ -73,6 +73,7 @@ multiPackage:
           muenProof
 
   libmucontroltypes:
+    buildVars: [ARCH]
     buildScript: |
       muenBuild $1/libmucontroltypes/libmucontroltypes
     multiPackage: *common_dev_tgt
@@ -80,11 +81,12 @@ multiPackage:
   libmucontrol:
     inherit: [muen_component_cspecs]
     depends:
+      - muen::common-common-dev
       - muen::component-libs-libmucontroltypes-dev
     privateEnvironment:
       CSPECS_FILE: "generated/libmucontrol.xml"
       GPR_PATH: "libmucontrol/libmucontrol"
-    buildVars: [GPR_PATH]
+    buildVars: [ARCH, GPR_PATH]
     buildScript: |
       muenCspecs libmucontrol
     multiPackage:
@@ -236,7 +238,7 @@ multiPackage:
     privateEnvironment:
       CSPECS_FILE: "generated/libmutime.xml"
       GPR_PATH: "libmutime/libmutime"
-    buildVars: [GPR_PATH]
+    buildVars: [ARCH, GPR_PATH]
     buildSetup: |
       export LIBMUTIME_GENERATED=$(pwd)/generated
     buildTools: [mucgenspec]
@@ -254,7 +256,7 @@ multiPackage:
         privateEnvironment:
           GNATPROVE_STEPS: "200000"
           GNATPROVE_TIMEOUT: "0"
-      test: &simple_test
+      test:
         inherit: [muen_test]
         privateEnvironment:
           TEST_NAME: "libmutime"
@@ -266,6 +268,13 @@ multiPackage:
           muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
+        multiPackage:
+          arm64:
+            buildSetup: |
+              export TEST_SRC=arm64
+          x86_64:
+            buildSetup: |
+              export TEST_SRC=x86_64
 
   libmusinfo:
     depends:
@@ -299,12 +308,21 @@ multiPackage:
         buildScript: |
           muenProof
       test:
-        <<: *simple_test
+        inherit: [muen_test]
         privateEnvironment:
           TEST_NAME: "libmusinfo"
+        buildVars: [TEST_NAME]
+        buildSetup: |
+          export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
+        buildScript: |
+          GNATTEST_DATA_DIR=$1/${TEST_NAME}
+          muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+        packageScript: |
+          muenPackageTest
 
   tests:
     inherit: [muen_tests]
     depends:
       - muen::component-libs-libmusinfo-test
-      - muen::component-libs-libmutime-test
+      - muen::component-libs-libmutime-test-arm64
+      - muen::component-libs-libmutime-test-x86_64

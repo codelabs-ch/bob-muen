@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux.git
-  branch: linux-6.1.82-muen-unified
-  commit: e118d218281c6a25ea1c526e7f9d74df42207e20
+  branch: linux-6.1.82-muen-unified-misc-cleanups
+  commit: 98734146f0391a03d57903b91981aedd7b9e10b1
   shallow: 50
 
 depends:

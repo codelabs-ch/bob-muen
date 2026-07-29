@@ -1,0 +1,41 @@
+From b3e60835c6535b202c40e2e39fc63a7da2567603 Mon Sep 17 00:00:00 2001
+From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
+Date: Wed, 29 Jul 2026 16:18:47 +0200
+Subject: [PATCH] HW.MMIO_Range: Remove Array_T as formal parameter
+
+This is a workaround for the issue that Libxhcidbg declares an array
+type with aspect Atomic_Components. GNAT rightfully raises an error
+that the formal and the actual generic parameter must agree on atomic
+components. The correct fix would be to add the Atomic_Components aspect
+to the generic parameter, however this still does not silence the error.
+The most likely explanation being that there is a compiler issue.
+
+To workaround all of this, simply declare the array type in the private
+part of the generic specification.
+---
+ common/hw-mmio_range.ads | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/common/hw-mmio_range.ads b/common/hw-mmio_range.ads
+index 8495f73b62cc..3ff610be48bb 100644
+--- a/common/hw-mmio_range.ads
++++ b/common/hw-mmio_range.ads
+@@ -18,7 +18,6 @@ generic
+    Base_Addr : Word64;
+    type Element_T is mod <>;
+    type Index_T is range <>;
+-   type Array_T is array (Index_T) of Element_T;
+ package HW.MMIO_Range
+ with
+    Abstract_State =>
+@@ -33,4 +32,8 @@ is
+
+    procedure Set_Base_Address (Base : Word64);
+
++private
++
++   type Array_T is array (Index_T) of Element_T with Atomic_Components;
++
+ end HW.MMIO_Range;
+--
+2.47.3

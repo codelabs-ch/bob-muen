@@ -191,6 +191,7 @@ multiPackage:
           - muen::components-storage_drv-ahci-proof
           - muen::components-storage_drv-nvme-proof
           - muen::components-controller-proof
+          - muen::components-dbgserver-proof
           - muen::components-dm-proof
           - muen::components-example-proof
           - muen::components-sl-proof

@@ -1,4 +1,4 @@
-inherit: [muen_component]
+inherit: [muen_component, patch]
 
 depends:
   - muen::component-libs-libmusinfo-dev
@@ -11,6 +11,10 @@ checkoutSCM:
   url: https://github.com/coreboot/libhwbase.git
   branch: main
   commit: d8fae235d53c0376ab320c3d84a9b414bffe9d64
+
+checkoutDeterministic: True
+checkoutScript: |
+  patchApplySeries -p1 $<@libhwbase/*.patch@>
 
 buildSetup: |
   export LIBHWBASE_SRC=$1

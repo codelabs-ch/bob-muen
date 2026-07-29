@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
   branch: main
-  commit: 93b62a0f717cdec0e580da05a9bfbc02656d2e57
+  commit: 3023c62bd78404f581ae4aaa19e5bc5617d32921
 
 environment:
   MUEN_COMMON_VARIANT: "component"
@@ -117,7 +117,7 @@ multiPackage:
         packageScript: |
           gprInstallPackageDev
       "":
-        inherit: [python3, muen_component_app]
+        inherit: [python3]
         depends:
           - muen::component-libmubase-dev
           - muen::components-dbgserver-config-dev
@@ -141,6 +141,7 @@ multiPackage:
         buildVars: [ARCH, MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |
+          rm -rf generated && mkdir -p generated
           # generate dbg-subject_list.ads
           $1/dbgserver/misc/extract-subject-names.py \
             --out generated/dbg-subject_list.ads \
@@ -164,11 +165,20 @@ multiPackage:
                    --path ${BOB_DEP_PATHS[muen::build-cfg-scripts]}/ \
                    $1/dbgserver/misc/config.xsl \
                    ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
-
-          muenBuildApp dbgserver
-        packageScript: |
-          muenInstallApp dbgserver
-        provideDeps: ['*-tgt']
+        multiPackage:
+          "":
+            inherit: [muen_component_app]
+            buildScript: |
+              muenBuildApp dbgserver
+            packageScript: |
+              muenInstallApp dbgserver
+            provideDeps: ['*-tgt']
+          proof:
+            inherit: [muen_proof_app]
+            environment:
+              RTS: "muen::rts"
+              COMPONENT_NAME: "dbgserver"
+              GPR_PATH: "dbgserver/dbgserver_${ARCH}"
 
   dm:
     depends:

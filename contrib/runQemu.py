@@ -113,6 +113,14 @@ def run_x86(image: Path, extra_options: str = ""):
     )
     log.info(f"Artifacts directory is {vm.artifacts_path}")
     log.info("SSH root password is 'muen'")
+
+    # TODO: add to arm64 too
+    with open('./run/ssh.sh', "w") as f:
+        f.write("#!/bin/sh\nsshpass -p muen ssh localhost -l root -o ConnectTimeout=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p "
+                + vm.host_ref.get_runtime_var(key="host-uri").split(":")[1]
+                + " \"$@\"")
+    os.chmod('./run/ssh.sh', 0o755)
+
     with open(pidfile, "w") as pid:
         pid.write(str(vm.process.proc.pid))
     with open(vm.process.stderr_path, "r") as f:

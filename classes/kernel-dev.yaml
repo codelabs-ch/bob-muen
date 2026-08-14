@@ -82,7 +82,9 @@ packageScript: |
      (
         cd ${__BUILD_DIR}/source
 
-        cp -a scripts $kerneldir
+        cp -a --remove-destination scripts $kerneldir
+        # --remove-destination: $kerneldir/scripts/gdb/linux may be
+        # symlinks, must not try to write through them.
 
         # for v6.1+ (otherwise we are missing multiple default targets)
         cp -a --parents Kbuild $kerneldir/ 2>/dev/null ||:

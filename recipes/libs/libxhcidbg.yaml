@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/libxhcidbg.git
   branch: muen
-  commit: 9f7d86a1b8455d1a300d7e686976583e5216b405
+  commit: 9e6b1a199372845d7aac5f6adb6b262f9cb66b1c
 
 depends:
   - libs::libhwbase-dev

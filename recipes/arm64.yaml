@@ -176,7 +176,7 @@ buildScript: |
       bootgen -arch zynqmp -image bootgen.bif -w -o BOOT.bin
 
       if [[ ${HARDWARE} == qemu-zcu102 ]]; then
-        dd if=/dev/zero of=sdcard.img bs=128M count=1
+        dd if=/dev/zero of=sdcard.img bs=256M count=1
         mkfs.vfat -F 32 sdcard.img
         mcopy -i sdcard.img BOOT.bin ::/
       fi

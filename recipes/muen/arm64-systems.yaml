@@ -28,7 +28,7 @@ multiPackage:
         buildScript: |
           muenBuildApp subjects/event_logger
         packageScript: |
-          muenInstallApp event_logger
+          muenInstallApp
       example:
         inherit: [muen_component_app]
         depends:

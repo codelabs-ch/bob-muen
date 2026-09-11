@@ -24,6 +24,8 @@ depends:
   - name: muen::tau0-static
     tools:
       target-toolchain: host-compat-gnat-toolchain
+    environment:
+      RTS_PLATFORM: "linux"
     use: [tools]
 
   # kernel metric
@@ -63,6 +65,7 @@ multiPackage:
 
           - environment:
               RTS: "muen::rts"
+              RTS_PLATFORM: "bare"
             depends:
               - muen::x86-kernel
         buildTools:
@@ -164,6 +167,8 @@ multiPackage:
       proof:
         environment:
           MUEN_BUILD_MODE: "prove"
+          RTS: "muen::rts"
+          RTS_PLATFORM: "bare"
         depends:
           - muen::common-common-proof
           - muen::common-strings-proof
@@ -176,6 +181,8 @@ multiPackage:
             name: muen::tau0-static-proof
             tools:
               target-toolchain: host-compat-gnat-toolchain
+            environment:
+              RTS_PLATFORM: "linux"
 
           - muen::component-libs-libmublock-proof
           - muen::component-libs-libmuchannel-proof

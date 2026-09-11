@@ -34,7 +34,7 @@ environment:
 checkoutDeterministic: True
 checkoutTools: [meson]
 checkoutScript: |
-  patchApplySeries -p1 $<<qemu/*.patch>>
+  patchApplySeries -p1 $<@qemu/*.patch@>
   meson subprojects download
 
 buildTools: [gcrypt]

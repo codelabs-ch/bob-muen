@@ -132,6 +132,7 @@ multiPackage:
     depends:
       - muen::linux-image
       - environment:
+          RTS_PLATFORM: "bare"
           RTS: "muen::rts"
         depends:
           - muen::components-dbgserver

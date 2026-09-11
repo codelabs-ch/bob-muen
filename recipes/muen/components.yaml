@@ -311,6 +311,8 @@ multiPackage:
       - use: []
         depends:
           - muen::component-libs-libmudebuglog-tgt
+    privateEnvironment:
+      INSTALL_APPLY_SHEBANG_FIXUP: "no"
     buildVars: [MUEN_POLICY_SRC]
     buildScript: |
       muenBuildApp isolation_tests_monitor

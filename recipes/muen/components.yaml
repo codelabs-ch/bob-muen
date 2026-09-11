@@ -40,11 +40,13 @@ multiPackage:
           $1/storage_drv/spec/storage_drv.xml > storage_drv.xml
     buildScript: |
       buildApp () {
-        muenBuildApp storage_drv storage_drv.xml
+        muenBuildApp -n storage_drv-${DRIVE_KIND,,} \
+                     -s $(pwd)/storage_drv.xml \
+                     storage_drv
       }
     packageScript: |
       packageApp () {
-        muenInstallApp storage_drv-${DRIVE_KIND,,} $1/generated/storage_drv.xml
+        muenInstallApp
       }
     multiPackage:
       ahci:
@@ -53,7 +55,7 @@ multiPackage:
         multiPackage:
           "":
             buildScript: buildApp
-            packageScript: packageApp $1
+            packageScript: packageApp
             provideDeps: ['*-tgt']
           proof: &storage_drv_proof
             inherit: [muen_proof_app]
@@ -69,7 +71,7 @@ multiPackage:
         multiPackage:
           "":
             buildScript: buildApp
-            packageScript: packageApp $1
+            packageScript: packageApp
             provideDeps: ['*-tgt']
           proof: *storage_drv_proof
   controller:
@@ -89,7 +91,7 @@ multiPackage:
         buildScript: |
           muenBuildApp controller
         packageScript: |
-          muenInstallApp controller
+          muenInstallApp
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]
@@ -178,7 +180,7 @@ multiPackage:
             buildScript: |
               muenBuildApp dbgserver
             packageScript: |
-              muenInstallApp dbgserver
+              muenInstallApp
             provideDeps: ['*-tgt']
           proof:
             inherit: [muen_proof_app]
@@ -203,7 +205,7 @@ multiPackage:
         buildScript: |
           muenBuildApp dm
         packageScript: |
-          muenInstallApp dm
+          muenInstallApp
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]
@@ -253,7 +255,7 @@ multiPackage:
             buildScript: |
               muenBuildApp example
             packageScript: |
-              muenInstallApp example
+              muenInstallApp
             provideDeps: ['*-tgt']
           proof:
             inherit: [muen_proof_app]
@@ -269,7 +271,7 @@ multiPackage:
     buildScript: |
       muenBuildApp idle
     packageScript: |
-      muenInstallApp idle
+      muenInstallApp
 
   isolation_tests:
     inherit: [muen_component_app, python3]
@@ -294,7 +296,7 @@ multiPackage:
         --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
       muenBuildApp isolation_tests
     packageScript: |
-      muenInstallApp isolation_tests
+      muenInstallApp
     provideDeps: ['*-tgt']
 
   isolation_tests_monitor:
@@ -313,7 +315,7 @@ multiPackage:
     buildScript: |
       muenBuildApp isolation_tests_monitor
     packageScript: |
-      muenInstallApp isolation_tests_monitor
+      muenInstallApp
     provideDeps: ['*-tgt']
 
   ps2_drv:
@@ -329,7 +331,7 @@ multiPackage:
     buildScript: |
       muenBuildApp ps2_drv
     packageScript: |
-      muenInstallApp ps2_drv
+      muenInstallApp
     provideDeps: ['*-tgt']
 
   sl:
@@ -422,7 +424,7 @@ multiPackage:
             buildScript: |
               muenBuildApp sm
             packageScript: |
-              muenInstallApp sm
+              muenInstallApp
             provideDeps: ['*-tgt']
           proof:
             inherit: [muen_proof_app]
@@ -469,9 +471,9 @@ multiPackage:
           sed -e "s/%%%ARCH%%%/${ARCH}/g" \
               $1/time/spec/time.xml > time.xml
         buildScript: |
-          muenBuildApp time time.xml
+          muenBuildApp -s time.xml time
         packageScript: |
-          muenInstallApp time $1/generated/time.xml
+          muenInstallApp
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]
@@ -499,5 +501,5 @@ multiPackage:
     buildScript: |
       muenBuildApp vt
     packageScript: |
-      muenInstallApp vt
+      muenInstallApp
     provideDeps: ['*-tgt']

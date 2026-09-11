@@ -47,6 +47,14 @@ depends:
         use: [tools]
         forward: True
 
+      - name: adacore::gprinspect-fake
+        use: [tools]
+        forward: True
+
+      - name: adacore::gpr-gpr2Tools
+        use: [tools]
+        forward: True
+
       - name: adacore::gprbuild-tool
         use: [tools]
         forward: True

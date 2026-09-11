@@ -8,10 +8,37 @@ buildTools: [mucheckstack, mucbinsplit]
 buildSetup: |
   __SRC=$1
 
+  # -s <spec>
+  # -n <binary name>
   # $1 - SRC relative component directory
-  # $2 - Component spec XML to use (optional)
   muenBuildApp() {
-    muenCspecs $1 ${2:-}
+    local SPEC
+    local BIN_NAME
+    # parse args
+    OPTIND=1
+    local opt
+    while getopts "n:s:" opt ; do
+        case "$opt" in
+            n)
+                BIN_NAME="$OPTARG"
+                ;;
+            s)
+                SPEC="$OPTARG"
+                ;;
+            \?)
+              echo "Invalid option: -$OPTARG" >&2
+              exit 1
+              ;;
+        esac
+    done
+    shift $(( OPTIND -1 ))
+
+    if [ $# -ne 1 ]; then
+      echo "Invalid number of arguments: $# : ${@}" >&2
+      exit 1
+    fi
+
+    muenCspecs $1 ${SPEC:-}
 
     # check for arch-specific project file
     PRJ="${1##*/}"
@@ -27,11 +54,11 @@ buildSetup: |
     mucheckstack -P${__SRC}/${1}/${PRJ} -l8192
 
     # binsplit
-    if [[ -e generated/$1.xml ]]; then
+    if [[ -e generated/${1##*/}.xml ]]; then
       mkdir -p install/.bob/cspecs/
-      mucbinsplit -i generated/$1.xml \
-                  -b install/usr/bin/$1 \
-                  -o install/.bob/cspecs/$1.xml install/
+      mucbinsplit -i generated/${1##*/}.xml \
+                  -b install/usr/bin/${BIN_NAME:-${1##*/}} \
+                  -o install/.bob/cspecs/${1##*/}.xml install/
     fi
   }
 

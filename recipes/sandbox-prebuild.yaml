@@ -1,0 +1,29 @@
+# prebuild sandbox image. Used to minimize the cache footprint and
+# recipes parsing time.
+#
+# To generate:
+#  1) build the sandbox
+#     $ bob dev //devel::sandbox -DBASEMENT_SANDBOX_PKG="devel::sandbox-default"
+#  2) go to the sandbox-dist folder
+#  3) create the tarball:
+#     $ tar cvjf sandbox.tar.xz .
+#  4) upload the tarball.
+
+metaEnvironment:
+  PKG_VERSION: "20260915"
+
+checkoutSCM:
+  scm: url
+  url: https://bob-archive.codelabs.ch/sandbox/${PKG_VERSION}/sandbox.tar.xz
+  digestSHA256: 8015a2ecdbd48df790319f1de56f858256c68c9715e49f41f59922d94ec7332b
+  extract: False
+
+buildScript: |
+  ln -snf $1/sandbox.tar.xz
+
+packageScript: tar xjf $1/sandbox.tar.xz
+
+provideSandbox:
+  paths: ["/usr/bin"]
+  mount:
+    - "/etc/resolv.conf"

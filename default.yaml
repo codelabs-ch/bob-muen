@@ -6,6 +6,7 @@ environment:
   GRUB2_PLATFORM: "pc"
   GNULIB_URL: https://github.com/coreutils/gnulib.git
   GNU_MIRROR: https://mirror.init7.net/gnu/
+  BASEMENT_SANDBOX_PKG: "${BASMENT_SANDBOX_PKG:-sandbox-prebuild}"
 
 scmOverrides:
   - match:

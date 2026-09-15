@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/rts-aunit.git
   branch: main
-  commit: 2ca325fa73fe3634c8a44b420e8512682db05e00
+  commit: 371121660f726947d0abe667e759397172a923bf
 
 privateEnvironment:
   FP_SUPPORT: "true"

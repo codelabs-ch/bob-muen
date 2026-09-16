@@ -1,9 +1,16 @@
 inherit: [muen-root]
+
+environment:
+  RTS_PLATFORM: "linux"
+
 depends:
   - tools:
       target-toolchain: host-compat-gnat-toolchain
     depends:
       - name: adacore::libadalang-tools
+        use: [tools]
+        forward: True
+      - name: adacore::gnattest
         use: [tools]
         forward: True
 

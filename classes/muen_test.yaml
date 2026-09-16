@@ -3,8 +3,7 @@ inherit: [gnat]
 depends:
   - adacore::aunit-dev
 
-buildVarsWeak: [MAKE_JOBS]
-buildTools: [libadalang-tools]
+buildTools: [gnattest]
 buildVars: [TOOLCHAIN_SYSROOT]
 buildSetup: |
   export OBJ_DIR=$(pwd)/obj

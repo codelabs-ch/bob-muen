@@ -165,45 +165,45 @@ multiPackage:
         environment:
           MUEN_BUILD_MODE: "release"
       proof:
-        environment:
-          MUEN_BUILD_MODE: "prove"
-          RTS: "muen::rts"
-          RTS_PLATFORM: "bare"
         depends:
-          - muen::common-common-proof
-          - muen::common-strings-proof
+          - environment:
+              MUEN_BUILD_MODE: "prove"
+              RTS: "muen::rts"
+              RTS_PLATFORM: "bare"
+            depends:
+              - muen::common-common-proof
+              - muen::common-strings-proof
 
-          - muen::component-libs-libmusinfo-proof
+              - muen::component-libs-libmusinfo-proof
 
-          - muen::x86-kernel-proof
+              - muen::x86-kernel-proof
 
+              - muen::component-libs-libmublock-proof
+              - muen::component-libs-libmuchannel-proof
+              - muen::component-libs-libmucoll-proof
+              - muen::component-libs-libmucontrol-proof
+              - muen::component-libs-libmudebuglog-proof
+              - muen::component-libs-libmudm-proof
+              - muen::component-libs-libmuinit-proof
+              - muen::component-libs-libmupci-proof
+              - muen::component-libs-libmutime-proof
+              - muen::component-libs-muinitstub-proof
+
+              - muen::components-storage_drv-ahci-proof
+              - muen::components-storage_drv-nvme-proof
+              - muen::components-controller-proof
+              - muen::components-dbgserver-proof
+              - muen::components-dm-proof
+              - muen::components-example-proof
+              - muen::components-sl-proof
+              - muen::components-sm-proof
+              - muen::components-time-proof
           - if: $(ne,${TAU0_PROOF:-UNSET},UNSET)
             name: muen::tau0-static-proof
             tools:
               target-toolchain: host-compat-gnat-toolchain
             environment:
               RTS_PLATFORM: "linux"
-
-          - muen::component-libs-libmublock-proof
-          - muen::component-libs-libmuchannel-proof
-          - muen::component-libs-libmucoll-proof
-          - muen::component-libs-libmucontrol-proof
-          - muen::component-libs-libmudebuglog-proof
-          - muen::component-libs-libmudm-proof
-          - muen::component-libs-libmuinit-proof
-          - muen::component-libs-libmupci-proof
-          - muen::component-libs-libmutime-proof
-          - muen::component-libs-muinitstub-proof
-
-          - muen::components-storage_drv-ahci-proof
-          - muen::components-storage_drv-nvme-proof
-          - muen::components-controller-proof
-          - muen::components-dbgserver-proof
-          - muen::components-dm-proof
-          - muen::components-example-proof
-          - muen::components-sl-proof
-          - muen::components-sm-proof
-          - muen::components-time-proof
         buildScript: |
           for d in ${!BOB_DEP_PATHS[@]}; do
             dirname=$(echo $d | sed 's/::/-/g')

@@ -36,7 +36,7 @@ buildScript: |
       --mode=all \
       --proof=progressive \
       --counterexamples=off \
-      --prover=${GNATPROVE_PROVERS:-z3,cvc4,alt-ergo} \
+      --prover=${GNATPROVE_PROVERS:-z3,cvc5,alt-ergo} \
       --timeout=${GNATPROVE_TIMEOUT:-10} \
       --steps=${GNATPROVE_STEPS:-0} \
       --warnings=error \

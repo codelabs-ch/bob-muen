@@ -275,6 +275,7 @@ multiPackage:
         depends:
           - environment:
               RTS: "muen::rts"
+              RTS_PLATFORM: "bare"
             depends:
               - muen::x86-kernel-metrics
         buildScript: |

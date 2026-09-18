@@ -13,7 +13,7 @@ layers:
   - name: basement-gnu-linux
     scm: git
     url: https://github.com/codelabs-ch/basement-gnu-linux.git
-    commit: 5a49b39871dffc63b92f30c4975ce25746cdfd81
+    commit: 9f9484594836723181b342625d4d800abf215f16
     branch: rh-misc
 
   - name: ada

@@ -45,7 +45,7 @@ buildSetup: |
     if [ -f "${__SRC}/${1}/${PRJ}_${ARCH}.gpr" ]; then
       PRJ=${PRJ}_${ARCH}
     fi
-    muenBuild -n ${__SRC}/${1}/${PRJ} \
+    muenBuild ${__SRC}/${1}/${PRJ} \
       -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
       -Xstacksize=8192
 

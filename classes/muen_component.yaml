@@ -20,32 +20,14 @@ buildSetup: |
   fi
 buildScript: |
   muenBuild() {
-    local INSTALL_CALL_INFO=1
-    # parse arguments
-    OPTIND=1
-    local opt
-    while getopts "n" opt ; do
-      case "$opt" in
-        n)
-          INSTALL_CALL_INFO="0"
-          ;;
-      esac
-    done
-    shift $(( OPTIND -1 ))
-
     local GPR_FILE=$1
     shift
-    local GPRBUILD_OPTIONS=()
     local arg
     for arg in "$@"; do
       GPRBUILD_OPTIONS+=(-o "$arg")
     done
     gnatBuild -P "$GPR_FILE" "${GPRBUILD_OPTIONS[@]}"
 
-    if [[ ${INSTALL_CALL_INFO} == 1 ]]; then
-      find build -name '*.ci' | \
-        rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/lib
-    fi
   }
 
   # $1 ELF file to use

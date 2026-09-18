@@ -20,7 +20,7 @@ layers:
     scm: git
     url: https://git.codelabs.ch/bob/ada.git
     #    branch: main
-    commit: b107116dc232279a21d3669cdd5b267f5ab333eb
+    commit: 7e38c1ca58254f17a42c7085bb37e9adbd1c9f9a
 
   - name: codelabs
     scm: git

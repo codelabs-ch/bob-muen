@@ -4,7 +4,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-main}
-  commit: ${MUEN_X86_KNL_COMMIT:-994cda4b30fbf1d604c40b235855c0c7d8d4f69d}
+  commit: ${MUEN_X86_KNL_COMMIT:-14fc0a764b79f6a8c9168ed7a2632cce2c915737}
 
 depends:
   - environment:

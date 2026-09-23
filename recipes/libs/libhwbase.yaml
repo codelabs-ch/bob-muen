@@ -1,5 +1,8 @@
 inherit: [muen_component, patch]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-2.0-or-later"
+
 depends:
   - muen::component-libs-libmusinfo-dev
   - use: []

@@ -1,3 +1,6 @@
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git

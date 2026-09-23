@@ -1,5 +1,8 @@
 inherit: [muen_component]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later WITH GNAT-exception"
+
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git

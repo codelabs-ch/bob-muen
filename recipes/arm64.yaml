@@ -55,7 +55,7 @@ depends:
   # the target toolchain for the following 'sub-depends' is aarch64-
   # linux-gnu- with ada support.
   - name: devel::cross-toolchain-aarch64-linux-gnu-ada
-    use: [tools]
+    use: [tools, environment]
     forward: True
     tools:
       target-toolchain: host-compat-gnat-toolchain

@@ -2,6 +2,9 @@
 
 inherit: ['basement::rootrecipe']
 
+environment:
+  BASEMENT_OPTIMIZE: "s"
+
 depends:
 
   - name: libs::libxml2-bin

@@ -37,7 +37,7 @@ depends:
 
   # build an x86_64 linux gnu compiler with ada enabled
   - name: devel::cross-toolchain-x86_64-linux-gnu-ada
-    use: [tools]
+    use: [tools, environment]
     forward: True
     tools:
       target-toolchain: host-compat-gnat-toolchain

@@ -1,7 +1,17 @@
 # Development source linux kernel. When built, this recipe packages the \
 # source of the preferred virtual/kernel provider and makes it available for full kernel \
-# development or external module builds"
-# shamelessly stolen from yocto's kernel-devsrc.bb
+# development or external module builds.
+#
+# Shamelessly stolen from yocto's openembedded-core/meta/recipes-kernel/linux/kernel-devsrc.bb
+# Last import from commit 0238a49f57.
+#
+# Readable Diff:
+#   $ git diff -U0 --ignore-all-space --word-diff=color classes/kernel-dev.yaml
+
+## MUEN SPECIFIC
+# Unlike openembedded we copy pre-built binaries. We'd need a
+# modules_prepare call in out-of-tree modules otherwise.
+
 
 packageVars: [ARCH]
 packageScript: |
@@ -19,12 +29,12 @@ packageScript: |
      # first copy everything
      (
         cd ${__BUILD_DIR}/source
-        cp --parents $(find -type f -name "Makefile*" -o -name "Kconfig*") $kerneldir
-        cp --parents $(find -type f -name "Build" -o -name "Build.include") $kerneldir
+        cp --parents $(find  -type f -name "Makefile*" -o -name "Kconfig*") $kerneldir
+        cp --parents $(find  -type f -name "Build" -o -name "Build.include") $kerneldir
      )
 
      # then drop all but the needed Makefiles/Kconfig files
-     rm -rf $kerneldir/Documentation
+     rm -rf $kerneldir/Documentation # MUEN SPECIFIC - KEEP THIS
      rm -rf $kerneldir/scripts
      rm -rf $kerneldir/include
 
@@ -32,19 +42,21 @@ packageScript: |
      (
         cd ${__BUILD_DIR}
 
-        cp Module.symvers $kerneldir
+        if [ -s Module.symvers ]; then
+            cp Module.symvers $kerneldir
+        fi
         cp System.map* $kerneldir
         if [ -s Module.markers ]; then
-        i  cp Module.markers $kerneldir
+            cp Module.markers $kerneldir
         fi
 
-        cp .config $kerneldir
+        cp -a .config $kerneldir
 
-        # FIXME: This scripts copy blow up QA, so for now, we require a more
+        # This scripts copy blow up QA, so for now, we require a more
         # complex 'make scripts' to restore these, versus copying them
         # here. Left as a reference to indicate that we know the scripts must
         # be dealt with.
-        cp -a scripts $kerneldir
+        cp -a scripts $kerneldir ## MUEN SPECIFIC - KEEP THIS
 
         # although module.lds can be regenerated on target via 'make modules_prepare'
         # there are several places where 'makes scripts prepare' is done, and that won't
@@ -53,41 +65,66 @@ packageScript: |
         cp -a --parents scripts/module.lds $kerneldir/ 2>/dev/null || :
 
         if [ -d arch/${ARCH}/scripts ]; then
-           cp -a arch/${ARCH}/scripts $kerneldir/arch/${ARCH}
+            cp -a arch/${ARCH}/scripts $kerneldir/arch/${ARCH}
         fi
         if [ -f arch/${ARCH}/*lds ]; then
-           cp -a arch/${ARCH}/*lds $kerneldir/arch/${ARCH}
+            cp -a arch/${ARCH}/*lds $kerneldir/arch/${ARCH}
         fi
 
         rm -f $kerneldir/scripts/*.o
         rm -f $kerneldir/scripts/*/*.o
 
-        if [ "${ARCH}" = "arm64" ]; then
-           if [ -e arch/${ARCH}/kernel/vdso/vdso.lds ]; then
-              cp -a --parents arch/${ARCH}/kernel/vdso/vdso.lds $kerneldir/
-           fi
+        if [ "${ARCH}" = "powerpc" ]; then
+            if [ -e arch/powerpc/lib/crtsavres.S ] ||
+                   [ -e arch/powerpc/lib/crtsavres.o ]; then
+                cp -a --parents arch/powerpc/lib/crtsavres.[So] $kerneldir/
+            fi
         fi
 
-        cp -a --parents arch/*/include/generated $kerneldir
+        if [ "${ARCH}" = "arm64" -o "${ARCH}" = "riscv" ]; then
+            if [ -e arch/${ARCH}/kernel/vdso/vdso.lds ]; then
+                cp -a --parents arch/${ARCH}/kernel/vdso/vdso.lds $kerneldir/
+            fi
+        fi
+        if [ "${ARCH}" = "powerpc" ]; then
+            cp -a --parents arch/powerpc/kernel/vdso32/vdso32.lds $kerneldir 2>/dev/null || :
+            cp -a --parents arch/powerpc/kernel/vdso64/vdso64.lds $kerneldir 2>/dev/null || :
+            # v5.19+
+            cp -a --parents arch/powerpc/kernel/vdso/vdso*.lds $kerneldir 2>/dev/null || :
+        fi
+
         cp -a include $kerneldir/include
+
         # we don't usually copy generated files, since they can be rebuilt on the target,
         # but without this file, we get a forced syncconfig run in v5.8+, which prompts and
         # breaks workflows.
-        cp -a --parents include/generated/autoconf.h $kerneldir/ 2>/dev/null || :
+        cp -a --parents include/generated/autoconf.h $kerneldir 2>/dev/null || :
 
+        ## MUEN SPECIFIC - KEEP THIS
+        cp -a --parents arch/*/include/generated $kerneldir
         cp -a tools/objtool/objtool $kerneldir/tools/objtool/  2>/dev/null || :
+
+        rm -f $kerneldir/include/generated/.vdso-offsets.h.cmd
+        rm -f $kerneldir/include/generated/.vdso-offsets.h.cmd
+        rm -f $kerneldir/include/generated/.compat_vdso-offsets.h.cmd
+        rm -f $kerneldir/include/generated/.vdso32-offsets.h.cmd
+        rm -f $kerneldir/include/generated/.vdso64-offsets.h.cmd 
      )
 
      # now grab the chunks from the source tree that we need
      (
         cd ${__BUILD_DIR}/source
 
-        cp -a --remove-destination scripts $kerneldir
-        # --remove-destination: $kerneldir/scripts/gdb/linux may be
-        # symlinks, must not try to write through them.
+        cp -a --remove-destination scripts $kerneldir ## MUEN SPECIFIC - KEEP THIS
+        #^ Why --remove-destination?: $kerneldir/scripts/gdb/linux may be
+        #  symlinks, must not try to write through them.
 
         # for v6.1+ (otherwise we are missing multiple default targets)
-        cp -a --parents Kbuild $kerneldir/ 2>/dev/null ||:
+        cp -a --parents Kbuild $kerneldir 2>/dev/null || :
+
+        # For v6.6+ the debian packing is moved out to seperate rules file
+        # Remove as we else would ned to RDEPEND on make
+        rm $kerneldir/scripts/package/debian/rules 2>/dev/null || :
 
         # if our build dir had objtool, it will also be rebuilt on target, so
         # we copy what is required for that build
@@ -106,7 +143,7 @@ packageScript: |
 
             cp -a --parents tools/include/* $kerneldir/
 
-            cp -a --parents $(find tools/arch/${ARCH}/ -type f) $kerneldir
+            cp -a --parents $(find tools/arch/${ARCH}/ -type f) $kerneldir/
         fi
 
         if [ "${ARCH}" = "arm64" ]; then
@@ -116,33 +153,88 @@ packageScript: |
             cp -a --parents arch/arm/include/asm/opcodes.h $kerneldir/
 
             # v6.1+
-            cp -a --parents arch/arm64/kernel/asm-offsets.c $kerneldir
+            cp -a --parents arch/arm64/kernel/asm-offsets.c $kerneldir/
 
             cp -a --parents arch/arm64/kernel/vdso/*gettimeofday.* $kerneldir/
             cp -a --parents arch/arm64/kernel/vdso/sigreturn.S $kerneldir/
             cp -a --parents arch/arm64/kernel/vdso/note.S $kerneldir/
             cp -a --parents arch/arm64/kernel/vdso/gen_vdso_offsets.sh $kerneldir/
 
-            cp -a --parents arch/arm64/kernel/module.lds $kerneldir/  2>/dev/null || :
+            cp -a --parents arch/arm64/kernel/module.lds $kerneldir/ 2>/dev/null || :
 
-           # 5.13+ needs these tools
-           cp -a --parents arch/arm64/tools/gen-cpucaps.awk $kerneldir/ 2>/dev/null || :
-           cp -a --parents arch/arm64/tools/cpucaps $kerneldir/ 2>/dev/null || :
+            # 5.13+ needs these tools
+            cp -a --parents arch/arm64/tools/gen-cpucaps.awk $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/arm64/tools/cpucaps $kerneldir/ 2>/dev/null || :
 
-           # 5.19+
-           cp -a --parents arch/arm64/tools/gen-sysreg.awk $kerneldir/   2>/dev/null || :
-           cp -a --parents arch/arm64/tools/sysreg $kerneldir/   2>/dev/null ||:
+            # 5.19+
+            cp -a --parents arch/arm64/tools/gen-sysreg.awk $kerneldir/   2>/dev/null || :
+            cp -a --parents arch/arm64/tools/sysreg $kerneldir/   2>/dev/null || :
 
-           if [ -e $kerneldir/arch/arm64/tools/gen-cpucaps.awk ]; then
-              sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-cpucaps.awk
-           fi
-           if [ -e $kerneldir/arch/arm64/tools/gen-sysreg.awk ]; then
-                sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-sysreg.awk
-           fi
+            if [ -e $kerneldir/arch/arm64/tools/gen-cpucaps.awk ]; then
+                 sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-cpucaps.awk
+            fi
+            if [ -e $kerneldir/arch/arm64/tools/gen-sysreg.awk ]; then
+                 sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-sysreg.awk
+            fi
+        fi
+
+        if [ "${ARCH}" = "powerpc" ]; then
+            # 5.0 needs these files, but don't error if they aren't present in the source
+            cp -a --parents arch/${ARCH}/kernel/syscalls/syscall.tbl $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/${ARCH}/kernel/syscalls/syscalltbl.sh $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/${ARCH}/kernel/syscalls/syscallhdr.sh $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/${ARCH}/kernel/vdso32/* $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/${ARCH}/kernel/vdso64/* $kerneldir/ 2>/dev/null || :
+
+            # v5.19+
+            cp -a --parents arch/powerpc/kernel/vdso/*.S $kerneldir 2>/dev/null || :
+            cp -a --parents arch/powerpc/kernel/vdso/*gettimeofday.* $kerneldir 2>/dev/null || :
+            cp -a --parents arch/powerpc/kernel/vdso/gen_vdso*_offsets.sh $kerneldir/ 2>/dev/null || :
+
+            # v6,1+
+            cp -a --parents arch/powerpc/kernel/asm-offsets.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/powerpc/kernel/head_booke.h $kerneldir/ 2>/dev/null || :
+        fi
+        if [ "${ARCH}" = "riscv" ]; then
+            cp -a --parents arch/riscv/kernel/vdso/*gettimeofday.* $kerneldir/
+            cp -a --parents arch/riscv/kernel/vdso/note.S $kerneldir/
+            # v6.1+
+            cp -a --parents arch/riscv/kernel/asm-offsets.c $kerneldir/
+            if [ -e arch/riscv/kernel/vdso/gen_vdso_offsets.sh ]; then
+                    cp -a --parents arch/riscv/kernel/vdso/gen_vdso_offsets.sh $kerneldir/
+            fi
+            cp -a --parents arch/riscv/kernel/vdso/* $kerneldir/ 2>/dev/null || :
+            if [ -e arch/riscv/kernel/compat_vdso/gen_compat_vdso_offsets.sh ]; then
+                cp -a --parents arch/riscv/kernel/compat_vdso/gen_compat_vdso_offsets.sh $kerneldir/
+            fi
+            cp -a --parents arch/riscv/kernel/compat_vdso/* $kerneldir/ 2>/dev/null || :
+        fi
+
+        # include the machine specific headers for ARM variants, if available.
+        if [ "${ARCH}" = "arm" ]; then
+            cp -a --parents arch/${ARCH}/mach-*/include $kerneldir/
+
+            # include a few files for 'make prepare'
+            cp -a --parents arch/arm/tools/gen-mach-types $kerneldir/
+            cp -a --parents arch/arm/tools/mach-types $kerneldir/
+
+            # 5.19+
+            cp -a --parents arch/arm/tools/gen-sysreg.awk $kerneldir/ 2>/dev/null || :
+
+            # ARM syscall table tools only exist for kernels v4.10 or later
+            SYSCALL_TOOLS=$(find arch/arm/tools -name "syscall*")
+            if [ -n "$SYSCALL_TOOLS" ] ; then
+                cp -a --parents $SYSCALL_TOOLS $kerneldir/
+            fi
+
+            cp -a --parents arch/arm/kernel/module.lds $kerneldir/ 2>/dev/null || :
+            # v6.1+
+            cp -a --parents arch/arm/kernel/asm-offsets.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/arm/kernel/signal.h $kerneldir/ 2>/dev/null || :
         fi
 
         if [ -d arch/${ARCH}/include ]; then
-           cp -a --parents arch/${ARCH}/include $kerneldir/
+            cp -a --parents arch/${ARCH}/include $kerneldir/
         fi
 
         cp -a include $kerneldir
@@ -153,12 +245,72 @@ packageScript: |
         cp -a --parents tools/include/tools/be_byteshift.h $kerneldir/
 
         # required for generate missing syscalls prepare phase
-        cp -a --parents $(find arch/x86 -type f -name "syscall_32.tbl") $kerneldir/
-        cp -a --parents $(find arch/arm -type f -name "*.tbl") $kerneldir/ 2>/dev/null || :
+        cp -a --parents $(find arch/x86 -type f -name "syscall_32.tbl") $kerneldir
+        cp -a --parents $(find arch/arm -type f -name "*.tbl") $kerneldir 2>/dev/null || :
+
+        if [ "${ARCH}" = "x86" ]; then
+            # files for 'make prepare' to succeed with kernel-devel
+            cp -a --parents $(find arch/x86 -type f -name "syscall_32.tbl") $kerneldir/ 2>/dev/null || :
+            cp -a --parents $(find arch/x86 -type f -name "syscalltbl.sh") $kerneldir/ 2>/dev/null || :
+            cp -a --parents $(find arch/x86 -type f -name "syscallhdr.sh") $kerneldir/ 2>/dev/null || :
+            cp -a --parents $(find arch/x86 -type f -name "syscall_64.tbl") $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/tools/relocs_32.c $kerneldir/
+            cp -a --parents arch/x86/tools/relocs_64.c $kerneldir/
+            cp -a --parents arch/x86/tools/relocs.c $kerneldir/
+            cp -a --parents arch/x86/tools/relocs_common.c $kerneldir/
+            cp -a --parents arch/x86/tools/relocs.h $kerneldir/
+            cp -a --parents arch/x86/tools/gen-insn-attr-x86.awk $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/purgatory/purgatory.c $kerneldir/
+
+            # 4.18 + have unified the purgatory files, so we ignore any errors if
+            # these files are not present
+            cp -a --parents arch/x86/purgatory/sha256.h $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/purgatory/sha256.c $kerneldir/ 2>/dev/null || :
+
+            cp -a --parents arch/x86/purgatory/stack.S $kerneldir/
+            cp -a --parents arch/x86/purgatory/string.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/purgatory/setup-x86_64.S $kerneldir/
+            cp -a --parents arch/x86/purgatory/entry64.S $kerneldir/
+            cp -a --parents arch/x86/boot/string.h $kerneldir/
+            cp -a --parents arch/x86/boot/string.c $kerneldir/
+            cp -a --parents arch/x86/boot/compressed/string.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/boot/ctype.h $kerneldir/
+
+            # objtool requires these files
+            cp -a --parents arch/x86/lib/inat.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/lib/insn.c $kerneldir/ 2>/dev/null || :
+
+            # v6.1+
+            cp -a --parents arch/x86/kernel/asm-offsets* $kerneldir || :
+            # for capabilities.h, vmx.h
+            cp -a --parents arch/x86/kvm/vmx/*.h $kerneldir || :
+            # for lapic.h, hyperv.h ....
+            cp -a --parents arch/x86/kvm/*.h $kerneldir || :
+        fi
 
         # moved from arch/mips to all arches for v6.1+
-        cp -a --parents kernel/time/timeconst.bc $kerneldir/ 2>/dev/null || :
-        cp -a --parents kernel/bounds.c $kerneldir/ 2>/dev/null || :
+        cp -a --parents kernel/time/timeconst.bc $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/bounds.c $kerneldir 2>/dev/null || :
+
+        if [ "${ARCH}" = "mips" ]; then
+            cp -a --parents arch/mips/Kbuild.platforms $kerneldir/
+            cp --parents $(find -type f -name "Platform") $kerneldir
+            cp --parents arch/mips/boot/tools/relocs* $kerneldir
+            cp -a --parents arch/mips/kernel/asm-offsets.c $kerneldir
+            cp -a --parents Kbuild $kerneldir
+            cp -a --parents arch/mips/kernel/syscalls/*.sh $kerneldir 2>/dev/null || :
+            cp -a --parents arch/mips/kernel/syscalls/*.tbl $kerneldir 2>/dev/null || :
+            cp -a --parents arch/mips/tools/elf-entry.c $kerneldir 2>/dev/null || :
+        fi
+
+        if [ "${ARCH}" = "loongarch" ]; then
+            cp -a --parents arch/loongarch/kernel/asm-offsets.c $kerneldir
+            cp -a --parents Kbuild $kerneldir
+            cp -a --parents arch/loongarch/vdso/*.S $kerneldir 2>/dev/null || :
+            cp -a --parents arch/loongarch/vdso/*gettimeofday.* $kerneldir 2>/dev/null || :
+            cp -a --parents arch/loongarch/vdso/*getcpu.* $kerneldir 2>/dev/null || :
+            cp -a --parents arch/loongarch/vdso/gen_vdso*_offsets.sh $kerneldir/ 2>/dev/null || :
+        fi
 
         # required to build scripts/selinux/genheaders/genheaders
         cp -a --parents security/selinux/include/* $kerneldir/
@@ -183,21 +335,21 @@ packageScript: |
      touch -r $kerneldir/.config $kerneldir/include/config/auto.conf* 2>/dev/null || :
 
      if [ -e "$kerneldir/include/config/auto.conf.cmd" ]; then
-         sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
-         sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/include/config/auto.conf.cmd"
-         sed -i 's/ifneq "$(AR)" ".*-linux-.*ar.*$/ifneq "$(AR)" "ar"/' "$kerneldir/include/config/auto.conf.cmd"
-         sed -i 's/ifneq "$(OBJCOPY)" ".*-linux-.*objcopy.*$/ifneq "$(OBJCOPY)" "objcopy"/' "$kerneldir/include/config/auto.conf.cmd"
-         if [ "${ARCH}" = "powerpc" ]; then
-             sed -i 's/ifneq "$(NM)" ".*-linux-.*nm.*$/ifneq "$(NM)" "nm --synthetic"/' "$kerneldir/include/config/auto.conf.cmd"
-         else
-             sed -i 's/ifneq "$(NM)" ".*-linux-.*nm.*$/ifneq "$(NM)" "nm"/' "$kerneldir/include/config/auto.conf.cmd"
-         fi
-         sed -i 's/ifneq "$(HOSTCXX)" ".*$/ifneq "$(HOSTCXX)" "g++"/' "$kerneldir/include/config/auto.conf.cmd"
-         sed -i 's/ifneq "$(HOSTCC)" ".*$/ifneq "$(HOSTCC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
-         sed -i 's/ifneq "$(CC_VERSION_TEXT)".*\(gcc.*\)"/ifneq "$(CC_VERSION_TEXT)" "\1"/' "$kerneldir/include/config/auto.conf.cmd"
-         sed -i 's/ifneq "$(srctree)" ".*"/ifneq "$(srctree)" "."/' "$kerneldir/include/config/auto.conf.cmd"
-         # we don't build against the defconfig, so make sure it isn't the trigger for syncconfig
-         sed -i 's/ifneq "$(KBUILD_DEFCONFIG)".*"\(.*\)"/ifneq "\1" "\1"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(AR)" ".*-linux-.*ar.*$/ifneq "$(AR)" "ar"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(OBJCOPY)" ".*-linux-.*objcopy.*$/ifneq "$(OBJCOPY)" "objcopy"/' "$kerneldir/include/config/auto.conf.cmd"
+        if [ "${ARCH}" = "powerpc" ]; then
+            sed -i 's/ifneq "$(NM)" ".*-linux-.*nm.*$/ifneq "$(NM)" "nm --synthetic"/' "$kerneldir/include/config/auto.conf.cmd"
+        else
+            sed -i 's/ifneq "$(NM)" ".*-linux-.*nm.*$/ifneq "$(NM)" "nm"/' "$kerneldir/include/config/auto.conf.cmd"
+        fi
+        sed -i 's/ifneq "$(HOSTCXX)" ".*$/ifneq "$(HOSTCXX)" "g++"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(HOSTCC)" ".*$/ifneq "$(HOSTCC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(CC_VERSION_TEXT)".*\(gcc.*\)"/ifneq "$(CC_VERSION_TEXT)" "\1"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(srctree)" ".*"/ifneq "$(srctree)" "."/' "$kerneldir/include/config/auto.conf.cmd"
+        # we don't build against the defconfig, so make sure it isn't the trigger for syncconfig
+        sed -i 's/ifneq "$(KBUILD_DEFCONFIG)".*"\(.*\)"/ifneq "\1" "\1"/' "$kerneldir/include/config/auto.conf.cmd"
      fi
 
      # make the scripts python3 safe. We won't be running these, and if they are

@@ -3,7 +3,7 @@
 # development or external module builds.
 #
 # Shamelessly stolen from yocto's openembedded-core/meta/recipes-kernel/linux/kernel-devsrc.bb
-# Last import from commit 0238a49f57.
+# Last import from commit fdfa602332.
 #
 # Readable Diff:
 #   $ git diff -U0 --ignore-all-space --word-diff=color classes/kernel-dev.yaml
@@ -46,6 +46,7 @@ packageScript: |
             cp Module.symvers $kerneldir
         fi
         cp System.map* $kerneldir
+        #ln -s System.map-* $kerneldir/System.map
         if [ -s Module.markers ]; then
             cp Module.markers $kerneldir
         fi
@@ -102,13 +103,15 @@ packageScript: |
 
         ## MUEN SPECIFIC - KEEP THIS
         cp -a --parents arch/*/include/generated $kerneldir
+        rm -f $kerneldir/include/generated/.vdso-cfi-offsets.h.cmd
+        rm -f $kerneldir/include/generated/.vdso-cfi-offsets.h.cmd
         cp -a tools/objtool/objtool $kerneldir/tools/objtool/  2>/dev/null || :
 
         rm -f $kerneldir/include/generated/.vdso-offsets.h.cmd
         rm -f $kerneldir/include/generated/.vdso-offsets.h.cmd
         rm -f $kerneldir/include/generated/.compat_vdso-offsets.h.cmd
         rm -f $kerneldir/include/generated/.vdso32-offsets.h.cmd
-        rm -f $kerneldir/include/generated/.vdso64-offsets.h.cmd 
+        rm -f $kerneldir/include/generated/.vdso64-offsets.h.cmd
      )
 
      # now grab the chunks from the source tree that we need
@@ -119,11 +122,25 @@ packageScript: |
         #^ Why --remove-destination?: $kerneldir/scripts/gdb/linux may be
         #  symlinks, must not try to write through them.
 
+        # In sdk, when CONFIG_RUST is enabled, `make prepare` requires the full Rust
+        # kernel infrastructure. The Rust build system pulls in bindgen inputs, C helpers,
+        # generated headers, and generate crate metadata (.rmeta), and shared objects
+        # needed for building Rust kernel modules. Copy the entire rust/ directory (of size 2.5MB)
+        # to avoid failures with 'make prepare'.
+        #if ${@bb.utils.contains('KERNEL_FEATURES', 'rust', "true", "false", d)}; then
+        #    cp -a rust ${kerneldir}/build
+        #fi
+
         # for v6.1+ (otherwise we are missing multiple default targets)
         cp -a --parents Kbuild $kerneldir 2>/dev/null || :
 
         # For v6.6+ the debian packing is moved out to seperate rules file
         # Remove as we else would ned to RDEPEND on make
+        # tools/include is needed by the archscripts host tools that
+        # 'make scripts prepare' rebuilds on target (e.g. x86 vdso2c) and
+        # not checked against objtool as it previously was.
+        cp -a --parents tools/include/* $kerneldir/
+
         rm $kerneldir/scripts/package/debian/rules 2>/dev/null || :
 
         # if our build dir had objtool, it will also be rebuilt on target, so
@@ -132,7 +149,7 @@ packageScript: |
             # these are a few files associated with objtool, since we'll need to
             # rebuild it
             cp -a --parents tools/build/Build.include $kerneldir/
-            cp -a --parents tools/build/Build $kerneldir/
+            cp -a --parents tools/build/Build $kerneldir/ 2>/dev/null || :
             cp -a --parents tools/build/fixdep.c $kerneldir/
             cp -a --parents tools/scripts/utilities.mak $kerneldir/
 
@@ -141,10 +158,20 @@ packageScript: |
             cp -a --parents tools/lib/* $kerneldir/
             cp -a --parents tools/lib/subcmd/* $kerneldir/
 
-            cp -a --parents tools/include/* $kerneldir/
-
             cp -a --parents $(find tools/arch/${ARCH}/ -type f) $kerneldir/
         fi
+
+        # For v5.2+ when BTF is enabled, scripts prepare may rebuild the
+        # resolve_btfids host tool. Copy the minimal sources it needs instead
+        # of coupling this recipe to a specific kernel CONFIG_ symbol.
+        cp -a --parents tools/bpf/resolve_btfids/* $kerneldir/ 2>/dev/null || :
+        cp -a --parents tools/lib/bpf/* $kerneldir/ 2>/dev/null || :
+        cp -a --parents tools/lib/subcmd/* $kerneldir/ 2>/dev/null || :
+        cp -a --parents tools/lib/ctype.c tools/lib/rbtree.c tools/lib/str_error_r.c \
+            tools/lib/string.c tools/lib/zalloc.c $kerneldir/ 2>/dev/null || :
+        cp -a --parents tools/build/Build.include tools/build/Build tools/build/fixdep.c \
+            tools/scripts/Makefile.arch tools/scripts/Makefile.include \
+            tools/scripts/utilities.mak $kerneldir/ 2>/dev/null || :
 
         if [ "${ARCH}" = "arm64" ]; then
             # arch/arm64/include/asm/xen references arch/arm
@@ -160,6 +187,10 @@ packageScript: |
             cp -a --parents arch/arm64/kernel/vdso/note.S $kerneldir/
             cp -a --parents arch/arm64/kernel/vdso/gen_vdso_offsets.sh $kerneldir/
 
+            # 6.12+
+            cp -a --parents arch/arm64/kernel/vdso/vgetrandom.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/arm64/kernel/vdso/vgetrandom-chacha.S $kerneldir/ 2>/dev/null || :
+
             cp -a --parents arch/arm64/kernel/module.lds $kerneldir/ 2>/dev/null || :
 
             # 5.13+ needs these tools
@@ -170,6 +201,13 @@ packageScript: |
             cp -a --parents arch/arm64/tools/gen-sysreg.awk $kerneldir/   2>/dev/null || :
             cp -a --parents arch/arm64/tools/sysreg $kerneldir/   2>/dev/null || :
 
+            # 6.12+
+            cp -a --parents arch/arm64/tools/syscall_64.tbl $kerneldir/   2>/dev/null || :
+            cp -a --parents arch/arm64/tools/syscall_32.tbl $kerneldir/   2>/dev/null || :
+
+            # 7.0+
+            cp -a --parents arch/arm64/tools/gen-kernel-hwcaps.sh $kerneldir/   2>/dev/null || :
+
             if [ -e $kerneldir/arch/arm64/tools/gen-cpucaps.awk ]; then
                  sed -i -e "s,#!.*awk.*,#!/usr/bin/env awk," $kerneldir/arch/arm64/tools/gen-cpucaps.awk
             fi
@@ -179,6 +217,13 @@ packageScript: |
         fi
 
         if [ "${ARCH}" = "powerpc" ]; then
+            # Copy scripts that are needed by powperpc build, but don't error if they aren't present in the source.
+            # 4.18+ needs gcc-check-mprofile-kernel.sh for MPROFILE_KERNEL, for example.
+            # See https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=abba759796f9b73eb24df9b734dd063839fc62e0
+            for script in gcc-check-mprofile-kernel.sh gcc-check-fpatchable-function-entry.sh head_check.sh relocs_check.sh unrel_branch_check.sh; do
+                cp -a --parents arch/powerpc/tools/$script $kerneldir/ 2>/dev/null || :
+            done
+
             # 5.0 needs these files, but don't error if they aren't present in the source
             cp -a --parents arch/${ARCH}/kernel/syscalls/syscall.tbl $kerneldir/ 2>/dev/null || :
             cp -a --parents arch/${ARCH}/kernel/syscalls/syscalltbl.sh $kerneldir/ 2>/dev/null || :
@@ -194,6 +239,11 @@ packageScript: |
             # v6,1+
             cp -a --parents arch/powerpc/kernel/asm-offsets.c $kerneldir/ 2>/dev/null || :
             cp -a --parents arch/powerpc/kernel/head_booke.h $kerneldir/ 2>/dev/null || :
+
+            # 6.12+
+            cp -a --parents arch/powerpc/kernel/vdso/vgetrandom.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/powerpc/kernel/vdso/vgetrandom-chacha.S $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/powerpc/lib/crtsavres.S $kerneldir/ 2>/dev/null || :
         fi
         if [ "${ARCH}" = "riscv" ]; then
             cp -a --parents arch/riscv/kernel/vdso/*gettimeofday.* $kerneldir/
@@ -259,7 +309,11 @@ packageScript: |
             cp -a --parents arch/x86/tools/relocs.c $kerneldir/
             cp -a --parents arch/x86/tools/relocs_common.c $kerneldir/
             cp -a --parents arch/x86/tools/relocs.h $kerneldir/
+            # v7.2+ archscripts also builds the vdso2c host tool
+            cp -a --parents arch/x86/tools/vdso2c.c $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/tools/vdso2c.h $kerneldir/ 2>/dev/null || :
             cp -a --parents arch/x86/tools/gen-insn-attr-x86.awk $kerneldir/ 2>/dev/null || :
+            cp -a --parents arch/x86/tools/cpufeaturemasks.awk $kerneldir/ 2>/dev/null || :
             cp -a --parents arch/x86/purgatory/purgatory.c $kerneldir/
 
             # 4.18 + have unified the purgatory files, so we ignore any errors if
@@ -291,6 +345,19 @@ packageScript: |
         # moved from arch/mips to all arches for v6.1+
         cp -a --parents kernel/time/timeconst.bc $kerneldir 2>/dev/null || :
         cp -a --parents kernel/bounds.c $kerneldir 2>/dev/null || :
+
+        # v6.18+ rq offset generation needs these scheduler sources/headers
+        cp -a --parents kernel/sched/rq-offsets.c $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/sched/sched.h $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/sched/cpudeadline.h $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/sched/cpupri.h $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/sched/features.h $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/sched/stats.h $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/sched/ext.h $kerneldir 2>/dev/null || :
+        cp -a --parents kernel/workqueue_internal.h $kerneldir 2>/dev/null || :
+
+        # 7.1+
+        cp -a --parents kernel/sched/ext/ext.h $kerneldir 2>/dev/null || :
 
         if [ "${ARCH}" = "mips" ]; then
             cp -a --parents arch/mips/Kbuild.platforms $kerneldir/
@@ -336,6 +403,7 @@ packageScript: |
 
      if [ -e "$kerneldir/include/config/auto.conf.cmd" ]; then
         sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(CC)" ".*clang.*$/ifneq "$(CC)" "clang"/' "$kerneldir/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(AR)" ".*-linux-.*ar.*$/ifneq "$(AR)" "ar"/' "$kerneldir/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(OBJCOPY)" ".*-linux-.*objcopy.*$/ifneq "$(OBJCOPY)" "objcopy"/' "$kerneldir/include/config/auto.conf.cmd"
@@ -358,7 +426,7 @@ packageScript: |
      for ss in $(find $kerneldir/scripts -type f -name '*'); do
         sed -i 's,/usr/bin/python2,/usr/bin/env python3,' "$ss"
         sed -i 's,/usr/bin/env python2,/usr/bin/env python3,' "$ss"
-        sed -i 's,/usr/bin/python,/usr/bin/env python3,' "$ss"
+        sed -i 's,/usr/bin/python$,/usr/bin/env python3,' "$ss"
      done
 
   }

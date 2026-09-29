@@ -19,10 +19,11 @@ buildSetup: |
 
     # collect dependencies cspecs
     for dep_name in ${!BOB_DEP_PATHS[@]}; do
-      dep_dir=${BOB_DEP_PATHS[${dep_name}]}
-      if [[ -e ${dep_dir}/.bob/cspecs ]]; then
-        CSPECS+=${CSPECS:+,}${dep_dir}/$(cat ${dep_dir}/.bob/cspecs)
-      fi
+      dep=${BOB_DEP_PATHS[$dep_name]}
+      [ -d ${dep}/.bob/cspecs ] || continue
+      for cspec in ${dep}/.bob/cspecs/*.xml; do
+        CSPECS+="${CSPECS:+,}${cspec}"
+      done
     done
 
     # Join

@@ -1,5 +1,8 @@
 inherit: [muen_component]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/mulog-analyzer.git
@@ -16,7 +19,7 @@ buildScript: |
   muenBuild $1/mulog_analyzer
 
 packageScript: |
-  gprInstallPackageTgt
+  muenInstallPackageTgt
 
 provideTools:
   mulog-analyzer: "usr/bin"

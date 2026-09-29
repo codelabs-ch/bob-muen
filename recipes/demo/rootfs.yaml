@@ -1,8 +1,10 @@
 #build a minimal rootfs for the linuxes.
+environment:
+  RTS_PLATFORM: "linux"
 
 depends:
-  - codelabs::adhcp-client
-  - codelabs::adhcp-notifier-simple
+  - codelabs::adhcp-tools
+  - codelabs::adhcp-notify
   - core::busybox
   - demo::gnat-linux
   - libs::libc-tgt

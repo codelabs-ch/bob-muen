@@ -1,9 +1,11 @@
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
 
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/tau0.git
   branch: main
-  commit: df666447e1c02abba4d669d6f84e2ae2c1118598
+  commit: 471fe4aae1ea946e160461812df38d9daadfc2cb
 
 depends:
   - muen::build-cfg-scripts
@@ -41,6 +43,6 @@ multiPackage:
       export OBJ_DIR=$(pwd)/obj/
       export EXEC_DIR=$(pwd)/bin/
       export GPR_TARGET="x86_64-linux-gnu"
-      export GNATPROVE_EXTRA_ARGS="--assumptions --no-loop-unrolling --no-axiom-guard"
+      export GNATPROVE_EXTRA_ARGS="--assumptions --no-loop-unrolling --function-sandboxing=off"
     buildScript: |
       muenProof

@@ -1,42 +1,69 @@
-inherit: [muen_component, muen_component_cspecs]
+inherit: [muen_component, muen_component_cspecs, install]
 
 depends:
   - muen::component-libmubase-ld
+
 buildVars: [ARCH]
-buildTools: [mucheckstack]
+buildTools: [mucheckstack, mucbinsplit]
 buildSetup: |
   __SRC=$1
 
+  # -s <spec>
+  # -n <binary name>
   # $1 - SRC relative component directory
-  # $2 - Component spec XML to use (optional)
   muenBuildApp() {
-    muenCspecs $1 ${2:-}
-    GPRBUILD_EXTRA_ARGS="
-      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
-      -Xstacksize=8192" \
+    local SPEC
+    local BIN_NAME
+    # parse args
+    OPTIND=1
+    local opt
+    while getopts "n:s:" opt ; do
+        case "$opt" in
+            n)
+                BIN_NAME="$OPTARG"
+                ;;
+            s)
+                SPEC="$OPTARG"
+                ;;
+            \?)
+              echo "Invalid option: -$OPTARG" >&2
+              exit 1
+              ;;
+        esac
+    done
+    shift $(( OPTIND -1 ))
+
+    if [ $# -ne 1 ]; then
+      echo "Invalid number of arguments: $# : ${@}" >&2
+      exit 1
+    fi
+
+    muenCspecs $1 ${SPEC:-}
 
     # check for arch-specific project file
     PRJ="${1##*/}"
     if [ -f "${__SRC}/${1}/${PRJ}_${ARCH}.gpr" ]; then
       PRJ=${PRJ}_${ARCH}
     fi
-    muenBuild ${__SRC}/${1}/${PRJ}
+    muenBuild ${__SRC}/${1}/${PRJ} \
+      -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
+      -Xstacksize=8192
 
     # stackcheck
     export OBJ_DIR=$(pwd)/build/obj/
     mucheckstack -P${__SRC}/${1}/${PRJ} -l8192
+
+    # binsplit
+    if [[ -e generated/${1##*/}.xml ]]; then
+      mkdir -p install/.bob/cspecs/
+      mucbinsplit -i generated/${1##*/}.xml \
+                  -b install/usr/bin/${BIN_NAME:-${1##*/}} \
+                  -o install/.bob/cspecs/${1##*/}.xml install/
+    fi
   }
 
-packageTools: [mucbinsplit]
 packageSetup: |
   __SRC=$1
-  # $1 - Component name
-  # $2 - Component spec XML to use (optional)
   muenInstallApp() {
-    spec=${2:-${__SRC}/generated/$1.xml}
-    mucbinsplit -i ${spec} \
-                -b ${__SRC}/install/usr/bin/$1 \
-                -o $1.xml .
-    mkdir -p .bob
-    echo "$1.xml" > .bob/cspecs
+    installPackageBin $__SRC/install/ ".bob" ".bob/***"
   }

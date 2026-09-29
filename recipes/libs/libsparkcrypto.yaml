@@ -1,30 +1,15 @@
-inherit: [muen_component, patch]
-
-metaEnvironment:
-  PD: "Cryptographic library written in SPARK"
-  LICENCE: "BSD-3-Clause [secunet]"
-  COPYRIGHT: |
-    Copyright (C) 2011, Adrian-Ken Rueegsegger
-    Copyright (C) 2010, 2011 Alexander Senier
-    Copyright (C) 2012, 2014 Stefan Berghofer
-    Copyright (C) 2010 - 2012, 2014, 2023 secunet Security Networks AG
-  SECURITY_RELEVANCE: "u"
-
-checkoutSCM:
-  scm: git
-  url: https://git.codelabs.ch/spark-crypto.git
-  branch: master
-  commit: 7326a3b8333e6962536a0b868ffd605cbcfc055b
-
-checkoutDeterministic: True
-checkoutScript: |
-  patchApplySeries -p1 $<@libsparkcrypto/*.patch@>
-
-buildVars: [LIBSPARKCRYPTO_SHA_MODE, LIBSPARKCRYPTO_AES_MODE]
-buildScript: |
-  muenBuild $1/libsparkcrypto
-
 multiPackage:
   dev:
-    packageScript: |
-      gprInstallPackageDev
+    depends:
+      - name: ${LIBSPARKCRYPTO_PROVIDER:-libs::libsparkcrypto_muen}-dev
+        use: []
+
+  test:
+    depends:
+      - name: ${LIBSPARKCRYPTO_PROVIDER:-libs::libsparkcrypto_muen}-test
+        use: []
+  proof:
+    depends:
+      - name: ${LIBSPARKCRYPTO_PROVIDER:-libs::libsparkcrypto_muen}-proof
+        use: []
+provideDeps: ['*']

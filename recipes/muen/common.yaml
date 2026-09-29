@@ -1,16 +1,19 @@
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: ${MUEN_COMMON_URL:-https://git.codelabs.ch/muen/common.git}
   branch: ${MUEN_COMMON_BRANCH:-main}
-  commit: ${MUEN_COMMON_COMMIT:-2112e9dd3f5a9346526d3cbf224628112a4d5f72}
+  commit: ${MUEN_COMMON_COMMIT:-f72de9284f72947e1e4b4e4d5b7357fef580c2ba}
 
 multiPackage:
   gpr:
-    inherit: [gpr]
     buildScript: |
       rsync -a --delete $1/gpr .
     packageScript: |
-      gprInstallPackageDev $1/gpr
+      cp $1/gpr/* .
+      echo "GPR_PROJECT_PATH=." >> .gpr_project
 
   "":
     inherit: [muen_component]
@@ -27,16 +30,29 @@ multiPackage:
         multiPackage: &common_dev_tgt_provides
           dev:
             provideDeps: ['*-dev']
-            packageScript: gprInstallPackageDev
+            packageScript: muenInstallPackageDev
           tgt:
             provideDeps: ['*-tgt']
-            packageScript: gprInstallPackageTgt
+            packageScript: muenInstallPackageTgt
       crash_audit:
         depends:
           - muen::common-common-dev
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: muenBuild $1/crash_audit/crash_audit
-        multiPackage: *common_dev_tgt_provides
+        privateEnvironment:
+          GPR_PATH: "crash_audit/crash_audit"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt_provides
+          proof: &common_proof
+            inherit: [muen_proof]
+            buildSetup: |
+              export GPR_FILE=$1/${GPR_PATH}
+              export MUEN_BUILD_MODE=prove
+              export OBJ_DIR=$(pwd)/obj/
+              export LIB_DIR=$(pwd)/lib/
+            buildScript: |
+              muenProof
       common:
         privateEnvironment:
           GPR_PATH: "src/muen_common"
@@ -47,18 +63,10 @@ multiPackage:
               muenBuild $1/${GPR_PATH}
             multiPackage: &common_dev_tgt
               dev:
-                packageScript: gprInstallPackageDev
+                packageScript: muenInstallPackageDev
               tgt:
-                packageScript: gprInstallPackageTgt
-          proof: &common_proof
-            inherit: [muen_proof]
-            buildSetup: |
-              export GPR_FILE=$1/${GPR_PATH}
-              export MUEN_BUILD_MODE=prove
-              export OBJ_DIR=$(pwd)/obj/
-              export LIB_DIR=$(pwd)/lib/
-            buildScript: |
-              muenProof
+                packageScript: muenInstallPackageTgt
+          proof: *common_proof
       strings:
         depends:
           - muen::common-common-dev
@@ -91,7 +99,12 @@ multiPackage:
         multiPackage: *common_dev_tgt
 
       mutimedevents:
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: |
-          muenBuild $1/mutimedevents/mutimedevents
-        multiPackage: *common_dev_tgt
+        privateEnvironment:
+          GPR_PATH: "mutimedevents/mutimedevents"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage:
+          "":
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage: *common_dev_tgt
+          proof: *common_proof

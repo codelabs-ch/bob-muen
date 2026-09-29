@@ -1,10 +1,13 @@
 inherit: [muen_component]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
   branch: main
-  commit: bb48b4c5ec7d33aba58edc2fc89d4d2996ca568f
+  commit: 5421516f0c38edb0298309aac040244d5b56d767
 
 depends:
   - muen::common-debug-dev
@@ -43,10 +46,11 @@ multiPackage:
       - muen::arm64-systems-test
     buildSetup: |
       export RTS_CONFIG=${BOB_DEP_PATHS[muen::arm64-systems-test]}
-      export GPRBUILD_EXTRA_ARGS=("--implicit-with=aunit")
       export BUILD_MODE=test
       export BIN_POSTFIX=_test
-    buildScript: *common_build
+    buildScript: |
+      muenBuild $1/kernel.gpr --implicit-with=aunit
+      NO_SUFFIX=1 muenBuildBin kernel${BIN_POSTFIX}.elf
     packageScript: *common_pkg
   proof:
     inherit: [muen_proof]

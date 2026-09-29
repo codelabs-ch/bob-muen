@@ -1,10 +1,13 @@
 inherit: [muen_component]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
   branch: ${MUEN_X86_KNL_BRANCH:-main}
-  commit: ${MUEN_X86_KNL_COMMIT:-994cda4b30fbf1d604c40b235855c0c7d8d4f69d}
+  commit: ${MUEN_X86_KNL_COMMIT:-14fc0a764b79f6a8c9168ed7a2632cce2c915737}
 
 depends:
   - environment:
@@ -19,7 +22,9 @@ depends:
       - muen::common-mutimedevents-dev
       - muen::common-strings-dev
 
-  - muen::x86-systems-policy
+  - name: muen::x86-systems-policy
+    environment:
+      MUEN_COMMON_VARIANT: "component"
   - muen::components-tau0
 buildVars: [MUEN_BUILD_MODE]
 buildSetup: |
@@ -62,7 +67,7 @@ multiPackage:
       # Copy all relevant lib deps here and create simple GPR file.
       for d in ${!BOB_DEP_PATHS[@]}; do
         DIR=${BOB_DEP_PATHS[$d]}
-        if [ -e ${DIR}/usr/share/gpr/*.gpr ]; then
+        if [ -e ${DIR}/usr/share/gpr/*.gpr ] && [ -d ${DIR}/usr/include ]; then
           # remove dependency from project path first
           GPR_PROJECT_PATH=$(echo "$GPR_PROJECT_PATH" | tr ':' '\n' | grep -v '$DIR' | paste -sd ':' -)
 

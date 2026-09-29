@@ -1,8 +1,6 @@
-inherit: [gpr]
+inherit: [gnat]
 
 depends:
-  - if: $(ne,${RTS:-UNSET},UNSET)
-    name: ${RTS}
   - muen::common-gpr
   - muen::build-cfg-gpr
 
@@ -22,26 +20,14 @@ buildSetup: |
   fi
 buildScript: |
   muenBuild() {
-    gprbuild -P $1 \
-      -j${MAKE_JOBS:-$(nproc)} \
-      --relocate-build-tree=build \
-      -gnatef -s -k \
-      --create-map-file \
-      --target=${GPR_TARGET} \
-      ${RTS:+--RTS=${BOB_DEP_PATHS[${RTS}]}/usr/include/rts} \
-      ${GPRBUILD_EXTRA_ARGS:-} \
-      -largs "${LARGS[@]}" \
-      -cargs "${CARGS[@]}"
-    rm -rf install
-    gprinstall -P $1 \
-      --relocate-build-tree=build \
-      --target=${GPR_TARGET} \
-      --prefix="${PREFIX:-install/usr}" \
-      -p \
-      -f \
-      ${@:2}
-    find build -name '*.ci' | \
-      rsync -a --mkpath --no-R --files-from - . ${PREFIX:-install/usr}/share/ci/
+    local GPR_FILE=$1
+    shift
+    local arg
+    for arg in "$@"; do
+      GPRBUILD_OPTIONS+=(-o "$arg")
+    done
+    gnatBuild -P "$GPR_FILE" "${GPRBUILD_OPTIONS[@]}"
+
   }
 
   # $1 ELF file to use
@@ -73,4 +59,20 @@ buildScript: |
       echo '& "";' >> $2
     done
     echo 'end String_Templates;' >> $2
+  }
+
+packageScript: |
+  muenInstallPackageDev () {
+    gnatPackageDev "${@}"
+  }
+
+  __BUILD_DIR=$1
+  muenInstallPackageTgt () {
+    gnatPackageTgt "${@}"
+
+    if [[ -f ${__BUILD_DIR}/${CSPECS_FILE:-} ]]; then
+      mkdir -p .bob/cspecs
+      cp ${__BUILD_DIR}/${CSPECS_FILE:-} .bob/cspecs
+    fi
+
   }

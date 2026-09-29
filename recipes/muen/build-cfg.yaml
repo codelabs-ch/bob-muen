@@ -1,19 +1,25 @@
-inherit: [gpr]
 
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/build-cfg.git
   branch: main
-  commit: a9a9196b026b4dbbe02b026dc2c280ae95718475
+  commit: af7f4da48c54532d14daab1cbb6134c946aa740a
 
 buildScript: |
   rsync -a --delete $1/ .
 
 multiPackage:
   gpr:
-    buildVars: [ARCH]
     packageScript: |
-      gprInstallPackageDev $1/gpr "*"
+      rm -rf .gpr_project
+      GPR_PROJECT_PATH=""
+      rsync -a --delete $1/gpr/ .
+      for GPR in $(find . -name "*.gpr" -printf '%h\n' | uniq | sort); do
+        [ ! -z ${GPR_PROJECT_PATH} ] && GPR_PROJECT_PATH+=":"
+        GPR_PROJECT_PATH+="${GPR}"
+      done
+      echo "GPR_PROJECT_PATH=${GPR_PROJECT_PATH}" >> .gpr_project
+
   scripts:
     packageScript: |
       rsync -a --delete $1/scripts/ .

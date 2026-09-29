@@ -2,6 +2,9 @@
 
 inherit: ['basement::rootrecipe']
 
+environment:
+  BASEMENT_OPTIMIZE: "s"
+
 depends:
 
   - name: libs::libxml2-bin
@@ -40,9 +43,18 @@ depends:
       target-toolchain: host-compat-gnat-toolchain
     environment:
       MUEN_BUILD_MODE: "release"
+      RTS_PLATFORM: "linux"
     depends:
 
       - name: adacore::gprbuild-bootstrap
+        use: [tools]
+        forward: True
+
+      - name: adacore::gprinspect-fake
+        use: [tools]
+        forward: True
+
+      - name: adacore::gpr-gpr2Tools
         use: [tools]
         forward: True
 

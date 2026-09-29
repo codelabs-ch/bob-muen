@@ -1,10 +1,13 @@
 inherit: [muen_component]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
   branch: main
-  commit: 60e688ceb4e404a64c7e9eccb3007294095f03f0
+  commit: 91fc9b5492f3fe266279ef60af90ea465c7372fb
 
 environment:
   MUEN_COMMON_VARIANT: "component"
@@ -40,11 +43,13 @@ multiPackage:
           $1/storage_drv/spec/storage_drv.xml > storage_drv.xml
     buildScript: |
       buildApp () {
-        muenBuildApp storage_drv storage_drv.xml
+        muenBuildApp -n storage_drv-${DRIVE_KIND,,} \
+                     -s $(pwd)/storage_drv.xml \
+                     storage_drv
       }
     packageScript: |
       packageApp () {
-        muenInstallApp storage_drv-${DRIVE_KIND,,} $1/generated/storage_drv.xml
+        muenInstallApp
       }
     multiPackage:
       ahci:
@@ -53,7 +58,7 @@ multiPackage:
         multiPackage:
           "":
             buildScript: buildApp
-            packageScript: packageApp $1
+            packageScript: packageApp
             provideDeps: ['*-tgt']
           proof: &storage_drv_proof
             inherit: [muen_proof_app]
@@ -69,7 +74,7 @@ multiPackage:
         multiPackage:
           "":
             buildScript: buildApp
-            packageScript: packageApp $1
+            packageScript: packageApp
             provideDeps: ['*-tgt']
           proof: *storage_drv_proof
   controller:
@@ -89,7 +94,7 @@ multiPackage:
         buildScript: |
           muenBuildApp controller
         packageScript: |
-          muenInstallApp controller
+          muenInstallApp
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]
@@ -115,7 +120,7 @@ multiPackage:
                   $1/dbgserver/misc/gpr.xsl \
                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       "":
         inherit: [python3]
         depends:
@@ -126,6 +131,7 @@ multiPackage:
           - muen::common-debug-dev
           - muen::common-crash_audit-dev
           - muen::common-strings-dev
+          - ${MUEN_POLICY_SRC}
           - muen::build-cfg-scripts
           - if: "$(eq,${ARCH:-},x86_64)"
             name: libs::libxhcidbg-dev
@@ -153,6 +159,12 @@ multiPackage:
                    $1/dbgserver/misc/logchannels.xsl \
                    ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
 
+          # generate logreaderstates.xml
+          xsltproc -o generated/logreaderstates.xml \
+                   --stringparam COMPONENTNAME dbgserver \
+                   $1/dbgserver/misc/logreaderstates.xsl \
+                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
+
           # generate subject_consoles.xml
           xsltproc -o generated/subject_consoles.xml \
                    --stringparam COMPONENTNAME dbgserver \
@@ -171,7 +183,7 @@ multiPackage:
             buildScript: |
               muenBuildApp dbgserver
             packageScript: |
-              muenInstallApp dbgserver
+              muenInstallApp
             provideDeps: ['*-tgt']
           proof:
             inherit: [muen_proof_app]
@@ -196,7 +208,7 @@ multiPackage:
         buildScript: |
           muenBuildApp dm
         packageScript: |
-          muenInstallApp dm
+          muenInstallApp
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]
@@ -206,12 +218,13 @@ multiPackage:
           GPR_PATH: "dm/dm"
 
   example:
+    depends:
+      - ${MUEN_POLICY_SRC}
+    buildVars: [MUEN_POLICY_SRC]
     multiPackage:
       config-dev:
         depends:
-          - ${MUEN_POLICY_SRC}
           - muen::build-cfg-scripts
-        buildVars: [MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |
           mkdir -p install/usr/share
@@ -221,7 +234,7 @@ multiPackage:
                   $1/example/misc/gpr.xsl \
                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
 
       "":
         depends:
@@ -245,7 +258,7 @@ multiPackage:
             buildScript: |
               muenBuildApp example
             packageScript: |
-              muenInstallApp example
+              muenInstallApp
             provideDeps: ['*-tgt']
           proof:
             inherit: [muen_proof_app]
@@ -261,11 +274,12 @@ multiPackage:
     buildScript: |
       muenBuildApp idle
     packageScript: |
-      muenInstallApp idle
+      muenInstallApp
 
   isolation_tests:
     inherit: [muen_component_app, python3]
     depends:
+      - ${MUEN_POLICY_SRC}
       - muen::common-strings-dev
       - muen::component-libmubase-dev
       - muen::component-libs-libmusinfo-dev
@@ -277,6 +291,7 @@ multiPackage:
       - name: python::lxml
         tools:
           target-toolchain: host-compat-toolchain
+    buildVars: [MUEN_POLICY_SRC]
     buildScript: |
       # Generate reference_values.ads
       $1/isolation_tests/misc/reference_values.py \
@@ -284,12 +299,13 @@ multiPackage:
         --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
       muenBuildApp isolation_tests
     packageScript: |
-      muenInstallApp isolation_tests
+      muenInstallApp
     provideDeps: ['*-tgt']
 
   isolation_tests_monitor:
     inherit: [muen_component_app]
     depends:
+      - ${MUEN_POLICY_SRC}
       - muen::common-strings-dev
       - muen::component-libmubase-dev
       - muen::component-libs-libmusinfo-dev
@@ -298,10 +314,13 @@ multiPackage:
       - use: []
         depends:
           - muen::component-libs-libmudebuglog-tgt
+    privateEnvironment:
+      INSTALL_APPLY_SHEBANG_FIXUP: "no"
+    buildVars: [MUEN_POLICY_SRC]
     buildScript: |
       muenBuildApp isolation_tests_monitor
     packageScript: |
-      muenInstallApp isolation_tests_monitor
+      muenInstallApp
     provideDeps: ['*-tgt']
 
   ps2_drv:
@@ -317,7 +336,7 @@ multiPackage:
     buildScript: |
       muenBuildApp ps2_drv
     packageScript: |
-      muenInstallApp ps2_drv
+      muenInstallApp
     provideDeps: ['*-tgt']
 
   sl:
@@ -325,16 +344,22 @@ multiPackage:
       - muen::component-libmubase-dev
       - muen::component-libs-libmusinfo-dev
       - muen::component-libs-libmuinit-dev
+      - name: python::lxml
+        tools:
+          target-toolchain: host-compat-toolchain
       - use: []
         depends:
           - muen::component-libs-libmuinit-tgt
     multiPackage:
       "":
-        inherit: [muen_component_app]
+        inherit: [muen_component_app, python3]
         buildScript: |
           muenBuildApp sl
+          mv install/.bob/cspecs/sl.xml sl_split.xml
+          $1/sl/misc/adjust-xml-spec.py sl_split.xml \
+            install/.bob/cspecs/sl.xml
         packageScript: |
-          muenInstallApp sl
+          muenInstallApp
       proof:
         inherit: [muen_proof_app]
         environment:
@@ -343,11 +368,12 @@ multiPackage:
           GPR_PATH: "sl/sl"
 
   sm:
+    depends:
+      - ${MUEN_POLICY_SRC}
     multiPackage:
       config-dev:
         depends:
           - muen::build-cfg-scripts
-          - ${MUEN_POLICY_SRC}
         buildVars: [MUEN_POLICY_SRC]
         buildTools: [libxslt-tools]
         buildScript: |
@@ -359,7 +385,7 @@ multiPackage:
                   $1/sm/misc/gpr.xsl \
                   ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       "":
         inherit: [python3]
         depends:
@@ -403,7 +429,7 @@ multiPackage:
             buildScript: |
               muenBuildApp sm
             packageScript: |
-              muenInstallApp sm
+              muenInstallApp
             provideDeps: ['*-tgt']
           proof:
             inherit: [muen_proof_app]
@@ -415,7 +441,8 @@ multiPackage:
   tau0:
     inherit: [muen_component_app]
     depends:
-      - muen::x86-systems-policy
+      - name: muen::x86-systems-policy
+        use: [result]
       - muen::component-libmubase-dev
     buildSetup: |
       export POLICY_DIR=${BOB_DEP_PATHS[muen::x86-systems-policy]}
@@ -449,9 +476,9 @@ multiPackage:
           sed -e "s/%%%ARCH%%%/${ARCH}/g" \
               $1/time/spec/time.xml > time.xml
         buildScript: |
-          muenBuildApp time time.xml
+          muenBuildApp -s time.xml time
         packageScript: |
-          muenInstallApp time $1/generated/time.xml
+          muenInstallApp
         provideDeps: ['*-tgt']
       proof:
         inherit: [muen_proof_app]
@@ -479,5 +506,5 @@ multiPackage:
     buildScript: |
       muenBuildApp vt
     packageScript: |
-      muenInstallApp vt
+      muenInstallApp
     provideDeps: ['*-tgt']

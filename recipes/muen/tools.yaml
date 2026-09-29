@@ -1,8 +1,11 @@
+metaEnvironment:
+  PKG_LICENSE: "GPL-3.0-or-later"
+
 checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-main}
-  commit: ${MUEN_TOOLS_COMMIT:-cd294a2fcd86fe7d89cd0baf773ac6de335d899a}
+  commit: ${MUEN_TOOLS_COMMIT:-88667379133fe82744d26537666d5ee26814f288}
 
 multiPackage:
   liballoc:
@@ -15,7 +18,7 @@ multiPackage:
           muenBuild $1/liballoc/liballoc
         provideDeps: ['*-dev']
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       test:
         inherit: [muen_test]
         depends:
@@ -40,7 +43,7 @@ multiPackage:
           muenBuild $1/libmucfgcheck/libmucfgcheck
         provideDeps: ['*-dev']
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       test: &simple_test
         inherit: [muen_test]
         privateEnvironment:
@@ -78,7 +81,7 @@ multiPackage:
           muenBuild $1/libmucfgvcpu/libmucfgvcpu
         provideDeps: ['*-dev']
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       test:
         <<: *simple_test
         privateEnvironment:
@@ -92,7 +95,7 @@ multiPackage:
       muenBuild $1/libmulog/libmulog
     provideDeps: ['*-dev']
     packageScript: |
-      gprInstallPackageDev
+      muenInstallPackageDev
 
   libmupy:
     inherit: [python3]
@@ -114,7 +117,7 @@ multiPackage:
           muenBuild $1/libmutools/libmutools
         provideDeps: ['*-dev']
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       test:
         <<: *simple_test
         privateEnvironment:
@@ -173,7 +176,7 @@ multiPackage:
       dev:
         buildScript: muenBuild $1/libmuxml/libmuxml
         provideDeps: ['*-dev']
-        packageScript: gprInstallPackageDev
+        packageScript: muenInstallPackageDev
       test:
         <<: *simple_test
         privateEnvironment:
@@ -189,7 +192,7 @@ multiPackage:
           muenBuild $1/libpaging/libpaging
         provideDeps: ['*-dev']
         packageScript: |
-          gprInstallPackageDev
+          muenInstallPackageDev
       test:
         <<: *simple_test
         privateEnvironment:
@@ -200,7 +203,7 @@ multiPackage:
     buildScript: |
       muenBuild $1/libtest/libtest
     packageScript: |
-      gprInstallPackageDev
+      muenInstallPackageDev
 
   mucbinsplit:
     inherit: [muen_component]
@@ -211,7 +214,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucbinsplit/mucbinsplit
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucbinsplit: "usr/bin"
       test:
@@ -242,7 +245,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgalloc/mucfgalloc
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgalloc: "usr/bin"
       test:
@@ -260,7 +263,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgcjoin/mucfgcjoin
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgcjoin: "usr/bin"
       test:
@@ -279,7 +282,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgcvresalloc/mucfgcvresalloc
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgcvresalloc: "usr/bin"
       test:
@@ -304,7 +307,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgexpand/mucfgexpand
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgexpand: "usr/bin"
       test:
@@ -321,7 +324,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgmemhashes/mucfgmemhashes
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgmemhashes: "usr/bin"
       test:
@@ -340,7 +343,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgmerge/mucfgmerge
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgmerge: "usr/bin"
       test:
@@ -360,7 +363,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgvalidate/mucfgvalidate
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgvalidate: "usr/bin"
       test:
@@ -379,7 +382,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgvresalloc/mucfgvresalloc
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucfgvresalloc: "usr/bin"
       test:
@@ -402,7 +405,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucgenspec/mucgenspec \
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucgenspec: "usr/bin"
       test:
@@ -419,7 +422,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucheckelf/mucheckelf -XLINKING=static
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucheckelf: "usr/bin"
       test:
@@ -430,14 +433,14 @@ multiPackage:
   mucheckstack:
     inherit: [muen_component]
     depends:
-      - adacore::gnatcoll-dev
+      - adacore::gnatcoll-projects-dev
       - muen::tools-libmutools-dev
     multiPackage:
       "":
         buildScript: |
           muenBuild $1/mucheckstack/mucheckstack
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mucheckstack: "usr/bin"
       test:
@@ -471,7 +474,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugenacpi/mugenacpi
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mugenacpi: "usr/bin"
       test:
@@ -496,7 +499,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugends/mugends
         packageScript: |
-          gprInstallPackageTgt $1/install/
+          muenInstallPackageTgt $1/install/
         provideTools:
           mugends: "usr/bin"
       test:
@@ -520,7 +523,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugendts/mugendts
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugendts: "usr/bin"
       test:
@@ -539,7 +542,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugenmsrstore/mugenmsrstore
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugenmsrstore: "usr/bin"
       test:
@@ -559,7 +562,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugenpt/mugenpt
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugenpt: "usr/bin"
       test:
@@ -577,7 +580,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugensinfo/mugensinfo
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugensinfo: "usr/bin"
       test:
@@ -594,7 +597,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugensolo5/mugensolo5
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugensolo5: "usr/bin"
       test:
@@ -616,7 +619,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugenspec/mugenspec
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugenspec: "usr/bin"
       test:
@@ -647,7 +650,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugentau0cmds/mugentau0cmds
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugentau0cmds: "usr/bin"
       test:
@@ -666,7 +669,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mugenzp/mugenzp
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mugenzp: "usr/bin"
       test:
@@ -681,7 +684,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mupcspkrdbg/mupcspkrdbg
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mupcspkrdbg: "usr/bin"
       test:
@@ -700,7 +703,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/muwalkpt/muwalkpt
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           muwalkpt: "usr/bin"
       test:
@@ -719,7 +722,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/muxmlfilter/muxmlfilter
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           muxmlfilter: "usr/bin"
       test:
@@ -736,7 +739,7 @@ multiPackage:
         buildScript: |
           muenBuild $1/mucfgucode/mucfgucode
         packageScript: |
-          gprInstallPackageTgt
+          muenInstallPackageTgt
         provideTools:
           mucfgucode: "usr/bin"
       test:

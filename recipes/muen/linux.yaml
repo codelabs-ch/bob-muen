@@ -12,14 +12,23 @@ checkoutSCM:
 
 depends:
   - ${LINUX_CUSTOM_CONFIG}
+  - tools:
+      target-toolchain: host-compat-toolchain
+    depends:
+      - libs::ncurses-dev
 
-buildTools: [bison, flex, m4, host-toolchain, target-toolchain]
+buildTools: [bison, flex, m4, host-toolchain, target-toolchain, perl]
 buildVars: [ARCH, LINUX_CONFIG, LINUX_CUSTOM_CONFIG]
-buildScript: |
+buildSetup: |
   # prevent timestamps in configuration
   export KCONFIG_NOTIMESTAMP=1
   export KBUILD_BUILD_TIMESTAMP='Mon Dec 28 22:49:40 CET 2015'
 
+  # support 'make menuconfig'
+  export HOSTCFLAGS="-I${BOB_DEP_PATHS['libs::ncurses-dev']}/usr/include"
+  export HOSTLDFLAGS="-L${BOB_DEP_PATHS['libs::ncurses-dev']}/usr/lib"
+
+buildScript: |
   cp -u "${BOB_DEP_PATHS[${LINUX_CUSTOM_CONFIG}]}/${LINUX_CONFIG:-kernel.config}" .config
   make -C "$1" O=$PWD olddefconfig
 
@@ -31,11 +40,16 @@ multiPackage:
           target-toolchain: host-compat-toolchain
         depends:
           - libs::elfutils-libelf-dev
-          - libs::openssl-dev
+          - name: libs::openssl-dev
+            environment:
+              OPENSSL_ADDITIONAL_OPTIONS: ""
           - name: kernel::kmod
             use: [tools]
 
     buildVars: [CROSS_COMPILE]
+    buildSetup: |
+      export HOSTCFLAGS="${HOSTCFLAGS} -I${BOB_DEP_PATHS['libs::openssl-dev']}/usr/include"
+      export HOSTLDFLAGS="${HOSTLDFLAGS} -L${BOB_DEP_PATHS['libs::openssl-dev']}/usr/lib"
     buildScript: |
       makeParallel LOCALVERSION=
 

@@ -1,5 +1,8 @@
 inherit: [muen_component]
 
+metaEnvironment:
+  PKG_LICENSE: "GPL-2.0-or-later"
+
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/libxhcidbg.git
@@ -22,12 +25,9 @@ multiPackage:
   dev:
     provideDeps: ['*-dev']
     packageScript: |
-      gprInstallPackageDev
+      muenInstallPackageDev
   tgt:
-    packageVars: [CSPECS_FILE]
     packageScript: |
-      gprInstallPackageTgt
-      mkdir -p usr/share/
-      cp -L $1/libxhcidbg.xml usr/share
-      mkdir -p .bob
-      echo usr/share/libxhcidbg.xml > .bob/cspecs
+      muenInstallPackageTgt
+      mkdir -p .bob/cspecs/
+      cp -L $1/libxhcidbg.xml .bob/cspecs

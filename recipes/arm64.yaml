@@ -55,7 +55,7 @@ depends:
   # the target toolchain for the following 'sub-depends' is aarch64-
   # linux-gnu- with ada support.
   - name: devel::cross-toolchain-aarch64-linux-gnu-ada
-    use: [tools]
+    use: [tools, environment]
     forward: True
     tools:
       target-toolchain: host-compat-gnat-toolchain
@@ -85,6 +85,8 @@ depends:
         depends:
           - muen::arm64-kernel-${MUEN_BUILD_MODE}
           - muen::arm64-systems-policy
+    environment:
+      RTS_PLATFORM: "bare"
 
   # (4) Build the bootloader binaries for exception level 3 (currently
   # prebuilt binaries depending on hardware from muenonarm repository).
@@ -103,6 +105,7 @@ depends:
       - muen::arm64-systems-devicetree
       - name: demo::rootfs
         environment:
+          RTS_PLATFORM: "linux"
           ROOTFS_ARCH: "arm64"
 
   # (6) Generate deployment scripts for all deploy modes.

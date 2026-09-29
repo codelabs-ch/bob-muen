@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git
-  branch: rh-upstream
-  commit: 1aa4850259ea6e28762abd83534aedffb347f0f0
+  branch: main
+  commit: 81357731520b0ff92054b6dbd24cfc0c22b824fe
 
 multiPackage:
   muinitstub:

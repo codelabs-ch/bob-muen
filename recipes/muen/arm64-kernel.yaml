@@ -3,8 +3,7 @@ inherit: [muen_component]
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
-  branch: main
-  commit: bb48b4c5ec7d33aba58edc2fc89d4d2996ca568f
+  branch: daniel-arm64-linux-smp
 
 depends:
   - muen::common-debug-dev

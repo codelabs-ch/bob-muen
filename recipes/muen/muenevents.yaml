@@ -10,8 +10,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muenevents.git
-  commit: de7dbbecc22d82c69f55adb7f80aa7c660eb8c31
-  branch: main
+  branch: daniel-arm64-linux-smp
 
 depends:
   - name: muen::linux-modules_prepare

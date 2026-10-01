@@ -1,8 +1,7 @@
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: 99f9e6264ef11af6ba7db66abedaa1b058683f33
+  branch: daniel-arm64-linux-smp
 
 multiPackage:
   common:

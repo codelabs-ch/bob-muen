@@ -8,8 +8,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muennet.git
-  commit: d5944ac55d3ba0cc59dfe2b1ea4b127ac8f0bb60
-  branch: main
+  branch: daniel-arm64-linux-smp
 
 buildTools: [target-toolchain]
 

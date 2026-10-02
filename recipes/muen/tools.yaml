@@ -5,7 +5,7 @@ checkoutSCM:
   scm: git
   url: ${MUEN_TOOLS_URL:-https://git.codelabs.ch/muen/tools.git}
   branch: ${MUEN_TOOLS_BRANCH:-hw-explicit-empty-bars}
-  commit: ${MUEN_TOOLS_COMMIT:-df2b951a4f467736471d634253107c707accc556}
+  commit: ${MUEN_TOOLS_COMMIT:-5854a8484c0cb18fe4fc4ce91ed5a14681af2441}
 
 multiPackage:
   liballoc:

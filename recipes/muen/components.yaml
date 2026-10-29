@@ -293,7 +293,7 @@ multiPackage:
           target-toolchain: host-compat-toolchain
     buildVars: [MUEN_POLICY_SRC]
     buildScript: |
-      # Generate reference_values.ads
+      # Generate reference_values.ads.
       $1/isolation_tests/misc/reference_values.py \
         --out generated/reference_values.ads \
         --src_policy ${BOB_DEP_PATHS[${MUEN_POLICY_SRC}]}/policy_src.xml

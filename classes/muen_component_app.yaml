@@ -14,16 +14,20 @@ buildSetup: |
   muenBuildApp() {
     local SPEC
     local BIN_NAME
+    local STACK_SIZE=8192
     # parse args
     OPTIND=1
     local opt
-    while getopts "n:s:" opt ; do
+    while getopts "n:s:S:" opt ; do
         case "$opt" in
             n)
                 BIN_NAME="$OPTARG"
                 ;;
             s)
                 SPEC="$OPTARG"
+                ;;
+            S)
+                STACK_SIZE=$OPTARG
                 ;;
             \?)
               echo "Invalid option: -$OPTARG" >&2
@@ -47,11 +51,11 @@ buildSetup: |
     fi
     muenBuild ${__SRC}/${1}/${PRJ} \
       -Xlinker_script=${BOB_DEP_PATHS[muen::component-libmubase-ld]}/component.ld \
-      -Xstacksize=8192
+      -Xstacksize=${STACK_SIZE}
 
     # stackcheck
     export OBJ_DIR=$(pwd)/build/obj/
-    mucheckstack -P${__SRC}/${1}/${PRJ} -l8192
+    mucheckstack -P${__SRC}/${1}/${PRJ} -l${STACK_SIZE}
 
     # binsplit
     if [[ -e generated/${1##*/}.xml ]]; then

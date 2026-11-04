@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: ${MUEN_X86_KNL_URL:-https://git.codelabs.ch/muen.git}
-  branch: ${MUEN_X86_KNL_BRANCH:-main}
-  commit: ${MUEN_X86_KNL_COMMIT:-639adb02c0a1d9579acdc2fdbc480c8c9356e7eb}
+  branch: ${MUEN_X86_KNL_BRANCH:-mitigations}
+  commit: ${MUEN_X86_KNL_COMMIT:-634e50ab879af170126c8b4916528586079a93e5}
 
 depends:
   - environment:

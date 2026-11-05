@@ -10,7 +10,7 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/linux/muenevents.git
-  commit: de7dbbecc22d82c69f55adb7f80aa7c660eb8c31
+  commit: ca3ab0e142fea44fa5edc71cc143d9f0a7b6de05
   branch: main
 
 depends:

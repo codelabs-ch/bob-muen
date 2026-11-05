@@ -7,6 +7,8 @@ depends:
 buildVars: [OBJCOPY, RTS, CROSS_COMPILE]
 buildVarsWeak: [MAKE_JOBS]
 buildSetup: |
+  # Avoid generation of __pycache__ in src/ workspaces.
+  export PYTHONDONTWRITEBYTECODE=1
   export GPR_TARGET="${CROSS_COMPILE%"-"}"
   export BUILD_CFG_PATH=${BOB_DEP_PATHS[muen::build-cfg-gpr]}
   if [[ ${MUEN_BUILD_MODE:-"0"} != "0" ]]; then

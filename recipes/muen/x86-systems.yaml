@@ -2,7 +2,7 @@ checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/x86/systems.git
   branch: main
-  commit: 8a442bfb58881c75d2cde4ef862b64a01ecf0c67
+  commit: d80f6f7711ac28867240c0a91ee7298360621c25
 
 multiPackage:
   bootloader-cfg:
@@ -50,7 +50,6 @@ multiPackage:
       ln -snf $1/policy .
     packageScript: |
       mkdir -p hardware
-      cp $1/policy/hardware/cirrus7-nimbus.xml hardware/Cirrus7_Asus_Q87T.mlph.xml
       cp $1/policy/hardware/intel-nuc-5i5myhe.xml hardware/Intel_NUC_5i5MYHE.mlph.xml
       cp $1/policy/hardware/intel-nuc-6cayh.xml hardware/Intel_NUC_6CAYH.mlph.xml
       cp $1/policy/hardware/kontron-ktqm77.xml hardware/Client_III.mlph.xml

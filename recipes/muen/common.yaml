@@ -4,8 +4,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: ${MUEN_COMMON_URL:-https://git.codelabs.ch/muen/common.git}
-  branch: ${MUEN_COMMON_BRANCH:-main}
-  commit: ${MUEN_COMMON_COMMIT:-cada943cd4f7e20be14631924cdd3ea09e750624}
+  branch: ${MUEN_COMMON_BRANCH:-hw-explicit-empty-bars}
+  commit: ${MUEN_COMMON_COMMIT:-54321a8e8442e06917ae965b4375e7fa4ce8fe79}
 
 multiPackage:
   gpr:

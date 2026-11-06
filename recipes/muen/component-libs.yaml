@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/component/libs.git
-  branch: main
-  commit: b09350f3b1916a2b07856236f42bdf960ca2541c
+  branch: hw-explicit-empty-bars
+  commit: d0c20419902a5975c5fc01e9355d676af751d84d
 
 multiPackage:
   muinitstub:

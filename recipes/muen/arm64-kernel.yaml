@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/kernel.git
-  branch: main
-  commit: 5421516f0c38edb0298309aac040244d5b56d767
+  branch: devel-subject-state
+  commit: e8244ee2fc0bd33085e5081bf89f23cb05aa01ea
 
 depends:
   - muen::common-debug-dev

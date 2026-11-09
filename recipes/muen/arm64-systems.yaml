@@ -4,8 +4,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/arm64/systems.git
-  branch: main
-  commit: 5c67b70f137a6dc2ac5f91577c6489a82f371f86
+  branch: devel-subject-state
+  commit: fd289eaaea89719108ae543d3d6054b244cbadd3
 
 multiPackage:
   common:

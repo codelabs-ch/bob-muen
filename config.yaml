@@ -19,8 +19,8 @@ layers:
   - name: ada
     scm: git
     url: https://git.codelabs.ch/bob/ada.git
-    branch: main
-    commit: fa9006fa06ef1a6c7d2e91224547240651bedb39
+    branch: gnatprove-libzstd-dep
+    commit: ca30857e39d2834d3495b24758da6ed33558751f
 
   - name: codelabs
     scm: git

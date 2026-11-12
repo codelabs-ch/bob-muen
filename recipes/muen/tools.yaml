@@ -48,12 +48,19 @@ multiPackage:
         inherit: [muen_test]
         privateEnvironment:
           TEST_NAME: "libmucfgcheck"
-        buildVars: [TEST_NAME]
+        buildVars: [TEST_NAME, TEST_IGNORE]
         buildSetup: |
           export GNATTEST_TESTS_DIR=$1/${TEST_NAME}/tests
         buildScript: |
+          ARGS=()
+          if [ -n "${TEST_IGNORE:-}" ]; then
+            echo -n "${TEST_IGNORE}" > gnattest_ignore.txt
+            ARGS+=("-i")
+            ARGS+=("$(pwd)/gnattest_ignore.txt")
+          fi
           GNATTEST_DATA_DIR=$1/${TEST_NAME}/data \
-            muenTest $1/${TEST_NAME}/gnattest_${TEST_NAME}
+            muenTest ${ARGS[@]}\
+              $1/${TEST_NAME}/gnattest_${TEST_NAME}
         packageScript: |
           muenPackageTest
 

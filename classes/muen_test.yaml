@@ -12,6 +12,23 @@ buildSetup: |
   export GNATTEST_STUBS_DIR=$(pwd)/stubs
 buildScript: |
   muenTest () {
+    local GNATTEST_IGNORE=""
+    # parse args
+    OPTIND=1
+    local opt
+    while getopts "i:" opt ; do
+        case "$opt" in
+            i)
+                GNATTEST_IGNORE="--ignore=$OPTARG"
+                ;;
+            \?)
+              echo "Invalid option: -$OPTARG" >&2
+              exit 1
+              ;;
+        esac
+    done
+    shift $(( OPTIND -1 ))
+
     mkdir -p tests
     if [[ ${GNATTEST_TESTS_DIR:-UNSET} != UNSET ]]; then
       rsync -a --delete ${GNATTEST_TESTS_DIR}/ tests
@@ -20,6 +37,7 @@ buildScript: |
     export GCONV_PATH=${BOB_TOOL_PATHS['target-toolchain']}/${TOOLCHAIN_SYSROOT}/usr/lib/gconv
     gnattest -q --test-duration --omit-sloc --no-subprojects \
         --target=${AUTOCONF_HOST} \
+        ${GNATTEST_IGNORE} \
         -P$1
 
     gnatBuild -P $(pwd)/build/test/test_driver \

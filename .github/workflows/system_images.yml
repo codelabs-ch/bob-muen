@@ -33,7 +33,7 @@ jobs:
           bob layers update
           bob --version
           echo "Building ${{ matrix.recipe }}"
-          bob dev -j$(nproc) ${{ matrix.recipe }}
+          bob dev -vv -j$(nproc) ${{ matrix.recipe }}
 
   build-debian:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
           bob layers update
           bob --version
           echo "Building ${{ matrix.recipe }}"
-          bob dev -j$(nproc)  --always-checkout muen::* ${{ matrix.recipe }}
+          bob dev -vv -j$(nproc)  --always-checkout muen::* ${{ matrix.recipe }}
 
   build-mirage-static_website:
     runs-on: ubuntu-latest

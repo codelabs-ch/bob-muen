@@ -61,9 +61,16 @@ multiPackage:
           "":
             buildScript: |
               muenBuild $1/${GPR_PATH}
-            multiPackage: &common_dev_tgt
+            multiPackage:
               dev:
-                packageScript: muenInstallPackageDev
+                packageScript: |
+                  muenInstallPackageDev
+                  GPR=usr/share/gpr/muen_common.gpr
+                  sed -i -E '/for Languages use/ { s/, *"Asm"//; s/"Asm", *// }' $GPR
+                  if grep -q '"Asm"' $GPR; then
+                    echo "Failed to drop Asm language from $GPR" >&2
+                    exit 1
+                  fi
               tgt:
                 packageScript: muenInstallPackageTgt
           proof: *common_proof
@@ -84,7 +91,11 @@ multiPackage:
         buildVars: [MUEN_COMMON_VARIANT]
         buildScript: |
           muenBuild $1/muinterrupts/muinterrupts
-        multiPackage: *common_dev_tgt
+        multiPackage: &common_dev_tgt
+          dev:
+            packageScript: muenInstallPackageDev
+          tgt:
+            packageScript: muenInstallPackageTgt
 
       musinfo:
         buildVars: [MUEN_COMMON_VARIANT]

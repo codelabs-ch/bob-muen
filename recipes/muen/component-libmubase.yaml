@@ -24,7 +24,14 @@ multiPackage:
     multiPackage:
       dev:
         provideDeps: ['*-dev']
-        packageScript: muenInstallPackageDev
+        packageScript: |
+          muenInstallPackageDev
+          GPR=usr/share/gpr/libmubase.gpr
+          sed -i -E '/for Languages use/ { s/, *"Asm"//; s/"Asm", *// }' $GPR
+          if grep -q '"Asm"' $GPR; then
+            echo "Failed to drop Asm language from $GPR" >&2
+            exit 1
+          fi
       tgt:
         provideDeps: ['*-tgt']
         packageScript: muenInstallPackageTgt

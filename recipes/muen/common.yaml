@@ -63,9 +63,19 @@ multiPackage:
               muenBuild $1/${GPR_PATH}
             multiPackage: &common_dev_tgt
               dev:
-                packageScript: muenInstallPackageDev
+                packageScript: |
+                  muenInstallPackageDev
+                  if [ -f usr/share/gpr/muen_common.gpr ]; then
+                    sed -i 's/("Ada", "Asm")/("Ada")/' \
+                      usr/share/gpr/muen_common.gpr
+                  fi
               tgt:
-                packageScript: muenInstallPackageTgt
+                packageScript: |
+                  muenInstallPackageTgt
+                  if [ -f usr/share/gpr/muen_common.gpr ]; then
+                    sed -i 's/("Ada", "Asm")/("Ada")/' \
+                      usr/share/gpr/muen_common.gpr
+                  fi
           proof: *common_proof
       strings:
         depends:

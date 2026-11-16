@@ -24,7 +24,17 @@ multiPackage:
     multiPackage:
       dev:
         provideDeps: ['*-dev']
-        packageScript: muenInstallPackageDev
+        packageScript: |
+          muenInstallPackageDev
+          if [ -f usr/share/gpr/libmubase.gpr ]; then
+            sed -i 's/("Ada", "Asm")/("Ada")/' \
+              usr/share/gpr/libmubase.gpr
+          fi
       tgt:
         provideDeps: ['*-tgt']
-        packageScript: muenInstallPackageTgt
+        packageScript: |
+          muenInstallPackageTgt
+          if [ -f usr/share/gpr/libmubase.gpr ]; then
+            sed -i 's/("Ada", "Asm")/("Ada")/' \
+              usr/share/gpr/libmubase.gpr
+          fi

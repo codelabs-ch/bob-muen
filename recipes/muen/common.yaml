@@ -4,8 +4,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/common.git
-  branch: main
-  commit: 934925f7ac65f57dace95fd8a17e434f30605cd0
+  branch: misc-minor
+  commit: 6fe63902fcf4126f8b24e641aa6fcbeaf5de67d7
 
 multiPackage:
   gpr:

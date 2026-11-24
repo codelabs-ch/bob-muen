@@ -172,6 +172,12 @@ multiPackage:
               RTS_PLATFORM: "bare"
             depends:
               - muen::common-common-proof
+              - muen::common-crash_audit-proof
+              - muen::common-debug-proof
+              - muen::common-muinterrupts-proof
+              - muen::common-muschedinfo-proof
+              - muen::common-musinfo-proof
+              - muen::common-mutimedevents-proof
               - muen::common-strings-proof
 
               - muen::component-libs-libmusinfo-proof

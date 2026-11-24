@@ -24,26 +24,20 @@ multiPackage:
           - muen::common-common-dev
           - muen::common-strings-dev
           - muen::common-crash_audit-dev
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: |
-          muenBuild $1/debug/common_debug
-        multiPackage: &common_dev_tgt_provides
-          dev:
-            provideDeps: ['*-dev']
-            packageScript: muenInstallPackageDev
-          tgt:
-            provideDeps: ['*-tgt']
-            packageScript: muenInstallPackageTgt
-      crash_audit:
-        depends:
-          - muen::common-common-dev
         privateEnvironment:
-          GPR_PATH: "crash_audit/crash_audit"
+          GPR_PATH: "debug/common_debug"
         buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
-        multiPackage:
+        multiPackage: &common_provides_lib
           "":
-            buildScript: muenBuild $1/${GPR_PATH}
-            multiPackage: *common_dev_tgt_provides
+            buildScript: |
+              muenBuild $1/${GPR_PATH}
+            multiPackage:
+              dev:
+                provideDeps: ['*-dev']
+                packageScript: muenInstallPackageDev
+              tgt:
+                provideDeps: ['*-tgt']
+                packageScript: muenInstallPackageTgt
           proof: &common_proof
             inherit: [muen_proof]
             buildSetup: |
@@ -53,6 +47,13 @@ multiPackage:
               export LIB_DIR=$(pwd)/lib/
             buildScript: |
               muenProof
+      crash_audit:
+        depends:
+          - muen::common-common-dev
+        privateEnvironment:
+          GPR_PATH: "crash_audit/crash_audit"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage: *common_provides_lib
       common:
         privateEnvironment:
           GPR_PATH: "src/muen_common"
@@ -80,42 +81,37 @@ multiPackage:
         privateEnvironment:
           GPR_PATH: "strings/common_strings"
         buildVars: [GPR_PATH, MUEN_COMMON_VARIANT]
-        multiPackage:
+        multiPackage: *common_provides_lib
+
+      muinterrupts:
+        privateEnvironment:
+          GPR_PATH: "muinterrupts/muinterrupts"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage: &common_lib
           "":
             buildScript: |
               muenBuild $1/${GPR_PATH}
-            multiPackage: *common_dev_tgt_provides
+            multiPackage:
+              dev:
+                packageScript: muenInstallPackageDev
+              tgt:
+                packageScript: muenInstallPackageTgt
           proof: *common_proof
 
-      muinterrupts:
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: |
-          muenBuild $1/muinterrupts/muinterrupts
-        multiPackage: &common_dev_tgt
-          dev:
-            packageScript: muenInstallPackageDev
-          tgt:
-            packageScript: muenInstallPackageTgt
-
       musinfo:
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: |
-          muenBuild $1/musinfo/musinfo
-        multiPackage: *common_dev_tgt
+        privateEnvironment:
+          GPR_PATH: "musinfo/musinfo"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage: *common_lib
 
       muschedinfo:
-        buildVars: [MUEN_COMMON_VARIANT]
-        buildScript: |
-          muenBuild $1/muschedinfo/muschedinfo
-        multiPackage: *common_dev_tgt
+        privateEnvironment:
+          GPR_PATH: "muschedinfo/muschedinfo"
+        buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
+        multiPackage: *common_lib
 
       mutimedevents:
         privateEnvironment:
           GPR_PATH: "mutimedevents/mutimedevents"
         buildVars: [MUEN_COMMON_VARIANT, GPR_PATH]
-        multiPackage:
-          "":
-            buildScript: |
-              muenBuild $1/${GPR_PATH}
-            multiPackage: *common_dev_tgt
-          proof: *common_proof
+        multiPackage: *common_lib

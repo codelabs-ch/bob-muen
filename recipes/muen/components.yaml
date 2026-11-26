@@ -6,8 +6,8 @@ metaEnvironment:
 checkoutSCM:
   scm: git
   url: https://git.codelabs.ch/muen/components.git
-  branch: main
-  commit: 8b8fe571b949f8924378ff3cb0caad5aeeec738c
+  branch: t834
+  commit: c7a4b5c6e3f0abd5603e1c5c5613c56db10b4f55 
 
 environment:
   MUEN_COMMON_VARIANT: "component"
